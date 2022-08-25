@@ -1,0 +1,64 @@
+plugins {
+    id "maven-publish"
+    id 'java'
+}
+
+group 'co.nvqa'
+version '0.0.1'
+sourceCompatibility = JavaVersion.VERSION_1_8
+String qaRepoUsername = System.getenv("nvqaRepositoryUsername") ?
+        System.getenv("nvqaRepositoryUsername") :
+        "${defaultNvqaRepositoryUsername}"
+String qaRepoPassword = System.getenv("nvqaRepositoryPassword") ?
+        System.getenv("nvqaRepositoryPassword") :
+        "${defaultNvqaRepositoryPassword}"
+
+
+repositories {
+    mavenCentral()
+    maven {
+        url "http://nexus.qa.tech.nv/nexus/content/repositories/nvqa-release"
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId = "co.nvqa"
+            artifactId = "common-core"
+            version = version
+
+            from components.java
+
+            pom {
+                name = "NVQA Common Sort Library"
+                description = "Sort API and DB client library"
+                url = "https://bitbucket.ninjavan.co/projects/QA/repos/common-sort/browse"
+            }
+        }
+    }
+    repositories {
+        maven {
+            name = "nvqaRepository"
+            credentials {
+                username = qaRepoUsername
+                password = qaRepoPassword
+            }
+            url = "http://nexus.qa.tech.nv/nexus/content/repositories/nvqa-release"
+        }
+    }
+}
+
+dependencies {
+    compileOnly "org.projectlombok:lombok:1.18.24"
+    annotationProcessor "org.projectlombok:lombok:1.18.22"
+    implementation "co.nvqa:common-base:0.0.2"
+    implementation "co.nvqa:common-auth:0.0.1"
+    implementation "org.assertj:assertj-core:3.22.0"
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+}
+
+test {
+    useJUnitPlatform()
+}
