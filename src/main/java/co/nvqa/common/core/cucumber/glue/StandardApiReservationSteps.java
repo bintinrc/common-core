@@ -13,6 +13,7 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.Optional;
 
@@ -64,7 +65,7 @@ public class StandardApiReservationSteps extends StandardSteps<StandardScenarioM
     if (reservationRequest.getPickupInstruction() == null) {
       String generatedComments = f(
           "Please ignore this Automation test reservation. Created at %s by scenario \"%s\".",
-          DTF_CREATED_DATE.withZone(ZoneId.of("UTC")).format(LocalDateTime.now()), scenarioName);
+          DTF_CREATED_DATE.withZone(ZoneId.of("UTC")).format(ZonedDateTime.now()), scenarioName);
 
       if (generatedComments.length() > MAX_COMMENTS_LENGTH_ON_SHIPPER_PICKUP_PAGE) {
         generatedComments =
