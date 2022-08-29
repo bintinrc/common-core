@@ -14,6 +14,7 @@ import co.nvqa.commonauth.utils.TokenUtils;
 import io.cucumber.java.en.Given;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
@@ -51,7 +52,7 @@ public class StandardApiRouteSteps extends StandardSteps<StandardScenarioManager
     LocalDateTime routeDateForToday = CoreTestUtils.getRouteDateForToday();
 
     DateTimeFormatter utcDtf = DTF_NORMAL_DATETIME.withZone(ZoneId.of("UTC"));
-    String createdDate = DTF_CREATED_DATE.format(LocalDateTime.now());
+    String createdDate = DTF_CREATED_DATE.format(ZonedDateTime.now());
     String formattedRouteDate = utcDtf.format(routeDateForToday);
     String formattedRouteDateTime = utcDtf.format(routeDateForToday);
 
