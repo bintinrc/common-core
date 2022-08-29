@@ -6,13 +6,13 @@ import co.nvqa.common.core.model.reservation.ReservationRequest;
 import co.nvqa.common.core.model.reservation.ReservationResponse;
 import co.nvqa.common.cucumber.StandardScenarioManager;
 import co.nvqa.common.cucumber.glue.StandardSteps;
-import co.nvqa.common.model.address.Address;
 import co.nvqa.common.utils.StandardTestConstants;
 import co.nvqa.common.utils.StandardTestUtils;
 import co.nvqa.commonauth.utils.TokenUtils;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Map;
 import java.util.Optional;
 
@@ -40,32 +40,31 @@ public class StandardApiReservationSteps extends StandardSteps<StandardScenarioM
    * Sample:
    * <p>
    * Given API Operator create V2 reservation using data below: | reservationRequest | {
-   * "legacy_shipper_id":{shipper-v4-legacy-id}, "pickup_start_time":"{gradle-current-date-yyyy-MM-dd}T15:00:00{gradle-timezone-XXX}",
+   * "legacy_shipper_id":{shipper-v4-legacy-id}, "pickup_address_id":"{KEY_CREATED_ADDRESS.id}", "pickup_start_time":"{gradle-current-date-yyyy-MM-dd}T15:00:00{gradle-timezone-XXX}",
    * "pickup_end_time":"{gradle-current-date-yyyy-MM-dd}T18:00:00{gradle-timezone-XXX}" } |
    *
    * @param dataTableAsMap Map of data from feature file.
    */
-  @Given("API Operator create V2 reservation using data below:")
+  @Given("API Operator create reservation using data below:")
   public void apiOperatorCreateV2ReservationUsingDataBelow(Map<String, String> dataTableAsMap) {
     Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
-    Address createdAddress = get(KEY_CREATED_ADDRESS);
-    ReservationResponse reservationResult = apiOperatorCreateV2Reservation(createdAddress, resolvedDataTable);
+    String reservationRequestReplaced = StandardTestUtils.replaceTokens(resolvedDataTable.get("reservationRequest"),
+        StandardTestUtils.createDefaultTokens());
+    ReservationRequest reservationRequest = fromJson(getDefaultSnakeCaseMapper(),
+        reservationRequestReplaced, ReservationRequest.class);
+    ReservationResponse reservationResult = apiOperatorCreateV2Reservation(reservationRequest);
 
     putInList(KEY_LIST_OF_CREATED_RESERVATIONS, reservationResult);
   }
 
-  private ReservationResponse apiOperatorCreateV2Reservation(Address address,
-      Map<String, String> dataTableAsMap) {
+  private ReservationResponse apiOperatorCreateV2Reservation(ReservationRequest reservationRequest) {
     String scenarioName = getScenarioManager().getCurrentScenario().getName();
-    String reservationRequestReplaced = StandardTestUtils.replaceTokens(dataTableAsMap.get("reservationRequest"),
-        StandardTestUtils.createDefaultTokens());
-    ReservationRequest reservationRequest = fromJson(getDefaultSnakeCaseMapper(),
-        reservationRequestReplaced, ReservationRequest.class);
+
 
     if (reservationRequest.getPickupInstruction() == null) {
       String generatedComments = f(
           "Please ignore this Automation test reservation. Created at %s by scenario \"%s\".",
-          DTF_CREATED_DATE.format(LocalDateTime.now()), scenarioName);
+          DTF_CREATED_DATE.withZone(ZoneId.of("UTC")).format(LocalDateTime.now()), scenarioName);
 
       if (generatedComments.length() > MAX_COMMENTS_LENGTH_ON_SHIPPER_PICKUP_PAGE) {
         generatedComments =
@@ -78,8 +77,6 @@ public class StandardApiReservationSteps extends StandardSteps<StandardScenarioM
     reservationRequest.setPickupApproxVolume(
         Optional.ofNullable(reservationRequest.getPickupApproxVolume())
             .orElse("Less than 3 Parcels"));
-    reservationRequest.setPickupAddressId(
-        Optional.ofNullable(reservationRequest.getPickupAddressId()).orElse(address.getId()));
     reservationRequest.setPickupServiceType(
         Optional.ofNullable(reservationRequest.getPickupServiceType()).orElse("Scheduled"));
     reservationRequest.setPickupServiceLevel(
