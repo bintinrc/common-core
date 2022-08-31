@@ -102,7 +102,7 @@ public class StandardApiRouteSteps extends StandardSteps<StandardScenarioManager
 
     String addParcelToRouteRequestTemplate = resolvedDataTable.get("addParcelToRouteRequest");
     Long orderId = Long.valueOf(resolvedDataTable.get("orderId"));
-    final AddParcelToRouteRequest addParcelToRouteRequest = fromJson(
+    final AddParcelToRouteRequest addParcelToRouteRequest = fromJsonSnakeCase(
         addParcelToRouteRequestTemplate, AddParcelToRouteRequest.class);
     apiOperatorAddParcelToTheRoute(addParcelToRouteRequest, orderId);
   }
