@@ -1,6 +1,7 @@
 package co.nvqa.common.core.model.order;
 
 import co.nvqa.common.model.DataEntity;
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -444,6 +445,68 @@ public class Order extends DataEntity<Order> implements Serializable {
     public Dimension(String rawJson) {
       fromJson(rawJson);
     }
+  }
+
+  @Getter
+  @Setter
+  public static class InboundScan implements Serializable {
+
+    private String createdAt;
+    private Long hubId;
+    private String location;
+    private String result;
+    private Long routeId;
+    private String scannedBy;
+    private String type;
+    private Object scan;
+    private Object deletedAt;
+    private Long id;
+    private Object activeOrder;
+    private Object updatedAt;
+    private Object activeRoute;
+  }
+
+  @Setter
+  @Getter
+  public static class Transaction implements Serializable {
+
+    public static final String TYPE_PICKUP = "PICKUP";
+    public static final String TYPE_DELIVERY = "DELIVERY";
+    public static final String TYPE_PP = "PP";
+    public static final String TYPE_DD = "DD";
+
+    public static final String STATUS_PENDING = "pending";
+    public static final String STATUS_SUCCESS = "success";
+    public static final String STATUS_FAIL = "fail";
+
+    private Long distributionPointId;
+    private Long dnrId;
+    private String driverName;
+    private String email;
+    private String endTime;
+    private Long id;
+    private String instruction;
+    private String name;
+    private Long orderId;
+    private String address1;
+    private String address2;
+    private String postcode;
+    private Long routeId;
+    private String startTime;
+    private String status;
+    private Boolean transit;
+    private String type;
+    private Long waypointId;
+    private String dnr;
+    private String serviceEndTime;
+    private Long priorityLevel;
+    private Long routingZoneId;
+    private String comments;
+    private Order order;
+    private Integer seqNo;
+
+    @JsonAlias({"failure_reason_code", "failureReasonCode"})
+    private String failureReasonCode;
   }
 
   /**

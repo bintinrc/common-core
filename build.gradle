@@ -21,6 +21,11 @@ repositories {
     }
 }
 
+task sourcesJar(type: Jar) {
+    archiveClassifier = 'sources'
+    from sourceSets.main.allJava
+}
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
@@ -29,11 +34,11 @@ publishing {
             version = version
 
             from components.java
-
+            artifact sourcesJar
             pom {
-                name = "NVQA Common Sort Library"
+                name = "NVQA Common Core Library"
                 description = "Sort API and DB client library"
-                url = "https://bitbucket.ninjavan.co/projects/QA/repos/common-sort/browse"
+                url = "https://bitbucket.ninjavan.co/projects/QA/repos/common-core/browse"
             }
         }
     }
@@ -52,7 +57,7 @@ publishing {
 dependencies {
     compileOnly "org.projectlombok:lombok:1.18.24"
     annotationProcessor "org.projectlombok:lombok:1.18.22"
-    implementation "co.nvqa:common-base:0.0.2"
+    implementation "co.nvqa:common-base:0.0.3"
     implementation "co.nvqa:common-auth:0.0.1"
     implementation "org.assertj:assertj-core:3.22.0"
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
@@ -61,4 +66,8 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+task generateJavadoc(type: Javadoc) {
+    source = sourceSets.main.allJava
 }
