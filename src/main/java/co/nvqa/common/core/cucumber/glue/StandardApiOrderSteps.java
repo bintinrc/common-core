@@ -31,7 +31,9 @@ public class StandardApiOrderSteps extends StandardSteps<StandardScenarioManager
   @When("API Operator get order details for tracking order {string}")
   public void apiOperatorCreateV2ReservationUsingDataBelow(String tracking) {
     String trackingId = resolveValue(tracking);
-    Order order = getOrderClient().searchOrderByTrackingId(trackingId);
+    Order order = retryIfAssertionErrorOccurred(
+        () -> getOrderClient().searchOrderByTrackingId(trackingId),
+        "Order client search order by tracking id");
 
     putInList(KEY_LIST_OF_CREATED_ORDERS, order);
   }
