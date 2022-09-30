@@ -133,16 +133,17 @@ public class Order extends DataEntity<Order> implements Serializable {
   private ShipperRefMetadata shipperRefMetadata;
   private Double insurance;
   private Long parcelSizeId;
+  private List<PackageContent> packageContent;
 
   public enum Timeslot {
 
-    NIGHT("Night Slot (6PM - 10PM)", LocalTime.of(18, 00), LocalTime.of(22, 00), -3),
-    DAY("Day Slot (9AM - 6PM)", LocalTime.of(9, 00), LocalTime.of(18, 00), -2),
-    ALL_DAY("All Day (9AM - 10PM)", LocalTime.of(9, 00), LocalTime.of(22, 00), -1),
-    AM9_PM12("9AM - 12PM", LocalTime.of(9, 00), LocalTime.of(12, 00), 0),
-    PM12_PM3("12PM - 3PM", LocalTime.of(12, 00), LocalTime.of(15, 00), 1),
-    PM3_PM6("3PM - 6PM", LocalTime.of(15, 00), LocalTime.of(18, 00), 2),
-    PM6_PM10("6PM - 10PM", LocalTime.of(18, 00), LocalTime.of(22, 00), 3);
+    NIGHT("Night Slot (6PM - 10PM)", LocalTime.of(18, 0), LocalTime.of(22, 0), -3),
+    DAY("Day Slot (9AM - 6PM)", LocalTime.of(9, 0), LocalTime.of(18, 0), -2),
+    ALL_DAY("All Day (9AM - 10PM)", LocalTime.of(9, 0), LocalTime.of(22, 0), -1),
+    AM9_PM12("9AM - 12PM", LocalTime.of(9, 0), LocalTime.of(12, 0), 0),
+    PM12_PM3("12PM - 3PM", LocalTime.of(12, 0), LocalTime.of(15, 0), 1),
+    PM3_PM6("3PM - 6PM", LocalTime.of(15, 0), LocalTime.of(18, 0), 2),
+    PM6_PM10("6PM - 10PM", LocalTime.of(18, 0), LocalTime.of(22, 0), 3);
 
     private final String value;
     private final LocalTime startTime;
@@ -577,5 +578,14 @@ public class Order extends DataEntity<Order> implements Serializable {
       }
       return UNKNOWN;
     }
+  }
+
+  @Getter
+  @Setter
+  public static class PackageContent {
+
+    private String itemDescription;
+    private Boolean isDangerousGood;
+    private Integer quantity;
   }
 }
