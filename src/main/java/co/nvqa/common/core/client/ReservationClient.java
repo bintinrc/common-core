@@ -48,7 +48,7 @@ public class ReservationClient extends SimpleApiClient {
     String url = "reservation/2.0/reservations";
 
     RequestSpecification spec = createAuthenticatedRequest()
-        .queryParams(filter.createFilter());
+        .queryParams(filter.toQueryParam());
 
     Response r = doGet("Get Reservations V2", spec, url);
     r.then().contentType(ContentType.JSON);
@@ -56,7 +56,7 @@ public class ReservationClient extends SimpleApiClient {
       throw new NvTestHttpException("unexpected http status: " + r.statusCode());
     }
 
-    ReservationWrapper wrapper = fromJson(r.body().asString(), ReservationWrapper.class);
+    ReservationWrapper wrapper = fromJsonSnakeCase(r.body().asString(), ReservationWrapper.class);
     return wrapper.getData();
   }
 
