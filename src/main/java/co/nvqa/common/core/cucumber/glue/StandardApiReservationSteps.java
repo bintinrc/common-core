@@ -1,6 +1,8 @@
 package co.nvqa.common.core.cucumber.glue;
 
 import co.nvqa.common.core.client.ReservationClient;
+import co.nvqa.common.core.model.reservation.ReservationFilter;
+import co.nvqa.common.core.model.reservation.ReservationFilter.ReservationFilterBuilder;
 import co.nvqa.common.core.utils.CoreScenarioStorageKeys;
 import co.nvqa.common.core.model.reservation.ReservationRequest;
 import co.nvqa.common.core.model.reservation.ReservationResponse;
@@ -13,6 +15,7 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -25,15 +28,6 @@ public class StandardApiReservationSteps extends StandardSteps<StandardScenarioM
   @Override
   public void init() {
 
-  }
-
-  public ReservationClient getReservationClient() {
-    if (reservationClient == null) {
-      reservationClient = new ReservationClient(StandardTestConstants.API_BASE_URL,
-          TokenUtils.getOperatorAuthToken());
-    }
-
-    return reservationClient;
   }
 
   /**
@@ -111,5 +105,25 @@ public class StandardApiReservationSteps extends StandardSteps<StandardScenarioM
           () -> getReservationClient()
               .addReservationToRoute(routeId, reservationResultId),
           "add reservation to route ");
+  }
+
+  @When("API Operator get reservation from reservation id {string}")
+  public void apiOperatorGetReservationForId(String reservationIdString) {
+    final long reservationId = Long.parseLong(resolveValue(reservationIdString));
+    final ReservationFilter filter = ReservationFilter.builder()
+        .reservationId(reservationId)
+        .build();
+
+    final List<ReservationResponse> responses = getReservationClient().getReservations(filter);
+    put(KEY_LIST_OF_RESERVATIONS, responses);
+  }
+
+  private ReservationClient getReservationClient() {
+    if (reservationClient == null) {
+      reservationClient = new ReservationClient(StandardTestConstants.API_BASE_URL,
+          TokenUtils.getOperatorAuthToken());
+    }
+
+    return reservationClient;
   }
 }

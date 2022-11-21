@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'co.nvqa'
-version '0.0.3'
+version '1.0.1'
 sourceCompatibility = JavaVersion.VERSION_11
 String qaRepoUsername = System.getenv("nvqaRepositoryUsername") ?
         System.getenv("nvqaRepositoryUsername") :
@@ -17,7 +17,8 @@ String qaRepoPassword = System.getenv("nvqaRepositoryPassword") ?
 repositories {
     mavenCentral()
     maven {
-        url "http://nexus.qa.tech.nv/nexus/content/repositories/nvqa-release"
+        allowInsecureProtocol = true
+        url = "http://nexus3.qa.tech.nv/repository/nvqa-release/"
     }
 }
 
@@ -49,7 +50,8 @@ publishing {
                 username = qaRepoUsername
                 password = qaRepoPassword
             }
-            url = "http://nexus.qa.tech.nv/nexus/content/repositories/nvqa-release"
+            allowInsecureProtocol = true
+            url = "http://nexus3.qa.tech.nv/repository/nvqa-release/"
         }
     }
 }
@@ -57,8 +59,8 @@ publishing {
 dependencies {
     compileOnly "org.projectlombok:lombok:1.18.24"
     annotationProcessor "org.projectlombok:lombok:1.18.22"
-    implementation "co.nvqa:common-base:0.0.3"
-    implementation "co.nvqa:common-auth:0.0.1"
+    implementation "co.nvqa:common-base:1.0.5"
+    implementation "co.nvqa:common-auth:1.0.4"
     implementation "org.assertj:assertj-core:3.22.0"
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
