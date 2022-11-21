@@ -118,7 +118,7 @@ public class StandardApiReservationSteps extends StandardSteps<StandardScenarioM
     put(KEY_LIST_OF_RESERVATIONS, responses);
   }
 
-  public ReservationClient getReservationClient() {
+  private ReservationClient getReservationClient() {
     if (reservationClient == null) {
       reservationClient = new ReservationClient(StandardTestConstants.API_BASE_URL,
           TokenUtils.getOperatorAuthToken());

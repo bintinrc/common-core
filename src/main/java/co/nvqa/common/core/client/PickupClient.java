@@ -30,7 +30,7 @@ public class PickupClient extends SimpleApiClient {
     return fromJsonSnakeCaseToList(response.getBody().asString(), Pickup.class);
   }
 
-  public Response getPickupsRawResponse(PickupSearchRequest request) {
+  private Response getPickupsRawResponse(PickupSearchRequest request) {
     String url = "core/pickups/search";
     String json = toJsonSnakeCase(request);
 

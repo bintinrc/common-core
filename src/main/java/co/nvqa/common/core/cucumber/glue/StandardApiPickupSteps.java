@@ -28,7 +28,7 @@ public class StandardApiPickupSteps extends StandardSteps<StandardScenarioManage
     put(KEY_LIST_OF_PICKUPS, pickups);
   }
 
-  public PickupClient getPickupClient() {
+  private PickupClient getPickupClient() {
     if (pickupClient == null) {
       pickupClient = new PickupClient(StandardTestConstants.API_BASE_URL,
           TokenUtils.getOperatorAuthToken());
