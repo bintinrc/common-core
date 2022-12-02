@@ -1,13 +1,11 @@
 package co.nvqa.common.core.cucumber.glue;
 
 import co.nvqa.common.core.client.RouteClient;
+import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.model.route.AddParcelToRouteRequest;
 import co.nvqa.common.core.model.route.RouteRequest;
 import co.nvqa.common.core.model.route.RouteResponse;
-import co.nvqa.common.core.utils.CoreScenarioStorageKeys;
 import co.nvqa.common.core.utils.CoreTestUtils;
-import co.nvqa.common.cucumber.StandardScenarioManager;
-import co.nvqa.common.cucumber.glue.StandardSteps;
 import co.nvqa.common.utils.StandardTestConstants;
 import co.nvqa.common.utils.StandardTestUtils;
 import co.nvqa.commonauth.utils.TokenUtils;
@@ -18,23 +16,13 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
-public class StandardApiRouteSteps extends StandardSteps<StandardScenarioManager> implements
-    CoreScenarioStorageKeys {
+public class ApiRouteSteps extends CoreStandardSteps {
 
   private RouteClient routeClient;
 
   @Override
   public void init() {
 
-  }
-
-  public RouteClient getRouteClient() {
-    if (routeClient == null) {
-      routeClient = new RouteClient(StandardTestConstants.API_BASE_URL,
-          TokenUtils.getOperatorAuthToken());
-    }
-
-    return routeClient;
   }
 
   /**
@@ -45,7 +33,7 @@ public class StandardApiRouteSteps extends StandardSteps<StandardScenarioManager
    *
    * @param dataTableAsMap Map of data from feature file.
    */
-  @Given("API Operator create new route using data below:")
+  @Given("API Core - Operator create new route using data below:")
   public void apiOperatorCreateNewRouteUsingDataBelow(Map<String, String> dataTableAsMap) {
     String scenarioName = getScenarioManager().getCurrentScenario().getName();
 
@@ -82,7 +70,7 @@ public class StandardApiRouteSteps extends StandardSteps<StandardScenarioManager
       createRouteRequest.setHubId(get(KEY_DESTINATION_HUB_ID));
     }
 
-    RouteResponse createRouteResponse = getRouteClient().createRoute(createRouteRequest);
+    final RouteResponse createRouteResponse = getRouteClient().createRoute(createRouteRequest);
     putInList(KEY_LIST_OF_CREATED_ROUTES, createRouteResponse);
   }
 
@@ -96,16 +84,25 @@ public class StandardApiRouteSteps extends StandardSteps<StandardScenarioManager
    *
    * @param dataTableAsMap Map of data from feature file.
    */
-  @Given("API Operator add parcel to the route using data below:")
+  @Given("API Core - Operator add parcel to the route using data below:")
   public void apiOperatorAddParcelToTheRouteUsingDataBelow(Map<String, String> dataTableAsMap) {
-    Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
+    final Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
 
-    String addParcelToRouteRequestTemplate = resolvedDataTable.get("addParcelToRouteRequest");
-    Long orderId = Long.valueOf(resolvedDataTable.get("orderId"));
+    final String addParcelToRouteRequestTemplate = resolvedDataTable.get("addParcelToRouteRequest");
+    final long orderId = Long.parseLong(resolvedDataTable.get("orderId"));
     final AddParcelToRouteRequest addParcelToRouteRequest = fromJsonSnakeCase(
         addParcelToRouteRequestTemplate, AddParcelToRouteRequest.class);
     retryIfAssertionErrorOccurred(
         () -> getRouteClient().addParcelToRoute(orderId, addParcelToRouteRequest),
         "add parcel to route");
+  }
+
+  private RouteClient getRouteClient() {
+    if (routeClient == null) {
+      routeClient = new RouteClient(StandardTestConstants.API_BASE_URL,
+          TokenUtils.getOperatorAuthToken());
+    }
+
+    return routeClient;
   }
 }

@@ -1,13 +1,10 @@
 package co.nvqa.common.core.cucumber.glue;
 
 import co.nvqa.common.core.client.ReservationClient;
+import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.model.reservation.ReservationFilter;
-import co.nvqa.common.core.model.reservation.ReservationFilter.ReservationFilterBuilder;
-import co.nvqa.common.core.utils.CoreScenarioStorageKeys;
 import co.nvqa.common.core.model.reservation.ReservationRequest;
 import co.nvqa.common.core.model.reservation.ReservationResponse;
-import co.nvqa.common.cucumber.StandardScenarioManager;
-import co.nvqa.common.cucumber.glue.StandardSteps;
 import co.nvqa.common.utils.StandardTestConstants;
 import co.nvqa.common.utils.StandardTestUtils;
 import co.nvqa.commonauth.utils.TokenUtils;
@@ -19,8 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class StandardApiReservationSteps extends StandardSteps<StandardScenarioManager> implements
-    CoreScenarioStorageKeys {
+public class ApiReservationSteps extends CoreStandardSteps {
 
   public static final int MAX_COMMENTS_LENGTH_ON_SHIPPER_PICKUP_PAGE = 255;
   private ReservationClient reservationClient;
@@ -39,7 +35,7 @@ public class StandardApiReservationSteps extends StandardSteps<StandardScenarioM
    *
    * @param dataTableAsMap Map of data from feature file.
    */
-  @Given("API Operator create reservation using data below:")
+  @Given("API Core - Operator create reservation using data below:")
   public void apiOperatorCreateV2ReservationUsingDataBelow(Map<String, String> dataTableAsMap) {
     Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
     String reservationRequestReplaced = StandardTestUtils.replaceTokens(resolvedDataTable.get("reservationRequest"),
@@ -49,6 +45,39 @@ public class StandardApiReservationSteps extends StandardSteps<StandardScenarioM
     ReservationResponse reservationResult = apiOperatorCreateV2Reservation(reservationRequest);
 
     putInList(KEY_LIST_OF_CREATED_RESERVATIONS, reservationResult);
+  }
+
+  /**
+   * Sample:<p>
+   * <p>
+   * When API Operator add reservation pick-ups to the route using data below:<p>
+   * | reservationId | 111111 |<p>
+   * | routeId       | 222222 |<p>
+   * <p>
+   *
+   * @param dataTableAsMap Map of data from feature file.
+   */
+  @When("API Core - Operator add reservation pick-ups to the route using data below:")
+  public void apiOperatorAddReservationPickUpsToTheRoute(Map<String, String> dataTableAsMap) {
+    Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
+
+    final long reservationResultId = Long.parseLong(resolvedDataTable.get("reservationId"));
+    final long routeId = Long.parseLong(resolvedDataTable.get("routeId"));
+      retryIfAssertionErrorOrRuntimeExceptionOccurred(
+          () -> getReservationClient()
+              .addReservationToRoute(routeId, reservationResultId),
+          "add reservation to route ");
+  }
+
+  @When("API Core - Operator get reservation from reservation id {string}")
+  public void apiOperatorGetReservationForId(String reservationIdString) {
+    final long reservationId = Long.parseLong(resolveValue(reservationIdString));
+    final ReservationFilter filter = ReservationFilter.builder()
+        .reservationId(reservationId)
+        .build();
+
+    final List<ReservationResponse> responses = getReservationClient().getReservations(filter);
+    put(KEY_LIST_OF_RESERVATIONS, responses);
   }
 
   private ReservationResponse apiOperatorCreateV2Reservation(ReservationRequest reservationRequest) {
@@ -83,39 +112,6 @@ public class StandardApiReservationSteps extends StandardSteps<StandardScenarioM
         Optional.ofNullable(reservationRequest.getDisableCutoffValidation()).orElse(true));
 
     return getReservationClient().createReservation(reservationRequest);
-  }
-
-  /**
-   * Sample:<p>
-   * <p>
-   * When API Operator add reservation pick-ups to the route using data below:<p>
-   * | reservationId | 111111 |<p>
-   * | routeId       | 222222 |<p>
-   * <p>
-   *
-   * @param dataTableAsMap Map of data from feature file.
-   */
-  @When("API Operator add reservation pick-ups to the route using data below:")
-  public void apiOperatorAddReservationPickUpsToTheRoute(Map<String, String> dataTableAsMap) {
-    Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
-
-    final long reservationResultId = Long.parseLong(resolvedDataTable.get("reservationId"));
-    final long routeId = Long.parseLong(resolvedDataTable.get("routeId"));
-      retryIfAssertionErrorOrRuntimeExceptionOccurred(
-          () -> getReservationClient()
-              .addReservationToRoute(routeId, reservationResultId),
-          "add reservation to route ");
-  }
-
-  @When("API Operator get reservation from reservation id {string}")
-  public void apiOperatorGetReservationForId(String reservationIdString) {
-    final long reservationId = Long.parseLong(resolveValue(reservationIdString));
-    final ReservationFilter filter = ReservationFilter.builder()
-        .reservationId(reservationId)
-        .build();
-
-    final List<ReservationResponse> responses = getReservationClient().getReservations(filter);
-    put(KEY_LIST_OF_RESERVATIONS, responses);
   }
 
   private ReservationClient getReservationClient() {

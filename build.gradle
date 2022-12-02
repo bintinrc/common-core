@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'co.nvqa'
-version '1.0.1-riska'
+version '1.1.0-RC1'
 sourceCompatibility = JavaVersion.VERSION_11
 String qaRepoUsername = System.getenv("nvqaRepositoryUsername") ?
         System.getenv("nvqaRepositoryUsername") :
@@ -38,7 +38,7 @@ publishing {
             artifact sourcesJar
             pom {
                 name = "NVQA Common Core Library"
-                description = "Sort API and DB client library"
+                description = "Core API and DB client library"
                 url = "https://bitbucket.ninjavan.co/projects/QA/repos/common-core/browse"
             }
         }
@@ -59,8 +59,8 @@ publishing {
 dependencies {
     compileOnly "org.projectlombok:lombok:1.18.24"
     annotationProcessor "org.projectlombok:lombok:1.18.22"
-    implementation "co.nvqa:common-base:1.0.5"
-    implementation "co.nvqa:common-auth:1.0.4"
+    implementation "co.nvqa:common-base:1.1.0"
+    implementation "co.nvqa:common-auth:1.1.0"
     implementation "org.assertj:assertj-core:3.22.0"
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
