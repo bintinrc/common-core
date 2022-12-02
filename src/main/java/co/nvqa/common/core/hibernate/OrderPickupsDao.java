@@ -16,7 +16,7 @@ public class OrderPickupsDao extends DbBase {
   public List<OrderPickup> getOrderPickupByOrderId(Long orderId) {
     List<OrderPickup> results;
     String query = " FROM OrderPickup "
-        + "WHERE orderId = :orderI "
+        + "WHERE orderId = :orderId "
         + "AND reservationId IS NOT NULL "
         + "AND deletedAt IS NULL";
     results = findAll(session ->
