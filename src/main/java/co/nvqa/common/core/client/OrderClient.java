@@ -2,6 +2,7 @@ package co.nvqa.common.core.client;
 
 import co.nvqa.common.client.SimpleApiClient;
 import co.nvqa.common.constants.HttpConstants;
+import co.nvqa.common.core.model.route.AddParcelToRouteResponse;
 import co.nvqa.common.core.model.order.Order;
 import co.nvqa.common.core.model.order.Order.BillingZone;
 import co.nvqa.common.core.model.order.Order.Cod;
@@ -150,5 +151,31 @@ public class OrderClient extends SimpleApiClient {
     } catch (Exception ex) {
       throw new RuntimeException(ex);
     }
+  }
+
+  public AddParcelToRouteResponse putAddPickupToRoute(AddPickupToRouteRequest filter) {
+    String url = "reservation/2.0/reservations";
+
+    RequestSpecification spec = createAuthenticatedRequest()
+        .queryParams(filter.toQueryParam());
+
+    Response r = doPut("Core - Add Pickup To Route", spec, url);
+    r.then().contentType(ContentType.JSON);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+
+    AddParcelToRouteResponse response = fromJsonSnakeCase(r.body().asString(), AddParcelToRouteResponse.class);
+    return response;
+  }
+
+  private Response addPickupToRouteAsRawResponse(long orderId, AddPickupToRouteRequest addPickupToRouteRequest) {
+    String url = "core/orders/{orderId}/routes";
+    String json = toJsonSnakeCase(addPickupToRouteRequest);
+
+    RequestSpecification spec = createAuthenticatedRequest()
+        .pathParam("orderId", orderId)
+        .body(json);
+    return doPut("Core - Add Pickup To Route", spec, url);
   }
 }

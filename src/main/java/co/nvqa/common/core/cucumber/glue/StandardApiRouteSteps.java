@@ -104,17 +104,8 @@ public class StandardApiRouteSteps extends StandardSteps<StandardScenarioManager
     Long orderId = Long.valueOf(resolvedDataTable.get("orderId"));
     final AddParcelToRouteRequest addParcelToRouteRequest = fromJsonSnakeCase(
         addParcelToRouteRequestTemplate, AddParcelToRouteRequest.class);
-    apiOperatorAddParcelToTheRoute(addParcelToRouteRequest, orderId);
-  }
-
-  private void apiOperatorAddParcelToTheRoute(AddParcelToRouteRequest addParcelToRouteRequest,
-      Long orderId) {
-    final String methodInfo = f("%s - [Tracking ID = %s] - [Route ID = %d] - [Type = %s]",
-        getCurrentMethodName(), addParcelToRouteRequest.getTrackingId(),
-        addParcelToRouteRequest.getRouteId(), addParcelToRouteRequest.getType());
-
     retryIfAssertionErrorOccurred(
         () -> getRouteClient().addParcelToRoute(orderId, addParcelToRouteRequest),
-        methodInfo);
+        "add parcel to route");
   }
 }
