@@ -17,6 +17,14 @@ public class ApiPickupSteps extends CoreStandardSteps {
 
   }
 
+  /**
+   * <br/><b>Output key</b>: <ul><li>KEY_LIST_OF_PICKUPS: list of pickups</li></ul>
+   * <p>
+   * This method will read all the pickup in the given reservation id, and replace the previous
+   * value on the scenario storage
+   *
+   * @param reservationIdString key contains core's reservation id
+   */
   @When("API Core - Operator get pickup from reservation id {string}")
   public void getPickupFromReservationId(String reservationIdString) {
     final long reservationId = Long.parseLong(resolveValue(reservationIdString));
