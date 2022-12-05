@@ -63,4 +63,20 @@ public class RouteClient extends SimpleApiClient {
 
     return doPut("Operator Portal - Add Parcel to Route", spec, url);
   }
+
+  public Response archiveRouteV2AndGetRawResponse(long routeId) {
+    final String url = "route-v2/routes/{routeId}/archive-status?state=true";
+
+    RequestSpecification requestSpecification = createAuthenticatedRequest()
+        .pathParam("routeId", routeId);
+
+    return doPut("Operator API - Archive Route V2", requestSpecification, url);
+  }
+
+  public void archiveRouteV2(long routeId) {
+    Response r = archiveRouteV2AndGetRawResponse(routeId);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+  }
 }

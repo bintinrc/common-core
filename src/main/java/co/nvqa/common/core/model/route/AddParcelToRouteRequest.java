@@ -1,27 +1,16 @@
 package co.nvqa.common.core.model.route;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * @author Daniel Joi Partogi Hutapea
- * <p>
- * JSON format: snake case
- */
 @Setter
 @Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class AddParcelToRouteRequest {
 
-  private String trackingId;
-  private String type;
+  private String type; // DELIVERY / PICKUP
   private Long routeId;
-
-  public AddParcelToRouteRequest() {
-  }
-
-  public AddParcelToRouteRequest(String trackingId, String type, Long routeId) {
-    this.trackingId = trackingId;
-    this.type = type;
-    this.routeId = routeId;
-  }
 }
