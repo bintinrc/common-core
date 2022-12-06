@@ -3,6 +3,7 @@ package co.nvqa.common.core.cucumber.glue;
 import co.nvqa.common.core.client.OrderClient;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.model.order.Order;
+import co.nvqa.common.utils.JsonUtils;
 import co.nvqa.common.utils.NvTestRuntimeException;
 import co.nvqa.common.utils.StandardTestConstants;
 import co.nvqa.commonauth.utils.TokenUtils;
@@ -30,8 +31,8 @@ public class ApiOrderSteps extends CoreStandardSteps {
    */
   @When("API Core - Operator get order details for tracking order {string}")
   public void apiOperatorGetOrderDetailsForTrackingOrder(String tracking) {
-    String trackingId = resolveValue(tracking);
-    Order order = retryIfAssertionErrorOrRuntimeExceptionOccurred(
+    final String trackingId = resolveValue(tracking);
+    final Order order = retryIfAssertionErrorOrRuntimeExceptionOccurred(
         () -> getOrderClient().searchOrderByTrackingId(trackingId),
         "Order client search order by tracking id");
 
