@@ -9,9 +9,12 @@ import co.nvqa.common.utils.StandardTestConstants;
 import co.nvqa.commonauth.utils.TokenUtils;
 import io.cucumber.java.en.When;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ApiOrderSteps extends CoreStandardSteps {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(ApiOrderSteps.class);
   private OrderClient orderClient;
 
   @Override
