@@ -3,6 +3,7 @@ package co.nvqa.common.core.cucumber.glue;
 import co.nvqa.common.core.client.RouteClient;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.model.route.AddParcelToRouteRequest;
+import co.nvqa.common.core.model.route.AddPickupJobToRouteRequest;
 import co.nvqa.common.core.model.route.RouteRequest;
 import co.nvqa.common.core.model.route.RouteResponse;
 import co.nvqa.common.core.utils.CoreTestUtils;
@@ -95,6 +96,29 @@ public class ApiRouteSteps extends CoreStandardSteps {
     retryIfAssertionErrorOccurred(
         () -> getRouteClient().addParcelToRoute(orderId, addParcelToRouteRequest),
         "add parcel to route");
+  }
+
+  /**
+   * Sample:<p>
+   * <p>
+   * When API Core - Operator add pickup job to the route using data below:<p>
+   * | jobId | 1111 |<p>
+   * | addPickupJobToRouteRequest | {"new_route_id":95682687,"overwrite":false} |<p>
+   * <p>
+   *
+   * @param dataTableAsMap Map of data from feature file.
+   */
+  @Given("API Core - Operator add pickup job to the route using data below:")
+  public void apiOperatorAddPickupJobToTheRouteUsingDataBelow(Map<String, String> dataTableAsMap) {
+    final Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
+
+    final String addPickupJobToRouteRequestTemplate = resolvedDataTable.get("addPickupJobToRouteRequest");
+    final long jobId = Long.parseLong(resolvedDataTable.get("jobId"));
+    final AddPickupJobToRouteRequest addPickupJobToRouteRequest = fromJsonSnakeCase(
+        addPickupJobToRouteRequestTemplate, AddPickupJobToRouteRequest.class);
+    retryIfAssertionErrorOccurred(
+        () -> getRouteClient().addPickupJobToRoute(jobId, addPickupJobToRouteRequest),
+        "add pickup job to route");
   }
 
   private RouteClient getRouteClient() {

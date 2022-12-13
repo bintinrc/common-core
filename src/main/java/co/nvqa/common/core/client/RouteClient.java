@@ -3,6 +3,7 @@ package co.nvqa.common.core.client;
 import co.nvqa.common.client.SimpleApiClient;
 import co.nvqa.common.constants.HttpConstants;
 import co.nvqa.common.core.model.route.AddParcelToRouteRequest;
+import co.nvqa.common.core.model.route.AddPickupJobToRouteRequest;
 import co.nvqa.common.core.model.route.RouteRequest;
 import co.nvqa.common.core.model.route.RouteResponse;
 import co.nvqa.common.utils.NvTestHttpException;
@@ -78,5 +79,24 @@ public class RouteClient extends SimpleApiClient {
     if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
       throw new NvTestHttpException("unexpected http status: " + r.statusCode());
     }
+  }
+
+  public void addPickupJobToRoute(long jobId, AddPickupJobToRouteRequest addPickupJobToRouteRequest) {
+    final Response response = addPickupJobToRouteAndGetRawResponse(jobId, addPickupJobToRouteRequest);
+    response.then().contentType(ContentType.JSON);
+    if (response.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + response.statusCode());
+    }
+  }
+
+  private Response addPickupJobToRouteAndGetRawResponse(long jobId, AddPickupJobToRouteRequest addPickupJobToRouteRequest) {
+    final String url = "core/pickup-appointment-jobs/{jobId}/route";
+    final String json = toJson(DEFAULT_SNAKE_CASE_MAPPER, addPickupJobToRouteRequest);
+
+    final RequestSpecification spec = createAuthenticatedRequest()
+        .pathParam("jobId", jobId)
+        .body(json);
+
+    return doPut("Operator Portal - Add Pickup Job to Route", spec, url);
   }
 }
