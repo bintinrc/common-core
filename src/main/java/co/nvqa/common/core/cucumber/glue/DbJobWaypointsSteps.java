@@ -1,0 +1,40 @@
+package co.nvqa.common.core.cucumber.glue;
+
+import co.nvqa.common.core.cucumber.CoreStandardSteps;
+import co.nvqa.common.core.hibernate.JobWaypointDao;
+import co.nvqa.common.core.hibernate.OrderPickupsDao;
+import co.nvqa.common.core.model.persisted_class.JobWaypoint;
+import co.nvqa.common.core.model.persisted_class.OrderPickup;
+import co.nvqa.common.utils.NvTestRuntimeException;
+import io.cucumber.java.en.When;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class DbJobWaypointsSteps extends CoreStandardSteps {
+
+  private JobWaypointDao jobWaypointDao;
+
+  @Override
+  public void init() {
+    jobWaypointDao = new JobWaypointDao();
+  }
+
+  /**
+   * This method gets the waypoint_id if by job_id
+   *
+   * @param StringJobId KEY contains order id
+   */
+  @When("DB Core - get waypoint id for job id {string}")
+  public void getWaypointIdByJobId(String StringJobId) {
+    final long jobId = Long.parseLong(resolveValue(StringJobId));
+    final JobWaypoint jobWaypoint = retryIfAssertionErrorOrRuntimeExceptionOccurred(() -> {
+      final JobWaypoint result = jobWaypointDao.getWaypointIdByJobId(jobId);
+      if (result == null) {
+        throw new NvTestRuntimeException("waypoint is not found for job id " + jobId);
+      }
+      return result;
+    }, "reading job waypoint from job id: " + jobId);
+    put(KEY_WAY_POINT_ID, jobWaypoint.getWaypointId());
+  }
+}

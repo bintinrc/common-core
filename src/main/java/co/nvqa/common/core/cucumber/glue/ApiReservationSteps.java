@@ -78,6 +78,7 @@ public class ApiReservationSteps extends CoreStandardSteps {
 
     final List<ReservationResponse> responses = getReservationClient().getReservations(filter);
     put(KEY_LIST_OF_RESERVATIONS, responses);
+    put(KEY_WAY_POINT_ID, responses.get(0).getWaypointId());
   }
 
   private ReservationResponse apiOperatorCreateV2Reservation(ReservationRequest reservationRequest) {
