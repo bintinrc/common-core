@@ -35,6 +35,6 @@ public class DbJobWaypointsSteps extends CoreStandardSteps {
       }
       return result;
     }, "reading job waypoint from job id: " + jobId);
-    put(KEY_WAY_POINT_ID, jobWaypoint.getWaypointId());
+    put(KEY_WAYPOINT_ID, jobWaypoint.getWaypointId());
   }
 }
