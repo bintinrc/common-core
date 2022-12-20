@@ -6,6 +6,7 @@ import co.nvqa.common.core.model.route.AddParcelToRouteRequest;
 import co.nvqa.common.core.model.route.AddPickupJobToRouteRequest;
 import co.nvqa.common.core.model.route.RouteRequest;
 import co.nvqa.common.core.model.route.RouteResponse;
+import co.nvqa.common.core.model.waypoint.Waypoint;
 import co.nvqa.common.core.utils.CoreTestUtils;
 import co.nvqa.common.utils.StandardTestConstants;
 import co.nvqa.common.utils.StandardTestUtils;
@@ -15,6 +16,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 public class ApiRouteSteps extends CoreStandardSteps {
@@ -29,8 +33,9 @@ public class ApiRouteSteps extends CoreStandardSteps {
   /**
    * Sample:
    * <p>
-   * Given API Operator create new route using data below:
-   * | createRouteRequest | { "zoneId":{zone-id}, "hubId":{hub-id}, "vehicleId":{vehicle-id}, "driverId":{ninja-driver-id} } |
+   * Given API Operator create new route using data below: | createRouteRequest | {
+   * "zoneId":{zone-id}, "hubId":{hub-id}, "vehicleId":{vehicle-id}, "driverId":{ninja-driver-id} }
+   * |
    *
    * @param dataTableAsMap Map of data from feature file.
    */
@@ -78,9 +83,8 @@ public class ApiRouteSteps extends CoreStandardSteps {
   /**
    * Sample:<p>
    * <p>
-   * When API Operator add parcel to the route using data below:<p>
-   * | orderId | 111111 |<p>
-   * | addParcelToRouteRequest | {"tracking_id":"NVQASG","route_id":95139463,"type":"DELIVERY"} |<p>
+   * When API Operator add parcel to the route using data below:<p> | orderId | 111111 |<p> |
+   * addParcelToRouteRequest | {"tracking_id":"NVQASG","route_id":95139463,"type":"DELIVERY"} |<p>
    * <p>
    *
    * @param dataTableAsMap Map of data from feature file.
@@ -101,9 +105,8 @@ public class ApiRouteSteps extends CoreStandardSteps {
   /**
    * Sample:<p>
    * <p>
-   * When API Core - Operator add pickup job to the route using data below:<p>
-   * | jobId | 1111 |<p>
-   * | addPickupJobToRouteRequest | {"new_route_id":95682687,"overwrite":false} |<p>
+   * When API Core - Operator add pickup job to the route using data below:<p> | jobId | 1111 |<p> |
+   * addPickupJobToRouteRequest | {"new_route_id":95682687,"overwrite":false} |<p>
    * <p>
    *
    * @param dataTableAsMap Map of data from feature file.
@@ -112,13 +115,24 @@ public class ApiRouteSteps extends CoreStandardSteps {
   public void apiOperatorAddPickupJobToTheRouteUsingDataBelow(Map<String, String> dataTableAsMap) {
     final Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
 
-    final String addPickupJobToRouteRequestTemplate = resolvedDataTable.get("addPickupJobToRouteRequest");
+    final String addPickupJobToRouteRequestTemplate = resolvedDataTable
+        .get("addPickupJobToRouteRequest");
     final long jobId = Long.parseLong(resolvedDataTable.get("jobId"));
     final AddPickupJobToRouteRequest addPickupJobToRouteRequest = fromJsonSnakeCase(
         addPickupJobToRouteRequestTemplate, AddPickupJobToRouteRequest.class);
     retryIfAssertionErrorOccurred(
         () -> getRouteClient().addPickupJobToRoute(jobId, addPickupJobToRouteRequest),
         "add pickup job to route");
+  }
+
+  @Given("API Core - Operator update routed waypoint to pending")
+  public void operatorUpdateWaypointToPending(Map<String, String> dataTableAsMap) {
+    final String json = toJsonCamelCase(resolveKeyValues(dataTableAsMap));
+    final Waypoint waypoint = fromJsonCamelCase(json, Waypoint.class);
+    final List<Waypoint> request = Collections.singletonList(waypoint);
+    retryIfAssertionErrorOccurred(
+        () -> getRouteClient().updateWaypointToPending(request),
+        "set routed waypoint to pending");
   }
 
   private RouteClient getRouteClient() {
