@@ -8,6 +8,8 @@ import co.nvqa.commonauth.utils.TokenUtils;
 import io.cucumber.guice.ScenarioScoped;
 import io.cucumber.java.After;
 import java.util.List;
+import javax.inject.Inject;
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,6 +18,7 @@ public class HookSteps extends CoreStandardSteps {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(HookSteps.class);
 
+  @Inject @Getter
   private RouteClient routeClient;
 
   @Override
@@ -36,14 +39,4 @@ public class HookSteps extends CoreStandardSteps {
       }
     });
   }
-
-  private RouteClient getRouteClient() {
-    if (routeClient == null) {
-      routeClient = new RouteClient(StandardTestConstants.API_BASE_URL,
-          TokenUtils.getOperatorAuthToken());
-    }
-
-    return routeClient;
-  }
-
 }

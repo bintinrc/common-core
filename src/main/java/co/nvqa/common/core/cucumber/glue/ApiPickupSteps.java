@@ -7,9 +7,12 @@ import co.nvqa.common.utils.StandardTestConstants;
 import co.nvqa.commonauth.utils.TokenUtils;
 import io.cucumber.java.en.When;
 import java.util.List;
+import javax.inject.Inject;
+import lombok.Getter;
 
 public class ApiPickupSteps extends CoreStandardSteps {
 
+  @Inject @Getter
   private PickupClient pickupClient;
 
   @Override
@@ -30,14 +33,5 @@ public class ApiPickupSteps extends CoreStandardSteps {
     final long reservationId = Long.parseLong(resolveValue(reservationIdString));
     final List<Pickup> pickups = getPickupClient().getPickups(reservationId);
     put(KEY_LIST_OF_PICKUPS, pickups);
-  }
-
-  private PickupClient getPickupClient() {
-    if (pickupClient == null) {
-      pickupClient = new PickupClient(StandardTestConstants.API_BASE_URL,
-          TokenUtils.getOperatorAuthToken());
-    }
-
-    return pickupClient;
   }
 }

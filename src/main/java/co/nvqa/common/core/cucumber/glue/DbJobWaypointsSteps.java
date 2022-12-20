@@ -10,14 +10,15 @@ import io.cucumber.java.en.When;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.inject.Inject;
 
 public class DbJobWaypointsSteps extends CoreStandardSteps {
 
+  @Inject
   private JobWaypointDao jobWaypointDao;
 
   @Override
   public void init() {
-    jobWaypointDao = new JobWaypointDao();
   }
 
   /**

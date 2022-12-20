@@ -8,6 +8,8 @@ import co.nvqa.common.utils.NvTestRuntimeException;
 import co.nvqa.common.utils.StandardTestConstants;
 import co.nvqa.commonauth.utils.TokenUtils;
 import io.cucumber.java.en.When;
+import javax.inject.Inject;
+import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +17,8 @@ import org.slf4j.LoggerFactory;
 public class ApiOrderSteps extends CoreStandardSteps {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ApiOrderSteps.class);
+
+  @Inject @Getter
   private OrderClient orderClient;
 
   @Override
@@ -82,14 +86,5 @@ public class ApiOrderSteps extends CoreStandardSteps {
       LOGGER.warn(
           "failed to get the order with the expected granular status! cause: " + ex.getMessage());
     }
-  }
-
-  private OrderClient getOrderClient() {
-    if (orderClient == null) {
-      orderClient = new OrderClient(StandardTestConstants.API_BASE_URL,
-          TokenUtils.getOperatorAuthToken());
-    }
-
-    return orderClient;
   }
 }

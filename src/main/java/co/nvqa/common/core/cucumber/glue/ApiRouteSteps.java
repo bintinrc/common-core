@@ -20,9 +20,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import javax.inject.Inject;
+import lombok.Getter;
 
 public class ApiRouteSteps extends CoreStandardSteps {
 
+  @Inject @Getter
   private RouteClient routeClient;
 
   @Override
@@ -133,14 +136,5 @@ public class ApiRouteSteps extends CoreStandardSteps {
     retryIfAssertionErrorOccurred(
         () -> getRouteClient().updateWaypointToPending(request),
         "set routed waypoint to pending");
-  }
-
-  private RouteClient getRouteClient() {
-    if (routeClient == null) {
-      routeClient = new RouteClient(StandardTestConstants.API_BASE_URL,
-          TokenUtils.getOperatorAuthToken());
-    }
-
-    return routeClient;
   }
 }

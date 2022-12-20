@@ -7,14 +7,15 @@ import co.nvqa.common.utils.NvTestRuntimeException;
 import io.cucumber.java.en.When;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.inject.Inject;
 
 public class DbOrderPickupsSteps extends CoreStandardSteps {
 
+  @Inject
   private OrderPickupsDao orderPickupsDao;
 
   @Override
   public void init() {
-    orderPickupsDao = new OrderPickupsDao();
   }
 
   /**
