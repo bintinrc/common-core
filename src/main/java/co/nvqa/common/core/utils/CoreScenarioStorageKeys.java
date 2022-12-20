@@ -11,4 +11,6 @@ public interface CoreScenarioStorageKeys {
 
   String KEY_WAYPOINT_ID = "KEY_WAYPOINT_ID";
   String KEY_LIST_OF_RESERVATIONS = "KEY_LIST_OF_RESERVATIONS";
+
+  String KEY_SAVED_ORDER_WEIGHT = "KEY_SAVED_ORDER_WEIGHT";
 }
