@@ -24,7 +24,6 @@ public class OrderDao extends DbBase {
             .setParameter("orderId", orderId));
     if (orders != null && !orders.isEmpty()) {
       result = orders.get(0).getWeight();
-      System.out.println("test order null");
       return result;
     } else {
       throw new NvTestRuntimeException("order record is not found for order " + orderId);
