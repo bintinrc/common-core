@@ -18,19 +18,16 @@ import lombok.Setter;
 public class Order {
 
   @Id
-  @Column(name = "id")
   private Long id;
 
   @Column(name = "tracking_id")
   private String trackingId;
 
-  @Column(name = "status")
   private String status;
 
   @Column(name = "granular_status")
   private String granularStatus;
 
-  @Column(name = "weight")
   private Double weight;
 
   @Column(name = "deleted_at")

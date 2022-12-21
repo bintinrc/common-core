@@ -2,14 +2,8 @@ package co.nvqa.common.core.cucumber.glue;
 
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.hibernate.OrderDao;
-import co.nvqa.common.core.hibernate.OrderPickupsDao;
-import co.nvqa.common.core.model.persisted_class.OrderPickup;
-import co.nvqa.common.utils.NvTestRuntimeException;
 import io.cucumber.java.en.Given;
-import io.cucumber.java.en.When;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.assertj.core.api.Assertions;
 
@@ -35,7 +29,7 @@ public class DbCoreSteps extends CoreStandardSteps {
         Assertions.assertThat(actualWeight).as("orders.weight equals highest weight")
             .isEqualTo(expectedWeight);
         put(KEY_SAVED_ORDER_WEIGHT, actualWeight);
-      }, String.format("Get orders.weight of id %s ", orderId), 1000, 30);
+      }, f("Get orders.weight of id %s ", orderId), 10_000, 3);
     }
   }
 
@@ -55,6 +49,6 @@ public class DbCoreSteps extends CoreStandardSteps {
       Assertions.assertThat(actualWeight <= higherBound)
           .as("Order weight should be lover than " + expectedWeight + " - 0").isTrue();
       put(KEY_SAVED_ORDER_WEIGHT, actualWeight);
-    }, String.format("get orders weight of order id %s", orderId));
+    }, f("get orders weight of order id %s", orderId), 10_000, 3);
   }
 }
