@@ -15,10 +15,13 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import javax.inject.Inject;
+import lombok.Getter;
 
 public class ApiReservationSteps extends CoreStandardSteps {
 
   public static final int MAX_COMMENTS_LENGTH_ON_SHIPPER_PICKUP_PAGE = 255;
+  @Inject @Getter
   private ReservationClient reservationClient;
 
   @Override
@@ -112,14 +115,5 @@ public class ApiReservationSteps extends CoreStandardSteps {
         Optional.ofNullable(reservationRequest.getDisableCutoffValidation()).orElse(true));
 
     return getReservationClient().createReservation(reservationRequest);
-  }
-
-  private ReservationClient getReservationClient() {
-    if (reservationClient == null) {
-      reservationClient = new ReservationClient(StandardTestConstants.API_BASE_URL,
-          TokenUtils.getOperatorAuthToken());
-    }
-
-    return reservationClient;
   }
 }

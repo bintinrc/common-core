@@ -5,7 +5,9 @@ import co.nvqa.common.core.utils.CoreTestConstants;
 import co.nvqa.common.database.DbBase;
 import co.nvqa.common.utils.StandardTestConstants;
 import java.util.List;
+import javax.inject.Singleton;
 
+@Singleton
 public class OrderPickupsDao extends DbBase {
 
   public OrderPickupsDao() {

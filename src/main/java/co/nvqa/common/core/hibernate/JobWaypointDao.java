@@ -7,7 +7,9 @@ import co.nvqa.common.database.DbBase;
 import co.nvqa.common.utils.StandardTestConstants;
 
 import java.util.List;
+import javax.inject.Singleton;
 
+@Singleton
 public class JobWaypointDao extends DbBase {
 
   public JobWaypointDao() {

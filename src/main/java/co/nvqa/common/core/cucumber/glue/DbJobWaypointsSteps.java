@@ -2,22 +2,19 @@ package co.nvqa.common.core.cucumber.glue;
 
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.hibernate.JobWaypointDao;
-import co.nvqa.common.core.hibernate.OrderPickupsDao;
 import co.nvqa.common.core.model.persisted_class.JobWaypoint;
-import co.nvqa.common.core.model.persisted_class.OrderPickup;
 import co.nvqa.common.utils.NvTestRuntimeException;
 import io.cucumber.java.en.When;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import javax.inject.Inject;
 
 public class DbJobWaypointsSteps extends CoreStandardSteps {
 
+  @Inject
   private JobWaypointDao jobWaypointDao;
 
   @Override
   public void init() {
-    jobWaypointDao = new JobWaypointDao();
   }
 
   /**

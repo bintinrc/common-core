@@ -6,10 +6,12 @@ import co.nvqa.common.core.model.route.AddParcelToRouteRequest;
 import co.nvqa.common.core.model.route.AddPickupJobToRouteRequest;
 import co.nvqa.common.core.model.route.RouteRequest;
 import co.nvqa.common.core.model.route.RouteResponse;
+import co.nvqa.common.core.model.waypoint.Waypoint;
 import co.nvqa.common.utils.NvTestHttpException;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import java.util.List;
 import java.util.TimeZone;
 
 public class RouteClient extends SimpleApiClient {
@@ -81,15 +83,18 @@ public class RouteClient extends SimpleApiClient {
     }
   }
 
-  public void addPickupJobToRoute(long jobId, AddPickupJobToRouteRequest addPickupJobToRouteRequest) {
-    final Response response = addPickupJobToRouteAndGetRawResponse(jobId, addPickupJobToRouteRequest);
+  public void addPickupJobToRoute(long jobId,
+      AddPickupJobToRouteRequest addPickupJobToRouteRequest) {
+    final Response response = addPickupJobToRouteAndGetRawResponse(jobId,
+        addPickupJobToRouteRequest);
     response.then().contentType(ContentType.JSON);
     if (response.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
       throw new NvTestHttpException("unexpected http status: " + response.statusCode());
     }
   }
 
-  private Response addPickupJobToRouteAndGetRawResponse(long jobId, AddPickupJobToRouteRequest addPickupJobToRouteRequest) {
+  private Response addPickupJobToRouteAndGetRawResponse(long jobId,
+      AddPickupJobToRouteRequest addPickupJobToRouteRequest) {
     final String url = "core/pickup-appointment-jobs/{jobId}/route";
     final String json = toJson(DEFAULT_SNAKE_CASE_MAPPER, addPickupJobToRouteRequest);
 
@@ -98,5 +103,25 @@ public class RouteClient extends SimpleApiClient {
         .body(json);
 
     return doPut("Operator Portal - Add Pickup Job to Route", spec, url);
+  }
+
+  public Response updateWaypointToPendingAndGetRawResponse(
+      List<Waypoint> request) {
+    final String url = "core/waypoints";
+    final String json = toJson(request);
+
+    final RequestSpecification spec = createAuthenticatedRequest()
+        .body(json);
+
+    return doPut("Operator Portal - Update Routed Waypoint to Pending", spec, url);
+  }
+
+  public List<Waypoint> updateWaypointToPending(List<Waypoint> request) {
+    final Response response = updateWaypointToPendingAndGetRawResponse(request);
+    response.then().contentType(ContentType.JSON);
+    if (response.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + response.statusCode());
+    }
+    return fromJsonSnakeCaseToList(response.getBody().asString(), Waypoint.class);
   }
 }
