@@ -60,8 +60,8 @@ publishing {
 dependencies {
     compileOnly "org.projectlombok:lombok:1.18.24"
     annotationProcessor "org.projectlombok:lombok:1.18.22"
-    implementation "co.nvqa:common-base:1.1.8"
-    implementation "co.nvqa:common-auth:1.1.1"
+    implementation "co.nvqa:common-base:1.2.0"
+    implementation "co.nvqa:common-auth:1.2.0"
     implementation "org.assertj:assertj-core:3.22.0"
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
