@@ -66,7 +66,7 @@ public class OrderClient extends SimpleApiClient {
 
   public void forceSuccess(long orderId, boolean codCollected) {
     Response r = forceSuccessAsRawResponse(orderId, codCollected);
-    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+    if (r.statusCode() != HttpConstants.RESPONSE_204_NO_CONTENT) {
       throw new NvTestHttpException("unexpected http status: " + r.statusCode());
     }
   }
