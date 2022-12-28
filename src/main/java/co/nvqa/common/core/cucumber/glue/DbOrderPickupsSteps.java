@@ -32,7 +32,8 @@ public class DbOrderPickupsSteps extends CoreStandardSteps {
         throw new NvTestRuntimeException("pickup is not found for order " + orderId);
       }
       return result;
-    }, "reading pickup from order id: " + orderId);
+    }, "reading pickup from order id: " + orderId, 3000, 30);
+    // the delay is 3sec * 30 = 1.5 mins, because core sometimes is very slow
     put(KEY_LIST_OF_RESERVATION_IDS,
         orderPickups.stream()
             .map(OrderPickup::getReservationId)
