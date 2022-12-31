@@ -37,6 +37,24 @@ public class OrderClient extends SimpleApiClient {
     return searchOrder(searchOrderRequest, true);
   }
 
+  public Order searchOrder(SearchOrderRequest searchOrderRequest, boolean completeDetails) {
+    Response r = searchOrderAndGetRawResponse(searchOrderRequest);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+
+    SearchOrderResponse result = fromJson(r.body().asString(), SearchOrderResponse.class);
+
+    if (result.getCount() == 0) {
+      throw new AssertionError("Order not found!");
+    } else if (completeDetails) {
+      long orderId = result.getOrders().get(0).getId();
+      return getOrder(orderId);
+    } else {
+      return result.getOrders().get(0);
+    }
+  }
+
   public Response searchOrderAndGetRawResponse(SearchOrderRequest searchOrderRequest) {
     String url = "core/2.1/orders/search";
     String json = toJson(searchOrderRequest);
@@ -148,24 +166,6 @@ public class OrderClient extends SimpleApiClient {
       return order;
     } catch (Exception ex) {
       throw new RuntimeException(ex);
-    }
-  }
-
-  private Order searchOrder(SearchOrderRequest searchOrderRequest, boolean completeDetails) {
-    Response r = searchOrderAndGetRawResponse(searchOrderRequest);
-    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
-      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
-    }
-
-    SearchOrderResponse result = fromJson(r.body().asString(), SearchOrderResponse.class);
-
-    if (result.getCount() == 0) {
-      throw new AssertionError("Order not found!");
-    } else if (completeDetails) {
-      long orderId = result.getOrders().get(0).getId();
-      return getOrder(orderId);
-    } else {
-      return result.getOrders().get(0);
     }
   }
 }
