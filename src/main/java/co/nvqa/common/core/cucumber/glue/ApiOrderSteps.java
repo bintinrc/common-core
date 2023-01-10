@@ -87,4 +87,28 @@ public class ApiOrderSteps extends CoreStandardSteps {
           "failed to get the order with the expected granular status! cause: " + ex.getMessage());
     }
   }
+
+  /**
+   * API Core - Operator force success order "{KEY_LIST_OF_CREATED_ORDERS[1].id}"
+   *
+   * @param orderIdString example: {KEY_LIST_OF_CREATED_ORDERS[1].id}
+   */
+  @When("API Core - Operator force success order {string}")
+  public void apiOperatorForceSuccessOrder(String orderIdString) {
+    apiOperatorForceSuccessOrder(orderIdString, "true");
+  }
+
+  /**
+   * API Core - Operator force success order "{KEY_LIST_OF_CREATED_ORDERS[1].id}" with cod collected
+   * "false"
+   *
+   * @param orderIdString      example: {KEY_LIST_OF_CREATED_ORDERS[1].id}
+   * @param codCollectedString example: false
+   */
+  @When("API Core - Operator force success order {string} with cod collected {string}")
+  public void apiOperatorForceSuccessOrder(String orderIdString, String codCollectedString) {
+    final long orderId = Long.parseLong(resolveValue(orderIdString));
+    final boolean codCollected = Boolean.parseBoolean(codCollectedString);
+    retryIfAssertionErrorOrRuntimeExceptionOccurred(() -> getOrderClient().forceSuccess(orderId, codCollected), "Force success", 3000, 10);
+  }
 }

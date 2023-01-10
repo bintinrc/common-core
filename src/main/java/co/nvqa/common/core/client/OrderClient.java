@@ -82,6 +82,23 @@ public class OrderClient extends SimpleApiClient {
     return doGet("Core - Get Order", spec, url);
   }
 
+  public void forceSuccess(long orderId, boolean codCollected) {
+    Response r = forceSuccessAsRawResponse(orderId, codCollected);
+    if (r.statusCode() != HttpConstants.RESPONSE_204_NO_CONTENT) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+  }
+
+  public Response forceSuccessAsRawResponse(long orderId, boolean codCollected) {
+    String url = "core/orders/{orderId}/forcesuccess";
+    RequestSpecification spec = createAuthenticatedRequest(false)
+        .pathParam("orderId", orderId)
+        .param("codcollected", codCollected)
+        .param("reason", "FORCE_SUCCESS_QA_AUTO");
+
+    return doPut("Core - Force Success Order", spec, url);
+  }
+
   private Order convertJsonOrder(String jsonOrder) {
     try {
       JsonNode orderNode = mapper.readTree(jsonOrder);

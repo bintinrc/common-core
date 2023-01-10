@@ -67,18 +67,30 @@ public class RouteClient extends SimpleApiClient {
     return doPut("Operator Portal - Add Parcel to Route", spec, url);
   }
 
-  public Response archiveRouteV2AndGetRawResponse(long routeId) {
-    final String url = "route-v2/routes/{routeId}/archive-status?state=true";
+  public void archiveRoute(long routeId) {
+    Response r = archiveRouteAndGetRawResponse(routeId);
+    if (r.statusCode() != HttpConstants.RESPONSE_204_NO_CONTENT) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+  }
+
+  public Response archiveRouteAndGetRawResponse(long routeId) {
+    final String url = "route-v2/routes/{routeId}/archive";
 
     RequestSpecification requestSpecification = createAuthenticatedRequest()
         .pathParam("routeId", routeId);
 
-    return doPut("Operator API - Archive Route V2", requestSpecification, url);
+    return doPut("Operator API - Archive Route", requestSpecification, url);
   }
 
-  public void archiveRouteV2(long routeId) {
-    Response r = archiveRouteV2AndGetRawResponse(routeId);
-    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+  public void unArchiveRoute(long routeId) {
+    final String url = "route-v2/routes/{routeId}/unarchive";
+
+    RequestSpecification requestSpecification = createAuthenticatedRequest()
+        .pathParam("routeId", routeId);
+
+    Response r = doPut("Operator API - Un-archive Route", requestSpecification, url);
+    if (r.statusCode() != HttpConstants.RESPONSE_204_NO_CONTENT) {
       throw new NvTestHttpException("unexpected http status: " + r.statusCode());
     }
   }

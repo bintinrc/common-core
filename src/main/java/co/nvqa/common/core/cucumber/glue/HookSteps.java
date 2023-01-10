@@ -3,8 +3,6 @@ package co.nvqa.common.core.cucumber.glue;
 import co.nvqa.common.core.client.RouteClient;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.model.route.RouteResponse;
-import co.nvqa.common.utils.StandardTestConstants;
-import co.nvqa.commonauth.utils.TokenUtils;
 import io.cucumber.guice.ScenarioScoped;
 import io.cucumber.java.After;
 import java.util.List;
@@ -32,7 +30,7 @@ public class HookSteps extends CoreStandardSteps {
 
     routes.forEach(r -> {
       try {
-        getRouteClient().archiveRouteV2(r.getId());
+        getRouteClient().archiveRoute(r.getId());
         LOGGER.debug("Route ID = {} archived successfully", r.getId());
       } catch (Throwable t) {
         LOGGER.warn("error to archive route: " + t.getMessage());
