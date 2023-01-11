@@ -12,14 +12,17 @@ import co.nvqa.common.utils.StandardTestConstants;
 import co.nvqa.common.utils.StandardTestUtils;
 import co.nvqa.commonauth.utils.TokenUtils;
 import io.cucumber.java.en.Given;
+import io.cucumber.java.en.When;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import lombok.Getter;
 
@@ -136,5 +139,22 @@ public class ApiRouteSteps extends CoreStandardSteps {
     retryIfAssertionErrorOccurred(
         () -> getRouteClient().updateWaypointToPending(request),
         "set routed waypoint to pending");
+  }
+
+  /**
+   * Sample:<p>
+   * <p>
+   * Given API Core - Operator archives routes below:<p> | {KEY_CREATED_ROUTE_ID} |
+   * <p>
+   *
+   * @param routeIds
+   */
+  @When("API Core - Operator archives routes below:")
+  public void operatorArchivesRoutes(List<String> routeIds) {
+    routeIds = resolveValues(routeIds);
+    List<Long>ids = routeIds.stream().map(Long::parseLong).collect(Collectors.toList());
+    retryIfAssertionErrorOrRuntimeExceptionOccurred(
+        () -> getRouteClient().archiveRoutes(ids),
+        "Archive route",1000,2);
   }
 }

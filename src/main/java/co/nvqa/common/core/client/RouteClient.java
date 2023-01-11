@@ -74,6 +74,12 @@ public class RouteClient extends SimpleApiClient {
     }
   }
 
+  public void archiveRoutes(List<Long> routeIds) {
+    for (long routeId : routeIds) {
+      archiveRoute(routeId);
+    }
+  }
+
   public Response archiveRouteAndGetRawResponse(long routeId) {
     final String url = "route-v2/routes/{routeId}/archive";
 
