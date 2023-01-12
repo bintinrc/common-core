@@ -142,8 +142,8 @@ public class ApiRouteSteps extends CoreStandardSteps {
   /**
    * Sample:<p>
    * <p>
-   * Given API Core - Operator archives routes below:<p> | {KEY_CREATED_ROUTE_ID} |
-   * <p>
+   * Given API Core - Operator archives routes below:<p> | {KEY_LIST_OF_CREATED_ROUTES[1].id} |
+   * <p> | {KEY_LIST_OF_CREATED_ROUTES[2].id} | <p>
    *
    * @param routeIds
    */
