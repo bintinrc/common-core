@@ -8,11 +8,10 @@ import co.nvqa.common.core.model.route.RouteRequest;
 import co.nvqa.common.core.model.route.RouteResponse;
 import co.nvqa.common.core.model.waypoint.Waypoint;
 import co.nvqa.common.core.utils.CoreTestUtils;
-import co.nvqa.common.utils.StandardTestConstants;
 import co.nvqa.common.utils.StandardTestUtils;
-import co.nvqa.commonauth.utils.TokenUtils;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
+import io.restassured.response.Response;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -23,10 +22,12 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import lombok.Getter;
+import org.assertj.core.api.Assertions;
 
 public class ApiRouteSteps extends CoreStandardSteps {
 
-  @Inject @Getter
+  @Inject
+  @Getter
   private RouteClient routeClient;
 
   @Override
@@ -147,12 +148,49 @@ public class ApiRouteSteps extends CoreStandardSteps {
    *
    * @param routeIds
    */
-  @When("API Core - Operator archives routes below:")
+  @When("API Route - Operator archives routes below:")
   public void operatorArchivesRoutes(List<String> routeIds) {
     routeIds = resolveValues(routeIds);
-    List<Long>ids = routeIds.stream().map(Long::parseLong).collect(Collectors.toList());
+    List<Long> ids = routeIds.stream().map(Long::parseLong).collect(Collectors.toList());
     retryIfAssertionErrorOrRuntimeExceptionOccurred(
         () -> getRouteClient().archiveRoutes(ids),
-        "Archive route",1000,2);
+        "Archive route", 1000, 5);
+  }
+
+  @When("API Route - Operator unarchives routes below:")
+  public void operatorUnarchivesRoutes(List<String> routeIds) {
+    routeIds = resolveValues(routeIds);
+    List<Long> ids = routeIds.stream().map(Long::parseLong).collect(Collectors.toList());
+    retryIfAssertionErrorOrRuntimeExceptionOccurred(
+        () -> getRouteClient().unarchiveRoutes(ids),
+        "Unarchive route", 1000, 5);
+  }
+
+  @When("API Route - Operator unarchives invalid route with data below:")
+  public void operatorUnArchiveRouteInvalidState(Map<String, String> mapOfData) {
+    Map<String, String> expectedData = resolveKeyValues(mapOfData);
+    final long routeId = Long.valueOf(expectedData.get("routeId"));
+    retryIfAssertionErrorOrRuntimeExceptionOccurred(
+        () -> {
+          Response response = getRouteClient().unarchiveRouteAndGetRawResponse(routeId);
+          Assertions.assertThat(response.getStatusCode()).as("status code")
+              .isEqualTo(Integer.valueOf(expectedData.get("status")));
+          put(KEY_ROUTE_RESPONSE, response);
+        },
+        "Unarchive route", 1000, 5);
+  }
+
+  @When("API Route - Operator archives invalid route with data below:")
+  public void operatorArchiveRouteInvalidState(Map<String, String> mapOfData) {
+    Map<String, String> expectedData = resolveKeyValues(mapOfData);
+    final long routeId = Long.valueOf(expectedData.get("routeId"));
+    retryIfAssertionErrorOrRuntimeExceptionOccurred(
+        () -> {
+          Response response = getRouteClient().archiveRouteAndGetRawResponse(routeId);
+          Assertions.assertThat(response.getStatusCode()).as("status code")
+              .isEqualTo(Integer.valueOf(expectedData.get("status")));
+          put(KEY_ROUTE_RESPONSE, response);
+        },
+        "Unarchive route", 1000, 5);
   }
 }

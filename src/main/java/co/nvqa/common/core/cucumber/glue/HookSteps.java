@@ -16,7 +16,8 @@ public class HookSteps extends CoreStandardSteps {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(HookSteps.class);
 
-  @Inject @Getter
+  @Inject
+  @Getter
   private RouteClient routeClient;
 
   @Override
@@ -36,5 +37,17 @@ public class HookSteps extends CoreStandardSteps {
         LOGGER.warn("error to archive route: " + t.getMessage());
       }
     });
+  }
+
+  @After("@ArchiveDriverRoutes")
+  public void cleanCreatedRoute() {
+    final List<Long> routeIds = get(KEY_LIST_OF_CREATED_ROUTE_ID);
+
+    try {
+      getRouteClient().archiveRoutes(routeIds);
+      LOGGER.debug("Route ID = {} archived successfully", routeIds);
+    } catch (Throwable t) {
+      LOGGER.warn("Failed to archive route(s)");
+    }
   }
 }
