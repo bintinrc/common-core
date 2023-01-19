@@ -148,7 +148,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
    *
    * @param routeIds
    */
-  @When("API Route - Operator archives routes below:")
+  @When("API Core - Operator archives routes below:")
   public void operatorArchivesRoutes(List<String> routeIds) {
     routeIds = resolveValues(routeIds);
     List<Long> ids = routeIds.stream().map(Long::parseLong).collect(Collectors.toList());
@@ -157,7 +157,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
         "Archive route", 1000, 5);
   }
 
-  @When("API Route - Operator unarchives routes below:")
+  @When("API Core - Operator unarchives routes below:")
   public void operatorUnarchivesRoutes(List<String> routeIds) {
     routeIds = resolveValues(routeIds);
     List<Long> ids = routeIds.stream().map(Long::parseLong).collect(Collectors.toList());
@@ -166,7 +166,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
         "Unarchive route", 1000, 5);
   }
 
-  @When("API Route - Operator unarchives invalid route with data below:")
+  @When("API Core - Operator unarchives invalid route with data below:")
   public void operatorUnArchiveRouteInvalidState(Map<String, String> mapOfData) {
     Map<String, String> expectedData = resolveKeyValues(mapOfData);
     final long routeId = Long.valueOf(expectedData.get("routeId"));
@@ -180,7 +180,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
         "Unarchive route", 1000, 5);
   }
 
-  @When("API Route - Operator archives invalid route with data below:")
+  @When("API Core - Operator archives invalid route with data below:")
   public void operatorArchiveRouteInvalidState(Map<String, String> mapOfData) {
     Map<String, String> expectedData = resolveKeyValues(mapOfData);
     final long routeId = Long.valueOf(expectedData.get("routeId"));
