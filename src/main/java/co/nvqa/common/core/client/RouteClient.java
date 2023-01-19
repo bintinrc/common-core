@@ -89,16 +89,29 @@ public class RouteClient extends SimpleApiClient {
     return doPut("Operator API - Archive Route", requestSpecification, url);
   }
 
-  public void unArchiveRoute(long routeId) {
+  public void unarchiveRoutes(List<Long> routeIds) {
+    for (long routeId : routeIds) {
+      unarchiveRoute(routeId);
+    }
+  }
+
+  public void unarchiveRoute(long routeId) {
+    RequestSpecification requestSpecification = createAuthenticatedRequest()
+        .pathParam("routeId", routeId);
+
+    Response r = unarchiveRouteAndGetRawResponse(routeId);
+    if (r.statusCode() != HttpConstants.RESPONSE_204_NO_CONTENT) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+  }
+
+  public Response unarchiveRouteAndGetRawResponse(long routeId) {
     final String url = "route-v2/routes/{routeId}/unarchive";
 
     RequestSpecification requestSpecification = createAuthenticatedRequest()
         .pathParam("routeId", routeId);
 
-    Response r = doPut("Operator API - Un-archive Route", requestSpecification, url);
-    if (r.statusCode() != HttpConstants.RESPONSE_204_NO_CONTENT) {
-      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
-    }
+    return doPut("Operator API - Unarchive Route", requestSpecification, url);
   }
 
   public void addPickupJobToRoute(long jobId,
