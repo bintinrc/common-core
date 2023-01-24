@@ -3,11 +3,14 @@ package co.nvqa.common.core.cucumber.glue;
 import co.nvqa.common.core.client.OrderClient;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.model.order.Order;
+import co.nvqa.common.core.model.order.RescheduleOrderRequest;
+import co.nvqa.common.core.model.order.RescheduleOrderResponse;
 import co.nvqa.common.utils.JsonUtils;
 import co.nvqa.common.utils.NvTestRuntimeException;
 import co.nvqa.common.utils.StandardTestConstants;
 import co.nvqa.commonauth.utils.TokenUtils;
 import io.cucumber.java.en.When;
+import java.util.Map;
 import javax.inject.Inject;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
@@ -18,7 +21,8 @@ public class ApiOrderSteps extends CoreStandardSteps {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ApiOrderSteps.class);
 
-  @Inject @Getter
+  @Inject
+  @Getter
   private OrderClient orderClient;
 
   @Override
@@ -109,6 +113,37 @@ public class ApiOrderSteps extends CoreStandardSteps {
   public void apiOperatorForceSuccessOrder(String orderIdString, String codCollectedString) {
     final long orderId = Long.parseLong(resolveValue(orderIdString));
     final boolean codCollected = Boolean.parseBoolean(codCollectedString);
-    retryIfAssertionErrorOrRuntimeExceptionOccurred(() -> getOrderClient().forceSuccess(orderId, codCollected), "Force success", 3000, 10);
+    retryIfAssertionErrorOrRuntimeExceptionOccurred(
+        () -> getOrderClient().forceSuccess(orderId, codCollected), "Force success", 3000, 10);
+  }
+
+  /**
+   * Unless reattempt is false, this method will re-attempt the action until response message is
+   * success
+   * <p></p>
+   *
+   * @param dataTableRaw <br/> <b>orderId</b>: order ID of the order/parcel<br/>
+   *                     <b>rescheduleRequest</b> {"date":"{date: 0 days ago, yyyy-MM-dd}"}<br/>
+   *                     <b>[OPTIONAL] reattempt</b> true (default) | false"}
+   */
+  @When("API Core - Operator reschedule order:")
+  public void apiOperatorRescheduleOrder(Map<String, String> dataTableRaw) {
+    final Map<String, String> dataTable = resolveKeyValues(dataTableRaw);
+    final String rescheduleRequest = dataTable.get("rescheduleRequest");
+    final long orderId = Long.parseLong(dataTable.get("orderId"));
+    final boolean reattempt = Boolean.parseBoolean(dataTable.getOrDefault("reattempt", "true"));
+
+    final RescheduleOrderRequest request = JsonUtils.fromJsonSnakeCase(rescheduleRequest,
+        RescheduleOrderRequest.class);
+
+    retryIfAssertionErrorOrRuntimeExceptionOccurred(
+        () -> {
+          final RescheduleOrderResponse response = getOrderClient().rescheduleOrder(orderId,
+              request);
+          if (reattempt && !response.getStatus().equalsIgnoreCase("Success")) {
+            throw new NvTestRuntimeException("reschedule fail: " + response.getMessage());
+          }
+        }, "Reschedule order", 3000, 10);
+
   }
 }

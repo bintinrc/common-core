@@ -32,7 +32,7 @@ public class ApiReservationSteps extends CoreStandardSteps {
   /**
    * Sample:
    * <p>
-   * Given API Operator create V2 reservation using data below: | reservationRequest | {
+   * Given API Operator create V2 reservation using data below: <br/>| reservationRequest | {
    * "legacy_shipper_id":{shipper-v4-legacy-id}, "pickup_address_id":"{KEY_CREATED_ADDRESS.id}", "pickup_start_time":"{gradle-current-date-yyyy-MM-dd}T15:00:00{gradle-timezone-XXX}",
    * "pickup_end_time":"{gradle-current-date-yyyy-MM-dd}T18:00:00{gradle-timezone-XXX}" } |
    *

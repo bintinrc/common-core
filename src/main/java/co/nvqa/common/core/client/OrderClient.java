@@ -9,6 +9,8 @@ import co.nvqa.common.core.model.order.Order.PackageContent;
 import co.nvqa.common.core.model.order.Order.PricingInfo;
 import co.nvqa.common.core.model.order.Order.ShipperRefMetadata;
 import co.nvqa.common.core.model.order.Order.Transaction;
+import co.nvqa.common.core.model.order.RescheduleOrderRequest;
+import co.nvqa.common.core.model.order.RescheduleOrderResponse;
 import co.nvqa.common.core.model.order.SearchOrderRequest;
 import co.nvqa.common.core.model.order.SearchOrderResponse;
 import co.nvqa.common.utils.NvTestHttpException;
@@ -97,6 +99,25 @@ public class OrderClient extends SimpleApiClient {
         .param("reason", "FORCE_SUCCESS_QA_AUTO");
 
     return doPut("Core - Force Success Order", spec, url);
+  }
+
+  public RescheduleOrderResponse rescheduleOrder(long orderId, RescheduleOrderRequest payload) {
+    final Response r = rescheduleOrderAsRawResponse(orderId, payload);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+
+    return fromJsonSnakeCase(r.body().asString(), RescheduleOrderResponse.class);
+  }
+
+
+  public Response rescheduleOrderAsRawResponse(long orderId, RescheduleOrderRequest payload) {
+    String url = "core/orders/{orderId}/reschedule";
+    RequestSpecification spec = createAuthenticatedRequest()
+        .pathParam("orderId", orderId)
+        .body(toJsonSnakeCase(payload));
+
+    return doPost("Core - Reschedule Order", spec, url);
   }
 
   private Order convertJsonOrder(String jsonOrder) {
