@@ -65,7 +65,7 @@ public class DbCoreSteps extends CoreStandardSteps {
     }, f("get orders weight of order id %s", orderId), 10_000, 3);
   }
 
-  @And("DB Core get waypoint Id from reservation id {string}")
+  @And("DB Core - get waypoint Id from reservation id {string}")
   public void coreGetWaypointFromReservationId(String reservationId) {
     Long resolvedReservationIdKey = Long.parseLong(resolveValue(reservationId));
     retryIfAssertionErrorOrRuntimeExceptionOccurred(() -> {
