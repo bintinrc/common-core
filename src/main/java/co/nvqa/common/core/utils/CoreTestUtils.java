@@ -10,4 +10,9 @@ public class CoreTestUtils {
   public static LocalDateTime getRouteDateForToday() {
     return LocalDate.now().atStartOfDay();
   }
+
+  public static LocalDateTime getRouteDateForNextDay() {
+    return LocalDate.now().plusDays(1).atStartOfDay();
+  }
+
 }

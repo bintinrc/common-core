@@ -48,12 +48,18 @@ public class ApiRouteSteps extends CoreStandardSteps {
   public void apiOperatorCreateNewRouteUsingDataBelow(Map<String, String> dataTableAsMap) {
     String scenarioName = getScenarioManager().getCurrentScenario().getName();
 
-    LocalDateTime routeDateForToday = CoreTestUtils.getRouteDateForToday();
+    LocalDateTime routeDate;
+    if (dataTableAsMap.containsKey("to_use_different_date")) {
+      routeDate = CoreTestUtils.getRouteDateForNextDay();
+    } else {
+      routeDate = CoreTestUtils.getRouteDateForToday();
+    }
 
     DateTimeFormatter utcDtf = DTF_NORMAL_DATETIME.withZone(ZoneId.of("UTC"));
+    DateTimeFormatter utcRdtf = DTF_ROUTE_DATE_TIME.withZone(ZoneId.of("UTC"));
     String createdDate = DTF_CREATED_DATE.format(ZonedDateTime.now());
-    String formattedRouteDate = utcDtf.format(routeDateForToday);
-    String formattedRouteDateTime = utcDtf.format(routeDateForToday);
+    String formattedRouteDate = utcRdtf.format(routeDate);
+    String formattedRouteDateTime = utcDtf.format(routeDate);
 
     Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
     String createRouteRequestJson = StandardTestUtils
