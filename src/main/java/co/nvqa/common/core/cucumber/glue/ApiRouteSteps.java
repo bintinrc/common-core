@@ -89,6 +89,8 @@ public class ApiRouteSteps extends CoreStandardSteps {
 
     final RouteResponse createRouteResponse = getRouteClient().createRoute(createRouteRequest);
     putInList(KEY_LIST_OF_CREATED_ROUTES, createRouteResponse);
+    putInList(KEY_LIST_OF_CREATED_ROUTE_ID, createRouteResponse.getId());
+    putInList(KEY_CREATED_ROUTE_ID, createRouteResponse.getId());
   }
 
   /**
