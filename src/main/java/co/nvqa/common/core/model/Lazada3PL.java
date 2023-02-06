@@ -1,4 +1,4 @@
-package co.nvqa.common.core.model.dp;
+package co.nvqa.common.core.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,12 +8,12 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-public class CustomerCollectRequest {
+public class Lazada3PL {
 
-  private String status;
-  private String collectionTime;
-
+  private String trackingId;
+  private String code;
+  private String comment;
 }
