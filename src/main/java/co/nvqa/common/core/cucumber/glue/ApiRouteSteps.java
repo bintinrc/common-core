@@ -13,10 +13,8 @@ import io.cucumber.guice.ScenarioScoped;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
 import io.restassured.response.Response;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -50,19 +48,16 @@ public class ApiRouteSteps extends CoreStandardSteps {
   public void apiOperatorCreateNewRouteUsingDataBelow(Map<String, String> dataTableAsMap) {
     String scenarioName = getScenarioManager().getCurrentScenario().getName();
 
-    LocalDateTime routeDate;
+    ZonedDateTime routeDate;
     if (dataTableAsMap.containsKey("to_use_different_date")) {
-      routeDate = CoreTestUtils.getRouteDateForNextDay();
+      routeDate = CoreTestUtils.getDateForNextDay();
     } else {
-      routeDate = CoreTestUtils.getRouteDateForToday();
+      routeDate = CoreTestUtils.getDateForToday();
     }
 
-    DateTimeFormatter utcDtf = DTF_NORMAL_DATETIME.withZone(ZoneId.of("UTC"));
-    DateTimeFormatter utcRdtf = DTF_ROUTE_DATE_TIME.withZone(ZoneId.of("UTC"));
     String createdDate = DTF_CREATED_DATE.format(ZonedDateTime.now());
-    String formattedRouteDate = utcRdtf.format(routeDate);
-    String formattedRouteDateTime = utcDtf.format(routeDate);
-
+    String formattedRouteDate = DTF_NORMAL_DATETIME.format(routeDate.withZoneSameInstant(ZoneId.of("UTC")));
+    String formattedRouteDateTime = DTF_ROUTE_DATE_TIME.format(routeDate.withZoneSameInstant(ZoneId.of("UTC")));
 
     Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
     String createRouteRequestJson = StandardTestUtils
@@ -92,7 +87,8 @@ public class ApiRouteSteps extends CoreStandardSteps {
 
     final RouteResponse createRouteResponse = getRouteClient().createRoute(createRouteRequest);
     putInList(KEY_LIST_OF_CREATED_ROUTES, createRouteResponse);
-
+    putInList(KEY_LIST_OF_CREATED_ROUTE_ID, createRouteResponse.getId());
+    putInList(KEY_CREATED_ROUTE_ID, createRouteResponse.getId());
   }
 
   /**
