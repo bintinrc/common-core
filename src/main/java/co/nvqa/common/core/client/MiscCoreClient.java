@@ -5,18 +5,23 @@ import co.nvqa.common.constants.HttpConstants;
 import co.nvqa.common.core.model.miscellanous.Industry;
 import co.nvqa.common.core.model.miscellanous.SalesPerson;
 import co.nvqa.common.utils.NvTestHttpException;
+import co.nvqa.common.utils.StandardTestConstants;
+import co.nvqa.commonauth.utils.TokenUtils;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
-import java.util.TimeZone;
+import javax.inject.Singleton;
 
+@Singleton
 public class MiscCoreClient extends SimpleApiClient {
 
-  public MiscCoreClient(String baseUrl, String bearerToken) {
-    this(baseUrl, bearerToken, null);
+  public MiscCoreClient(String baseUrl, String token) {
+    super(baseUrl, token,
+        DEFAULT_CAMEL_CASE_MAPPER);
   }
 
-  public MiscCoreClient(String baseUrl, String bearerToken, TimeZone timeZone) {
-    super(baseUrl, bearerToken, timeZone, DEFAULT_CAMEL_CASE_MAPPER);
+  public MiscCoreClient() {
+    super(StandardTestConstants.API_BASE_URL, TokenUtils.getOperatorAuthToken(),
+        DEFAULT_CAMEL_CASE_MAPPER);
   }
 
   public Industry[] readIndustries() {

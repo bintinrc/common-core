@@ -4,18 +4,26 @@ import co.nvqa.common.client.SimpleApiClient;
 import co.nvqa.common.constants.HttpConstants;
 import co.nvqa.common.core.model.pickup.Pickup;
 import co.nvqa.common.core.model.pickup.PickupSearchRequest;
-import co.nvqa.common.utils.JsonUtils;
 import co.nvqa.common.utils.NvTestHttpException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import co.nvqa.common.utils.StandardTestConstants;
+import co.nvqa.commonauth.utils.TokenUtils;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import java.util.Collections;
 import java.util.List;
+import javax.inject.Singleton;
 
+@Singleton
 public class PickupClient extends SimpleApiClient {
 
-  public PickupClient(String baseUri, String bearerToken) {
-    super(baseUri, bearerToken, JsonUtils.getDefaultSnakeCaseMapper());
+  public PickupClient(String baseUrl, String token) {
+    super(baseUrl, token,
+        DEFAULT_SNAKE_CASE_MAPPER);
+  }
+
+  public PickupClient() {
+    super(StandardTestConstants.API_BASE_URL, TokenUtils.getOperatorAuthToken(),
+        DEFAULT_SNAKE_CASE_MAPPER);
   }
 
   public List<Pickup> getPickups(long id) {

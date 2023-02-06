@@ -9,6 +9,7 @@ import co.nvqa.common.utils.JsonUtils;
 import co.nvqa.common.utils.NvTestRuntimeException;
 import co.nvqa.common.utils.StandardTestConstants;
 import co.nvqa.commonauth.utils.TokenUtils;
+import io.cucumber.guice.ScenarioScoped;
 import io.cucumber.java.en.When;
 import java.util.Map;
 import javax.inject.Inject;
@@ -17,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@ScenarioScoped
 public class ApiOrderSteps extends CoreStandardSteps {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ApiOrderSteps.class);

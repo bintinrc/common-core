@@ -3,18 +3,23 @@ package co.nvqa.common.core.client;
 import co.nvqa.common.client.SimpleApiClient;
 import co.nvqa.common.core.model.dp.CustomerCollectRequest;
 import co.nvqa.common.core.model.dp.LodgeInRequest;
+import co.nvqa.common.utils.StandardTestConstants;
+import co.nvqa.commonauth.utils.TokenUtils;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
-import java.util.TimeZone;
+import javax.inject.Singleton;
 
+@Singleton
 public class CoreDpClient extends SimpleApiClient {
 
-  public CoreDpClient(String baseUrl, String bearerToken) {
-    this(baseUrl, bearerToken, null);
+  public CoreDpClient(String baseUrl, String token) {
+    super(baseUrl, token,
+        DEFAULT_SNAKE_CASE_MAPPER);
   }
 
-  public CoreDpClient(String baseUrl, String bearerToken, TimeZone timeZone) {
-    super(baseUrl, bearerToken, timeZone, DEFAULT_SNAKE_CASE_MAPPER);
+  public CoreDpClient() {
+    super(StandardTestConstants.API_BASE_URL, TokenUtils.getOperatorAuthToken(),
+        DEFAULT_SNAKE_CASE_MAPPER);
   }
 
   public Response lodgeInToDp(long orderId, LodgeInRequest request) {

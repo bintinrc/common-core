@@ -9,16 +9,15 @@ import co.nvqa.common.core.model.route.RouteResponse;
 import co.nvqa.common.core.model.waypoint.Waypoint;
 import co.nvqa.common.core.utils.CoreTestUtils;
 import co.nvqa.common.utils.StandardTestUtils;
+import io.cucumber.guice.ScenarioScoped;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
 import io.restassured.response.Response;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -26,6 +25,7 @@ import javax.inject.Inject;
 import lombok.Getter;
 import org.assertj.core.api.Assertions;
 
+@ScenarioScoped
 public class ApiRouteSteps extends CoreStandardSteps {
 
   @Inject
@@ -89,8 +89,10 @@ public class ApiRouteSteps extends CoreStandardSteps {
     if (createRouteRequest.getHubId() == null) {
       createRouteRequest.setHubId(get(KEY_DESTINATION_HUB_ID));
     }
+
     final RouteResponse createRouteResponse = getRouteClient().createRoute(createRouteRequest);
     putInList(KEY_LIST_OF_CREATED_ROUTES, createRouteResponse);
+
   }
 
   /**

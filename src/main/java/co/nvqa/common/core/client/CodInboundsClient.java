@@ -3,18 +3,23 @@ package co.nvqa.common.core.client;
 import co.nvqa.common.client.SimpleApiClient;
 import co.nvqa.common.core.model.CodInbound;
 import co.nvqa.common.utils.JsonUtils;
+import co.nvqa.common.utils.StandardTestConstants;
+import co.nvqa.commonauth.utils.TokenUtils;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
-import java.util.TimeZone;
+import javax.inject.Singleton;
 
+@Singleton
 public class CodInboundsClient extends SimpleApiClient {
 
-  public CodInboundsClient(String baseUrl, String bearerToken) {
-    this(baseUrl, bearerToken, null);
+  public CodInboundsClient(String baseUrl, String token) {
+    super(baseUrl, token,
+        DEFAULT_CAMEL_CASE_MAPPER);
   }
 
-  public CodInboundsClient(String baseUrl, String bearerToken, TimeZone timeZone) {
-    super(baseUrl, bearerToken, timeZone, DEFAULT_CAMEL_CASE_MAPPER);
+  public CodInboundsClient() {
+    super(StandardTestConstants.API_BASE_URL, TokenUtils.getOperatorAuthToken(),
+        DEFAULT_CAMEL_CASE_MAPPER);
   }
 
   public Response codInbound(CodInbound request) {
