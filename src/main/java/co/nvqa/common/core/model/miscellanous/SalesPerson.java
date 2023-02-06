@@ -1,4 +1,4 @@
-package co.nvqa.common.core.model.shipper;
+package co.nvqa.common.core.model.miscellanous;
 
 import co.nvqa.common.model.DataEntity;
 import java.util.Map;
