@@ -7,8 +7,6 @@ import co.nvqa.common.core.model.order.RescheduleOrderRequest;
 import co.nvqa.common.core.model.order.RescheduleOrderResponse;
 import co.nvqa.common.utils.JsonUtils;
 import co.nvqa.common.utils.NvTestRuntimeException;
-import co.nvqa.common.utils.StandardTestConstants;
-import co.nvqa.commonauth.utils.TokenUtils;
 import io.cucumber.guice.ScenarioScoped;
 import io.cucumber.java.en.When;
 import java.util.Map;
