@@ -15,11 +15,6 @@ import javax.inject.Singleton;
 @Singleton
 public class MessagingClient extends SimpleApiClient {
 
-  public MessagingClient(String baseUrl, String token) {
-    super(baseUrl, token,
-        DEFAULT_CAMEL_CASE_MAPPER);
-  }
-
   public MessagingClient() {
     super(StandardTestConstants.API_BASE_URL, TokenUtils.getOperatorAuthToken(),
         DEFAULT_CAMEL_CASE_MAPPER);

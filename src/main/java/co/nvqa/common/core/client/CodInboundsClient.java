@@ -12,11 +12,6 @@ import javax.inject.Singleton;
 @Singleton
 public class CodInboundsClient extends SimpleApiClient {
 
-  public CodInboundsClient(String baseUrl, String token) {
-    super(baseUrl, token,
-        DEFAULT_CAMEL_CASE_MAPPER);
-  }
-
   public CodInboundsClient() {
     super(StandardTestConstants.API_BASE_URL, TokenUtils.getOperatorAuthToken(),
         DEFAULT_CAMEL_CASE_MAPPER);

@@ -14,11 +14,6 @@ import javax.inject.Singleton;
 @Singleton
 public class MiscCoreClient extends SimpleApiClient {
 
-  public MiscCoreClient(String baseUrl, String token) {
-    super(baseUrl, token,
-        DEFAULT_CAMEL_CASE_MAPPER);
-  }
-
   public MiscCoreClient() {
     super(StandardTestConstants.API_BASE_URL, TokenUtils.getOperatorAuthToken(),
         DEFAULT_CAMEL_CASE_MAPPER);

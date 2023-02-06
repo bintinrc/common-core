@@ -26,11 +26,6 @@ import javax.inject.Singleton;
 @Singleton
 public class OrderClient extends SimpleApiClient {
 
-  public OrderClient(String baseUrl, String token) {
-    super(baseUrl, token,
-        DEFAULT_CAMEL_CASE_MAPPER);
-  }
-
   public OrderClient() {
     super(StandardTestConstants.API_BASE_URL, TokenUtils.getOperatorAuthToken(),
         DEFAULT_CAMEL_CASE_MAPPER);

@@ -19,11 +19,6 @@ import javax.inject.Singleton;
 @Singleton
 public class RouteClient extends SimpleApiClient {
 
-  public RouteClient(String baseUrl, String token) {
-    super(baseUrl, token,
-        DEFAULT_CAMEL_CASE_MAPPER);
-  }
-
   public RouteClient() {
     super(StandardTestConstants.API_BASE_URL, TokenUtils.getOperatorAuthToken(),
         DEFAULT_CAMEL_CASE_MAPPER);

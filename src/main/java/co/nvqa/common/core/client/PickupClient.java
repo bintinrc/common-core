@@ -16,11 +16,6 @@ import javax.inject.Singleton;
 @Singleton
 public class PickupClient extends SimpleApiClient {
 
-  public PickupClient(String baseUrl, String token) {
-    super(baseUrl, token,
-        DEFAULT_SNAKE_CASE_MAPPER);
-  }
-
   public PickupClient() {
     super(StandardTestConstants.API_BASE_URL, TokenUtils.getOperatorAuthToken(),
         DEFAULT_SNAKE_CASE_MAPPER);

@@ -13,11 +13,6 @@ import javax.inject.Singleton;
 @Singleton
 public class Lazada3PLClient extends SimpleApiClient {
 
-  public Lazada3PLClient(String baseUrl, String token) {
-    super(baseUrl, token,
-        DEFAULT_SNAKE_CASE_MAPPER);
-  }
-
   public Lazada3PLClient() {
     super(StandardTestConstants.API_BASE_URL, TokenUtils.getOperatorAuthToken(),
         DEFAULT_SNAKE_CASE_MAPPER);

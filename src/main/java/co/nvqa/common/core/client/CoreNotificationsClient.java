@@ -14,11 +14,6 @@ import javax.inject.Singleton;
 @Singleton
 public class CoreNotificationsClient extends SimpleApiClient {
 
-  public CoreNotificationsClient(String baseUrl, String token) {
-    super(baseUrl, token,
-        DEFAULT_SNAKE_CASE_MAPPER);
-  }
-
   public CoreNotificationsClient() {
     super(StandardTestConstants.API_BASE_URL, TokenUtils.getOperatorAuthToken(),
         DEFAULT_SNAKE_CASE_MAPPER);

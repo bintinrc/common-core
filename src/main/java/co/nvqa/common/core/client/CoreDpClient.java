@@ -12,11 +12,6 @@ import javax.inject.Singleton;
 @Singleton
 public class CoreDpClient extends SimpleApiClient {
 
-  public CoreDpClient(String baseUrl, String token) {
-    super(baseUrl, token,
-        DEFAULT_SNAKE_CASE_MAPPER);
-  }
-
   public CoreDpClient() {
     super(StandardTestConstants.API_BASE_URL, TokenUtils.getOperatorAuthToken(),
         DEFAULT_SNAKE_CASE_MAPPER);

@@ -15,11 +15,6 @@ import javax.inject.Singleton;
 @Singleton
 public class BatchUpdatePodClient extends SimpleApiClient {
 
-  public BatchUpdatePodClient(String baseUrl, String token) {
-    super(baseUrl, token,
-        DEFAULT_SNAKE_CASE_MAPPER);
-  }
-
   public BatchUpdatePodClient() {
     super(StandardTestConstants.API_BASE_URL, TokenUtils.getOperatorAuthToken(),
         DEFAULT_SNAKE_CASE_MAPPER);
