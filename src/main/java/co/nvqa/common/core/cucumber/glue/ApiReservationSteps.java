@@ -116,4 +116,28 @@ public class ApiReservationSteps extends CoreStandardSteps {
 
     return getReservationClient().createReservation(reservationRequest);
   }
+
+  /**
+   * Sample:<p>
+   * <p>
+   * When API Core - Operator update priority level for the reservation using data below:<p>
+   * | pickupAddressId | {KEY_LIST_OF_RESERVATIONS[1].addressId} |<p>
+   * | legacyShipperId | {shipper-v4-legacy-id}                  |<p>
+   * | priorityLevel   | 1                                       |<p>
+   * | reservationId   | {KEY_CREATED_RESERVATION_ID}            |<p>
+   * <p>
+   *
+   * @param dataTableAsMap Map of data from feature file.
+   */
+
+  @When("API Core - Operator update priority level for the reservation using data below:")
+  public void apiOperatorUpdatePriorityLevelForTheReservation(Map<String, String> dataTableAsMap) {
+    long pickupAddressId = Long.parseLong(resolveValue(dataTableAsMap.get("pickupAddressId")));
+    long legacyShipperId = Long.parseLong(resolveValue(dataTableAsMap.get("legacyShipperId")));
+    long priorityLevel = Long.parseLong(resolveValue(dataTableAsMap.get("priorityLevel")));
+    long reservationId = Long.parseLong(resolveValue(dataTableAsMap.get("reservationId")));
+    getReservationClient()
+        .updatePriorityLevelOfReservation(pickupAddressId,legacyShipperId,priorityLevel, reservationId);
+  }
+
 }
