@@ -15,11 +15,16 @@ import lombok.Setter;
 @NoArgsConstructor
 public class PrinterSettings extends DataEntity<PrinterSettings> {
   private Long id;
+
   private String name;
+
   private String ipAddress;
+
   private Integer version;
+
   @JsonProperty("is_default")
   private boolean isDefault;
+
   public PrinterSettings(Map<String, ?> data) {
     fromMap(data);
   }
