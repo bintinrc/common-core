@@ -1,13 +1,16 @@
 package co.nvqa.common.core.utils;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Calendar;
-import java.util.Date;
+import co.nvqa.common.utils.DateUtil;
+import java.time.ZonedDateTime;
 
 public class CoreTestUtils {
 
-  public static LocalDateTime getRouteDateForToday() {
-    return LocalDate.now().atStartOfDay();
+  public static ZonedDateTime getDateForToday() {
+    return DateUtil.getStartOfDay(DateUtil.getDate());
   }
+
+  public static ZonedDateTime getDateForNextDay() {
+    return DateUtil.getStartOfDay(DateUtil.getDate()).plusDays(1);
+  }
+
 }
