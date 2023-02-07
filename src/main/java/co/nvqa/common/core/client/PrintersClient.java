@@ -13,6 +13,7 @@ import java.util.List;
 
 @Singleton
 public class PrintersClient extends SimpleApiClient {
+
   public PrintersClient() {
     super(StandardTestConstants.API_BASE_URL, TokenUtils.getOperatorAuthToken(),
         DEFAULT_CAMEL_CASE_MAPPER);
