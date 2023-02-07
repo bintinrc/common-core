@@ -4,19 +4,18 @@ import co.nvqa.common.client.SimpleApiClient;
 import co.nvqa.common.constants.HttpConstants;
 import co.nvqa.common.core.model.PrinterSettings;
 import co.nvqa.common.utils.NvTestHttpException;
+import co.nvqa.common.utils.StandardTestConstants;
+import co.nvqa.commonauth.utils.TokenUtils;
+import com.google.inject.Singleton;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import java.util.List;
-import java.util.TimeZone;
 
+@Singleton
 public class PrintersClient extends SimpleApiClient {
-
-  public PrintersClient(String baseUrl, String bearerToken) {
-    this(baseUrl, bearerToken, null);
-  }
-
-  public PrintersClient(String baseUrl, String bearerToken, TimeZone timeZone) {
-    super(baseUrl, bearerToken, timeZone, DEFAULT_CAMEL_CASE_MAPPER);
+  public PrintersClient() {
+    super(StandardTestConstants.API_BASE_URL, TokenUtils.getOperatorAuthToken(),
+        DEFAULT_CAMEL_CASE_MAPPER);
   }
 
   public PrinterSettings addPrinter(PrinterSettings printerSettings) {
