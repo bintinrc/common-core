@@ -55,7 +55,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
 
     String createdDate = DTF_CREATED_DATE.format(ZonedDateTime.now());
     String formattedRouteDate = DTF_NORMAL_DATETIME.format(routeDate.withZoneSameInstant(ZoneId.of("UTC")));
-    String formattedRouteDateTime = DTF_ROUTE_DATE_TIME.format(routeDate.withZoneSameInstant(ZoneId.of("UTC")));
+    String formattedRouteDateTime = DTF_ISO_8601_LITE.format(routeDate.withZoneSameInstant(ZoneId.of("UTC")));
 
     Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
     String createRouteRequestJson = StandardTestUtils
