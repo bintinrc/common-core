@@ -12,7 +12,6 @@ import io.restassured.specification.RequestSpecification;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.TimeZone;
 import javax.inject.Singleton;
 
 @Singleton
