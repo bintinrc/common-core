@@ -21,8 +21,8 @@ public class BlobData {
   private String comments;
   private int receivedParcels;
   private List<String> scannedParcels;
-  private int failureReasonId;
-  private int failureReaonCodeId;
+  private Integer failureReasonId;
+  private Integer failureReaonCodeId;
   private String failureReasonTranslations;
   private String status;
   private String url;

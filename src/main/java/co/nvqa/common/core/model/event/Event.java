@@ -1,5 +1,16 @@
 package co.nvqa.common.core.model.event;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Event {
 
   public static final String ROUTE_TRANSFER_SCAN_EVENT = "ROUTE_TRANSFER_SCAN";
@@ -18,68 +29,4 @@ public class Event {
   private Long userId;
   private String userName;
   private String userGrantType;
-
-  public Long getOrderId() {
-    return orderId;
-  }
-
-  public void setOrderId(Long orderId) {
-    this.orderId = orderId;
-  }
-
-  public String getType() {
-    return type;
-  }
-
-  public void setType(String type) {
-    this.type = type;
-  }
-
-  public String getTime() {
-    return time;
-  }
-
-  public void setTime(String time) {
-    this.time = time;
-  }
-
-  public String getUserEmail() {
-    return userEmail;
-  }
-
-  public void setUserEmail(String userEmail) {
-    this.userEmail = userEmail;
-  }
-
-  public EventDetail getData() {
-    return data;
-  }
-
-  public void setData(EventDetail data) {
-    this.data = data;
-  }
-
-  public Long getUserId() {
-    return userId;
-  }
-
-  public void setUserId(Long userId) {
-    this.userId = userId;
-  }
-
-  public String getUserName() {
-    return userName;
-  }
-
-  public void setUserName(String userName) {
-    this.userName = userName;
-  }
-
-  public String getUserGrantType() {
-    return userGrantType;
-  }
-
-  public void setUserGrantType(String userGrantType) {
-    this.userGrantType = userGrantType;
-  }
 }

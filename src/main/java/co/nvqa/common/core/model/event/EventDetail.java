@@ -2,7 +2,10 @@ package co.nvqa.common.core.model.event;
 
 import co.nvqa.common.core.utils.EventDetailDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @JsonDeserialize(using = EventDetailDeserializer.class)
@@ -41,26 +44,15 @@ public class EventDetail {
   //from update status event
   private String reason;
 
+  @Getter
+  @Setter
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
   public static class EventValue {
 
     private Long oldValue;
     private Long newValue;
-
-    public Long getOldValue() {
-      return oldValue;
-    }
-
-    public void setOldValue(Long oldValue) {
-      this.oldValue = oldValue;
-    }
-
-    public Long getNewValue() {
-      return newValue;
-    }
-
-    public void setNewValue(Long newValue) {
-      this.newValue = newValue;
-    }
 
   }
 

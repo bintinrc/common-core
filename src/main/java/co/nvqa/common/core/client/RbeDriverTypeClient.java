@@ -13,9 +13,9 @@ import java.util.List;
 import javax.inject.Singleton;
 
 @Singleton
-public class DriverTypeClient extends SimpleApiClient {
+public class RbeDriverTypeClient extends SimpleApiClient {
 
-  public DriverTypeClient() {
+  public RbeDriverTypeClient() {
     super(StandardTestConstants.API_BASE_URL, TokenUtils.getOperatorAuthToken(),
         DEFAULT_CAMEL_CASE_MAPPER);
   }
