@@ -1,6 +1,6 @@
 package co.nvqa.common.core.client;
 
-import co.nvqa.common.core.model.RouteMonitoringResponse;
+import co.nvqa.common.core.model.route_monitoring.RouteMonitoringResponse;
 import co.nvqa.common.utils.DateUtil;
 import co.nvqa.common.utils.NvRetry;
 import java.util.List;
@@ -45,9 +45,7 @@ public class RouteMonitoringClientTest implements NvRetry {
       List<RouteMonitoringResponse> response = testRouteMonitoringClient.getRouteMonitoringDetails(
           date, hubIds, zoneIds, 500);
       Assertions.assertThat(response).isNotNull();
-      response.forEach(routeMonitoringResponse -> {
-        LOGGER.info(routeMonitoringResponse.toString());
-      });
+      response.forEach(routeMonitoringResponse -> LOGGER.info(routeMonitoringResponse.toString()));
     });
   }
 

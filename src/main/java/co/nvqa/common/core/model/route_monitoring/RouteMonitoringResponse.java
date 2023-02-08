@@ -1,6 +1,5 @@
-package co.nvqa.common.core.model;
+package co.nvqa.common.core.model.route_monitoring;
 
-import co.nvqa.common.core.model.waypoint.Waypoint;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
