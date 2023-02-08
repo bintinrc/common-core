@@ -26,8 +26,10 @@ public class OutboundClient extends SimpleApiClient {
   public void outboundScan(OutboundRequest[] requests) {
     String uri = "core/scans/outbounds";
     String json = toJson(requests);
-
-    doPost("Scans - Outbound Scan", createAuthenticatedRequest().body(json), uri);
+    Response r = doPost("Scans - Outbound Scan", createAuthenticatedRequest().body(json), uri);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
   }
 
   public void outboundScanObsolete(OutboundRequest request) {
