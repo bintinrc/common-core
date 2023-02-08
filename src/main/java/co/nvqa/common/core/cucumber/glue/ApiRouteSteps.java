@@ -9,13 +9,12 @@ import co.nvqa.common.core.model.route.RouteResponse;
 import co.nvqa.common.core.model.waypoint.Waypoint;
 import co.nvqa.common.core.utils.CoreTestUtils;
 import co.nvqa.common.utils.StandardTestUtils;
+import io.cucumber.guice.ScenarioScoped;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
 import io.restassured.response.Response;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +23,7 @@ import javax.inject.Inject;
 import lombok.Getter;
 import org.assertj.core.api.Assertions;
 
+@ScenarioScoped
 public class ApiRouteSteps extends CoreStandardSteps {
 
   @Inject
@@ -48,12 +48,16 @@ public class ApiRouteSteps extends CoreStandardSteps {
   public void apiOperatorCreateNewRouteUsingDataBelow(Map<String, String> dataTableAsMap) {
     String scenarioName = getScenarioManager().getCurrentScenario().getName();
 
-    LocalDateTime routeDateForToday = CoreTestUtils.getRouteDateForToday();
+    ZonedDateTime routeDate;
+    if (dataTableAsMap.containsKey("to_use_different_date")) {
+      routeDate = CoreTestUtils.getDateForNextDay();
+    } else {
+      routeDate = CoreTestUtils.getDateForToday();
+    }
 
-    DateTimeFormatter utcDtf = DTF_NORMAL_DATETIME.withZone(ZoneId.of("UTC"));
     String createdDate = DTF_CREATED_DATE.format(ZonedDateTime.now());
-    String formattedRouteDate = utcDtf.format(routeDateForToday);
-    String formattedRouteDateTime = utcDtf.format(routeDateForToday);
+    String formattedRouteDate = DTF_NORMAL_DATETIME.format(routeDate.withZoneSameInstant(ZoneId.of("UTC")));
+    String formattedRouteDateTime = DTF_ISO_8601_LITE.format(routeDate.withZoneSameInstant(ZoneId.of("UTC")));
 
     Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
     String createRouteRequestJson = StandardTestUtils
@@ -83,6 +87,8 @@ public class ApiRouteSteps extends CoreStandardSteps {
 
     final RouteResponse createRouteResponse = getRouteClient().createRoute(createRouteRequest);
     putInList(KEY_LIST_OF_CREATED_ROUTES, createRouteResponse);
+    putInList(KEY_LIST_OF_CREATED_ROUTE_ID, createRouteResponse.getId());
+    put(KEY_CREATED_ROUTE_ID, createRouteResponse.getId());
   }
 
   /**
