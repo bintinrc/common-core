@@ -10,7 +10,6 @@ import co.nvqa.commonauth.utils.TokenUtils;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import java.util.List;
-import java.util.TimeZone;
 
 public class OrderJaroScoresV2Client extends SimpleApiClient {
 
