@@ -1,7 +1,6 @@
 package co.nvqa.common.core.hibernate;
 
 import co.nvqa.common.core.model.persisted_class.Reservations;
-import co.nvqa.common.core.model.persisted_class.Waypoints;
 import co.nvqa.common.core.utils.CoreTestConstants;
 import co.nvqa.common.database.DbBase;
 import co.nvqa.common.utils.StandardTestConstants;

@@ -3,12 +3,19 @@ package co.nvqa.common.core.cucumber.glue;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.hibernate.OrderDao;
 import co.nvqa.common.core.hibernate.ReservationsDao;
+import co.nvqa.common.core.hibernate.RouteLogsDao;
+import co.nvqa.common.core.hibernate.RouteMonitoringDataDao;
+import co.nvqa.common.core.hibernate.ShipperPickupSearchDao;
 import co.nvqa.common.core.hibernate.WaypointsDao;
+import co.nvqa.common.core.model.core.RouteLogs;
+import co.nvqa.common.core.model.core.RouteMonitoringData;
+import co.nvqa.common.core.model.core.ShipperPickupSearch;
+import co.nvqa.common.core.model.core.Waypoints;
 import co.nvqa.common.core.model.persisted_class.Reservations;
-import co.nvqa.common.core.model.persisted_class.Waypoints;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
 import java.util.List;
 import java.util.Map;
 import javax.inject.Inject;
@@ -18,9 +25,15 @@ public class DbCoreSteps extends CoreStandardSteps {
 
   @Inject
   private OrderDao orderDao;
+  @Inject
+  private RouteLogsDao routeLogsDao;
 
   @Inject
   private WaypointsDao waypointsDao;
+  @Inject
+  private ShipperPickupSearchDao shipperPickupSearchDao;
+  @Inject
+  private RouteMonitoringDataDao routeMonitoringDataDao;
 
   @Inject
   private ReservationsDao reservationDao;
@@ -69,32 +82,85 @@ public class DbCoreSteps extends CoreStandardSteps {
   public void coreGetWaypointFromReservationId(String reservationId) {
     Long resolvedReservationIdKey = Long.parseLong(resolveValue(reservationId));
     retryIfAssertionErrorOrRuntimeExceptionOccurred(() -> {
-      List<Reservations> results = reservationDao.getReservationsDetailsByReservationId(resolvedReservationIdKey);
+      List<Reservations> results = reservationDao.getReservationsDetailsByReservationId(
+          resolvedReservationIdKey);
       put(KEY_WAYPOINT_ID, results.get(0).getWaypointId());
     }, "Validating verified WayPoint Id value is as expected", 2000, 3);
   }
 
   @Then("DB Core - verifies that zone type is equal to {string} and zone id is not null for waypointId {string}")
-  public void dbCoreVerifiesThatZoneIdEqualTo(String expectedZoneType , String waypointId) {
+  public void dbCoreVerifiesThatZoneIdEqualTo(String expectedZoneType, String waypointId) {
     Long resolvedWayPointIdKey = Long.parseLong(resolveValue(waypointId));
     retryIfAssertionErrorOrRuntimeExceptionOccurred(() -> {
-      List<Waypoints> results = waypointsDao.getWaypointsDetailsByWaypointId(resolvedWayPointIdKey);
-      Assertions.assertThat(results.get(0).getZoneType())
+      Waypoints result = waypointsDao.getWaypointsDetails(resolvedWayPointIdKey);
+      Assertions.assertThat(result.getZoneType())
           .as("Assertion for Zone Type column value is as expected").isEqualTo(expectedZoneType);
-      Assertions.assertThat(results.get(0).getRoutingZoneId())
+      Assertions.assertThat(result.getRoutingZoneId())
           .as("Assertion for Zone Id column value is as expected").isNotNull();
     }, "Validating verified Zone Type value is as expected", 2000, 3);
   }
 
   @Then("DB Core - verifies that zone type is equal to {string} and zone id is null for waypointId {string}")
-  public void dbCoreVerifiesThatZoneIdEqualToNull(String expectedZoneType , String waypointId) {
+  public void dbCoreVerifiesThatZoneIdEqualToNull(String expectedZoneType, String waypointId) {
     Long resolvedWayPointIdKey = Long.parseLong(resolveValue(waypointId));
     retryIfAssertionErrorOrRuntimeExceptionOccurred(() -> {
-      List<Waypoints> results = waypointsDao.getWaypointsDetailsByWaypointId(resolvedWayPointIdKey);
-      Assertions.assertThat(results.get(0).getZoneType())
+      Waypoints result = waypointsDao.getWaypointsDetails(resolvedWayPointIdKey);
+      Assertions.assertThat(result.getZoneType())
           .as("Assertion for Zone Type column value is as expected").isEqualTo(expectedZoneType);
-      Assertions.assertThat(results.get(0).getRoutingZoneId())
+      Assertions.assertThat(result.getRoutingZoneId())
           .as("Assertion for Zone Id column value is as expected").isNull();
     }, "Validating verified Zone Type value is as expected", 2000, 3);
+  }
+
+  @When("DB Core - verify route_logs record:")
+  public void verifyRouteLogs(Map<String, String> data) {
+    data = resolveKeyValues(data);
+    RouteLogs expected = new RouteLogs(data);
+    RouteLogs actual = routeLogsDao.getRouteLogs(expected.getId());
+    Assertions.assertThat(actual)
+        .withFailMessage("Roure logs was not found: " + data)
+        .isNotNull();
+    expected.compareWithActual(actual, data);
+  }
+
+  @When("DB Core - verify waypoints record:")
+  public void verifyWaypoints(Map<String, String> data) {
+    data = resolveKeyValues(data);
+    Waypoints expected = new Waypoints(data);
+    Waypoints actual = waypointsDao.getWaypointsDetails(expected.getId());
+    Assertions.assertThat(actual)
+        .withFailMessage("waypoints record was not found: " + data)
+        .isNotNull();
+    expected.compareWithActual(actual, data);
+  }
+
+  @When("DB Core - verify shipper_pickup_search record:")
+  public void verifyShipperPickupSearch(Map<String, String> data) {
+    data = resolveKeyValues(data);
+    ShipperPickupSearch expected = new ShipperPickupSearch(data);
+    ShipperPickupSearch actual = null;
+    if (expected.getReservationId() != null) {
+      actual = shipperPickupSearchDao.getShipperPickupSearchByReservationId(
+          expected.getReservationId());
+    }
+    Assertions.assertThat(actual)
+        .withFailMessage("shipper_pickup_search record was not found: " + data)
+        .isNotNull();
+    expected.compareWithActual(actual, data);
+  }
+
+  @When("DB Core - verify route_monitoring_data record:")
+  public void verifyRouteMonitoringData(Map<String, String> data) {
+    data = resolveKeyValues(data);
+    RouteMonitoringData expected = new RouteMonitoringData(data);
+    RouteMonitoringData actual = null;
+    if (expected.getWaypointId() != null) {
+      actual = routeMonitoringDataDao.getRouteMonitoringDataByWaypointId(
+          expected.getWaypointId());
+    }
+    Assertions.assertThat(actual)
+        .withFailMessage("route_monitoring_data record was not found: " + data)
+        .isNotNull();
+    expected.compareWithActual(actual, data);
   }
 }
