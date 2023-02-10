@@ -1,4 +1,4 @@
-package co.nvqa.common.core.model.route;
+package co.nvqa.common.core.model.persisted_class.route;
 
 import co.nvqa.common.model.DataEntity;
 import java.util.Map;

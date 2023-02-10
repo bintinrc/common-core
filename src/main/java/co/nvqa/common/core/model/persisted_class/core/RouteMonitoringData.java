@@ -1,4 +1,4 @@
-package co.nvqa.common.core.model.core;
+package co.nvqa.common.core.model.persisted_class.core;
 
 import co.nvqa.common.model.DataEntity;
 import java.util.Map;

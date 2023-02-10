@@ -1,6 +1,6 @@
 package co.nvqa.common.core.hibernate;
 
-import co.nvqa.common.core.model.core.ShipperPickupSearch;
+import co.nvqa.common.core.model.persisted_class.core.ShipperPickupSearch;
 import co.nvqa.common.core.utils.CoreTestConstants;
 import co.nvqa.common.database.DbBase;
 import co.nvqa.common.utils.StandardTestConstants;
@@ -13,7 +13,7 @@ public class ShipperPickupSearchDao extends DbBase {
 
   public ShipperPickupSearchDao() {
     super(CoreTestConstants.DB_CORE_URL, StandardTestConstants.DB_USER,
-        StandardTestConstants.DB_PASS, "co.nvqa.common.core.model.core");
+        StandardTestConstants.DB_PASS, "co.nvqa.common.core.model.persisted_class");
   }
 
   public ShipperPickupSearch getShipperPickupSearchByReservationId(Long reservationId) {

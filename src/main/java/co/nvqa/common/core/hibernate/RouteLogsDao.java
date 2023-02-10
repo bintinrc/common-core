@@ -1,6 +1,6 @@
 package co.nvqa.common.core.hibernate;
 
-import co.nvqa.common.core.model.core.RouteLogs;
+import co.nvqa.common.core.model.persisted_class.core.RouteLogs;
 import co.nvqa.common.core.utils.CoreTestConstants;
 import co.nvqa.common.database.DbBase;
 import co.nvqa.common.utils.StandardTestConstants;
@@ -13,7 +13,7 @@ public class RouteLogsDao extends DbBase {
 
   public RouteLogsDao() {
     super(CoreTestConstants.DB_CORE_URL, StandardTestConstants.DB_USER,
-        StandardTestConstants.DB_PASS, "co.nvqa.common.core.model.core");
+        StandardTestConstants.DB_PASS, "co.nvqa.common.core.model.persisted_class");
   }
 
   public RouteLogs getRouteLogs(Long id) {

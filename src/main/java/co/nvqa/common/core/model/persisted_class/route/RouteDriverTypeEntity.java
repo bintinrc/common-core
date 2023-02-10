@@ -1,4 +1,4 @@
-package co.nvqa.common.core.model.route;
+package co.nvqa.common.core.model.persisted_class.route;
 
 import java.util.Date;
 

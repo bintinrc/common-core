@@ -2,9 +2,9 @@ package co.nvqa.common.core.cucumber.glue;
 
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.hibernate.RouteDao;
-import co.nvqa.common.core.model.route.RouteGroup;
-import co.nvqa.common.core.model.route.RouteGroupReferences;
-import co.nvqa.common.core.model.route.Waypoints;
+import co.nvqa.common.core.model.persisted_class.route.RouteGroup;
+import co.nvqa.common.core.model.persisted_class.route.RouteGroupReferences;
+import co.nvqa.common.core.model.persisted_class.route.Waypoints;
 import co.nvqa.common.model.DataEntity;
 import io.cucumber.java.en.When;
 import java.util.List;

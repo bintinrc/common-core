@@ -1,12 +1,12 @@
 package co.nvqa.common.core.hibernate;
 
-import co.nvqa.common.core.model.route.AreaVariation;
-import co.nvqa.common.core.model.route.Coverage;
-import co.nvqa.common.core.model.route.Keyword;
-import co.nvqa.common.core.model.route.RouteDriverTypeEntity;
-import co.nvqa.common.core.model.route.RouteGroup;
-import co.nvqa.common.core.model.route.RouteGroupReferences;
-import co.nvqa.common.core.model.route.Waypoints;
+import co.nvqa.common.core.model.persisted_class.route.AreaVariation;
+import co.nvqa.common.core.model.persisted_class.route.Coverage;
+import co.nvqa.common.core.model.persisted_class.route.Keyword;
+import co.nvqa.common.core.model.persisted_class.route.RouteDriverTypeEntity;
+import co.nvqa.common.core.model.persisted_class.route.RouteGroup;
+import co.nvqa.common.core.model.persisted_class.route.RouteGroupReferences;
+import co.nvqa.common.core.model.persisted_class.route.Waypoints;
 import co.nvqa.common.core.utils.CoreTestConstants;
 import co.nvqa.common.database.DbBase;
 import co.nvqa.common.utils.StandardTestConstants;
@@ -23,7 +23,7 @@ public class RouteDao extends DbBase {
 
   public RouteDao() {
     super(CoreTestConstants.DB_ROUTE_URL, StandardTestConstants.DB_USER,
-        StandardTestConstants.DB_PASS, "co.nvqa.common.core.model.route");
+        StandardTestConstants.DB_PASS, "co.nvqa.common.core.model.persisted_class");
   }
 
   public List<RouteDriverTypeEntity> findRouteDriverTypeByRouteIdAndNotDeleted(long routeId) {
