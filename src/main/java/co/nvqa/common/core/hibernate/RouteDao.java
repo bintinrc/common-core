@@ -3,7 +3,6 @@ package co.nvqa.common.core.hibernate;
 import co.nvqa.common.core.model.persisted_class.route.AreaVariation;
 import co.nvqa.common.core.model.persisted_class.route.Coverage;
 import co.nvqa.common.core.model.persisted_class.route.Keyword;
-import co.nvqa.common.core.model.persisted_class.route.RouteDriverTypeEntity;
 import co.nvqa.common.core.model.persisted_class.route.RouteGroup;
 import co.nvqa.common.core.model.persisted_class.route.RouteGroupReferences;
 import co.nvqa.common.core.model.persisted_class.route.Waypoints;
@@ -23,27 +22,20 @@ public class RouteDao extends DbBase {
 
   public RouteDao() {
     super(CoreTestConstants.DB_ROUTE_URL, StandardTestConstants.DB_USER,
-        StandardTestConstants.DB_PASS, "co.nvqa.common.core.model.persisted_class");
-  }
-
-  public List<RouteDriverTypeEntity> findRouteDriverTypeByRouteIdAndNotDeleted(long routeId) {
-    String query = "FROM route_driver_types WHERE route_id = :routeId AND deleted_at IS NULL";
-
-    return findAll(session ->
-        session.createQuery(query, RouteDriverTypeEntity.class)
-            .setParameter("routeId", routeId));
+        StandardTestConstants.DB_PASS, "co.nvqa.common.core.model.persisted_class.core");
   }
 
   public List<Coverage> getCoverageByArea(String area) {
-    String query = "FROM sr_coverages WHERE area = :area";
+    String query = "FROM Coverage WHERE area = :area AND systemId = :systemId";
 
     return findAll(session ->
         session.createQuery(query, Coverage.class)
-            .setParameter("area", area));
+            .setParameter("area", area)
+            .setParameter("systemId", StandardTestConstants.NV_SYSTEM_ID));
   }
 
   public Coverage getCoverageById(Long id) {
-    String query = "FROM sr_coverages WHERE id = :id";
+    String query = "FROM Coverage WHERE id = :id";
 
     var result = findAll(session ->
         session.createQuery(query, Coverage.class)
@@ -53,15 +45,16 @@ public class RouteDao extends DbBase {
   }
 
   public List<AreaVariation> getAreaVariations(String area) {
-    String query = "FROM sr_area_variations WHERE area = :area";
+    String query = "FROM AreaVariation WHERE area = :area AND systemId = :systemId";
 
     return findAll(session ->
         session.createQuery(query, AreaVariation.class)
-            .setParameter("area", area));
+            .setParameter("area", area)
+            .setParameter("systemId", StandardTestConstants.NV_SYSTEM_ID));
   }
 
   public List<Keyword> getKeywords(Long coverageId) {
-    String query = "FROM sr_keywords WHERE coverage_id = :coverageId";
+    String query = "FROM Keyword WHERE coverageId = :coverageId";
 
     return findAll(session ->
         session.createQuery(query, Keyword.class)
@@ -86,12 +79,12 @@ public class RouteDao extends DbBase {
   }
 
   public void softDeleteRoute(long routeId) {
-    String query = "UPDATE route_logs SET deleted_at = NOW() WHERE legacy_id = " + routeId;
+    String query = "UPDATE RouteLogs SET deletedAt = NOW() WHERE legacyId = " + routeId;
     saveOrUpdate(s -> s.createQuery(query));
   }
 
   public void setWaypointsZoneId(long zoneId, List<Long> waypointIds) {
-    String query = "UPDATE waypoints SET routing_zone_id = " + zoneId + " WHERE legacy_id in ("
+    String query = "UPDATE Waypoints SET routingZoneId = " + zoneId + " WHERE legacyId in ("
         + waypointIds.stream().map(Object::toString).collect(Collectors.joining(",")) + ")";
 
     saveOrUpdate(s -> s.createQuery(query));
