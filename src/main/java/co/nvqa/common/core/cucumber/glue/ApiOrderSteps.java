@@ -5,6 +5,7 @@ import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.model.order.Order;
 import co.nvqa.common.core.model.order.RescheduleOrderRequest;
 import co.nvqa.common.core.model.order.RescheduleOrderResponse;
+import co.nvqa.common.core.model.order.RtsOrderRequest;
 import co.nvqa.common.utils.JsonUtils;
 import co.nvqa.common.utils.NvTestRuntimeException;
 import co.nvqa.common.utils.StandardTestConstants;
@@ -145,5 +146,20 @@ public class ApiOrderSteps extends CoreStandardSteps {
           }
         }, "Reschedule order", 3000, 10);
 
+  }
+
+  /**
+   * @param dataTableRaw <br/> <b>orderId</b>: order ID of the order/parcel e.g. {KEY_LIST_OF_CREATED_ORDERS[1].id}<br/>
+   *                     <b>rtsRequest</b> { "reason": "Return to sender: Nobody at address", "timewindow_id":1, "date":"{date: 1 days next, yyyy-MM-dd}"}<br/>
+   */
+  @When("API Core - Operator rts order:")
+  public void apiOperatorRtsOrder(Map<String, String> dataTableRaw) {
+    final Map<String, String> dataTable = resolveKeyValues(dataTableRaw);
+    final long orderId = Long.parseLong(dataTable.get("orderId"));
+    final String rtsRequestString = dataTable.get("rtsRequest");
+    final RtsOrderRequest rtsRequest = fromJsonSnakeCase(rtsRequestString, RtsOrderRequest.class);
+
+    retryIfAssertionErrorOrRuntimeExceptionOccurred(
+        () -> getOrderClient().rts(orderId, rtsRequest), "set RTS order");
   }
 }
