@@ -13,7 +13,7 @@ public class ShipperPickupSearchDao extends DbBase {
 
   public ShipperPickupSearchDao() {
     super(CoreTestConstants.DB_CORE_URL, StandardTestConstants.DB_USER,
-        StandardTestConstants.DB_PASS, "co.nvqa.common.core.model.persisted_class");
+        StandardTestConstants.DB_PASS, "co.nvqa.common.core.model.persisted_class.core");
   }
 
   public ShipperPickupSearch getShipperPickupSearchByReservationId(Long reservationId) {

@@ -22,7 +22,7 @@ public class RouteDao extends DbBase {
 
   public RouteDao() {
     super(CoreTestConstants.DB_ROUTE_URL, StandardTestConstants.DB_USER,
-        StandardTestConstants.DB_PASS, "co.nvqa.common.core.model.persisted_class.core");
+        StandardTestConstants.DB_PASS, "co.nvqa.common.core.model.persisted_class.route");
   }
 
   public List<Coverage> getCoverageByArea(String area) {

@@ -22,7 +22,7 @@ public class CoreTestConstants extends PropertiesReader {
         StringUtils.lowerCase(StandardTestConstants.NV_SYSTEM_ID));
     DB_EVENTS_URL = String.format("jdbc:mysql://%s:%s/events_%s_%s?characterEncoding=UTF-8",
         StringUtils.lowerCase(StandardTestConstants.DB_HOST_TIDB),
-        StandardTestConstants.DB_HOST_TIDB,
+        StandardTestConstants.DB_PORT_TIDB,
         StringUtils.lowerCase(StandardTestConstants.NV_DATABASE_ENVIRONMENT),
         "gl");
     DB_ROUTE_URL = String.format("jdbc:mysql://%s:%s/route_%s_%s?characterEncoding=UTF-8",
