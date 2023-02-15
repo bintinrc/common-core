@@ -6,10 +6,18 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * @author Sergey Mishanin
  */
+@AllArgsConstructor
+@NoArgsConstructor
+@Setter
+@Getter
 @Entity
 @Table(name = "pickup_events")
 public class PickupEvents extends DataEntity<PickupEvents> {
@@ -40,106 +48,8 @@ public class PickupEvents extends DataEntity<PickupEvents> {
   @Column(name = "user_name")
   private String userName;
 
-  public PickupEvents() {
-  }
-
   public PickupEvents(Map<String, ?> data) {
     fromMap(data);
   }
 
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public String getCreatedAt() {
-    return createdAt;
-  }
-
-  public void setCreatedAt(String createdAt) {
-    this.createdAt = createdAt;
-  }
-
-  public String getData() {
-    return data;
-  }
-
-  public void setData(String data) {
-    this.data = data;
-  }
-
-  public String getEventTime() {
-    return eventTime;
-  }
-
-  public void setEventTime(String eventTime) {
-    this.eventTime = eventTime;
-  }
-
-  public Long getPickupId() {
-    return pickupId;
-  }
-
-  public void setPickupId(Long pickupId) {
-    this.pickupId = pickupId;
-  }
-
-  public Integer getPickupType() {
-    return pickupType;
-  }
-
-  public void setPickupType(Integer pickupType) {
-    this.pickupType = pickupType;
-  }
-
-  public String getSystemId() {
-    return systemId;
-  }
-
-  public void setSystemId(String systemId) {
-    this.systemId = systemId;
-  }
-
-  public Integer getType() {
-    return type;
-  }
-
-  public void setType(Integer type) {
-    this.type = type;
-  }
-
-  public String getUserEmail() {
-    return userEmail;
-  }
-
-  public void setUserEmail(String userEmail) {
-    this.userEmail = userEmail;
-  }
-
-  public String getUserGrantType() {
-    return userGrantType;
-  }
-
-  public void setUserGrantType(String userGrantType) {
-    this.userGrantType = userGrantType;
-  }
-
-  public Integer getUserId() {
-    return userId;
-  }
-
-  public void setUserId(Integer userId) {
-    this.userId = userId;
-  }
-
-  public String getUserName() {
-    return userName;
-  }
-
-  public void setUserName(String userName) {
-    this.userName = userName;
-  }
 }

@@ -6,10 +6,18 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * @author Sergey Mishanin
  */
+@AllArgsConstructor
+@NoArgsConstructor
+@Setter
+@Getter
 @Entity
 @Table(name = "route_group_references")
 public class RouteGroupReferences extends DataEntity<RouteGroupReferences> {
@@ -32,74 +40,8 @@ public class RouteGroupReferences extends DataEntity<RouteGroupReferences> {
   @Column(name = "system_id")
   private String systemId;
 
-  public RouteGroupReferences() {
-  }
-
   public RouteGroupReferences(Map<String, ?> data) {
     fromMap(data);
   }
 
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public String getCreatedAt() {
-    return createdAt;
-  }
-
-  public void setCreatedAt(String createdAt) {
-    this.createdAt = createdAt;
-  }
-
-  public String getDeletedAt() {
-    return deletedAt;
-  }
-
-  public void setDeletedAt(String deletedAt) {
-    this.deletedAt = deletedAt;
-  }
-
-  public String getUpdatedAt() {
-    return updatedAt;
-  }
-
-  public void setUpdatedAt(String updatedAt) {
-    this.updatedAt = updatedAt;
-  }
-
-  public Long getReferenceId() {
-    return referenceId;
-  }
-
-  public void setReferenceId(Long referenceId) {
-    this.referenceId = referenceId;
-  }
-
-  public Long getReferenceTypeId() {
-    return referenceTypeId;
-  }
-
-  public void setReferenceTypeId(Long referenceTypeId) {
-    this.referenceTypeId = referenceTypeId;
-  }
-
-  public Long getRouteGroupId() {
-    return routeGroupId;
-  }
-
-  public void setRouteGroupId(Long routeGroupId) {
-    this.routeGroupId = routeGroupId;
-  }
-
-  public String getSystemId() {
-    return systemId;
-  }
-
-  public void setSystemId(String systemId) {
-    this.systemId = systemId;
-  }
 }

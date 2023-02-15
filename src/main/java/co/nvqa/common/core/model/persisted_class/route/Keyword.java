@@ -6,10 +6,18 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * @author Sergey Mishanin
  */
+@AllArgsConstructor
+@NoArgsConstructor
+@Setter
+@Getter
 @Entity
 @Table(name = "sr_keywords")
 public class Keyword extends DataEntity<Keyword> {
@@ -22,34 +30,8 @@ public class Keyword extends DataEntity<Keyword> {
   @Column(name = "value")
   private String value;
 
-  public Keyword() {
-  }
-
   public Keyword(Map<String, ?> data) {
     super(data);
   }
 
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public Long getCoverageId() {
-    return coverageId;
-  }
-
-  public void setCoverageId(Long coverageId) {
-    this.coverageId = coverageId;
-  }
-
-  public String getValue() {
-    return value;
-  }
-
-  public void setValue(String value) {
-    this.value = value;
-  }
 }

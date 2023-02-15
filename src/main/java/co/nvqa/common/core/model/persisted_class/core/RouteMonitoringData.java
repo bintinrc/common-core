@@ -6,10 +6,18 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * @author Sergey Mishanin
  */
+@AllArgsConstructor
+@NoArgsConstructor
+@Setter
+@Getter
 @Entity
 @Table(name = "route_monitoring_data")
 public class RouteMonitoringData extends DataEntity<RouteMonitoringData> {
@@ -36,90 +44,8 @@ public class RouteMonitoringData extends DataEntity<RouteMonitoringData> {
   @Column(name = "zone_name")
   private String zoneName;
 
-  public RouteMonitoringData() {
-  }
-
   public RouteMonitoringData(Map<String, ?> data) {
     super(data);
   }
 
-  public Long getRouteId() {
-    return routeId;
-  }
-
-  public void setRouteId(Long routeId) {
-    this.routeId = routeId;
-  }
-
-  public Long getWaypointId() {
-    return waypointId;
-  }
-
-  public void setWaypointId(Long waypointId) {
-    this.waypointId = waypointId;
-  }
-
-  public String getCreatedAt() {
-    return createdAt;
-  }
-
-  public void setCreatedAt(String createdAt) {
-    this.createdAt = createdAt;
-  }
-
-  public String getData() {
-    return data;
-  }
-
-  public void setData(String data) {
-    this.data = data;
-  }
-
-  public String getDriverName() {
-    return driverName;
-  }
-
-  public void setDriverName(String driverName) {
-    this.driverName = driverName;
-  }
-
-  public String getHubName() {
-    return hubName;
-  }
-
-  public void setHubName(String hubName) {
-    this.hubName = hubName;
-  }
-
-  public String getType() {
-    return type;
-  }
-
-  public void setType(String type) {
-    this.type = type;
-  }
-
-  public String getUpdatedAt() {
-    return updatedAt;
-  }
-
-  public void setUpdatedAt(String updatedAt) {
-    this.updatedAt = updatedAt;
-  }
-
-  public Integer getVersion() {
-    return version;
-  }
-
-  public void setVersion(Integer version) {
-    this.version = version;
-  }
-
-  public String getZoneName() {
-    return zoneName;
-  }
-
-  public void setZoneName(String zoneName) {
-    this.zoneName = zoneName;
-  }
 }

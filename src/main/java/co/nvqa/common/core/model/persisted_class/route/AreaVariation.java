@@ -6,10 +6,18 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * @author Sergey Mishanin
  */
+@AllArgsConstructor
+@NoArgsConstructor
+@Setter
+@Getter
 @Entity
 @Table(name = "sr_area_variations")
 public class AreaVariation extends DataEntity<AreaVariation> {
@@ -24,42 +32,8 @@ public class AreaVariation extends DataEntity<AreaVariation> {
   @Column(name = "system_id")
   private String systemId;
 
-  public AreaVariation() {
-  }
-
   public AreaVariation(Map<String, ?> data) {
     super(data);
   }
 
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public String getArea() {
-    return area;
-  }
-
-  public void setArea(String area) {
-    this.area = area;
-  }
-
-  public String getVariationName() {
-    return variationName;
-  }
-
-  public void setVariationName(String variationName) {
-    this.variationName = variationName;
-  }
-
-  public String getSystemId() {
-    return systemId;
-  }
-
-  public void setSystemId(String systemId) {
-    this.systemId = systemId;
-  }
 }

@@ -31,7 +31,7 @@ public class EventsDao extends DbBase {
   }
 
   public List<PickupEvents> getPickupEvents(Long pickupId) {
-    String query = "FROM OrderEvents WHERE systemId = :systemId AND pickupId = :pickupId ORDER BY id DESC";
+    String query = "FROM PickupEvents WHERE systemId = :systemId AND pickupId = :pickupId ORDER BY id DESC";
 
     return findAll(session ->
         session.createQuery(query, PickupEvents

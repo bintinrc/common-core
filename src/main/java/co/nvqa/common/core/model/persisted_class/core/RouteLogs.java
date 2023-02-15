@@ -6,10 +6,18 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * @author Sergey Mishanin
  */
+@AllArgsConstructor
+@NoArgsConstructor
+@Setter
+@Getter
 @Entity
 @Table(name = "route_logs")
 public class RouteLogs extends DataEntity<RouteLogs> {
@@ -30,66 +38,8 @@ public class RouteLogs extends DataEntity<RouteLogs> {
   @Column(name = "zone_id")
   private Long zoneId;
 
-  public RouteLogs() {
-  }
-
   public RouteLogs(Map<String, ?> data) {
     super(data);
   }
 
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public String getDeletedAt() {
-    return deletedAt;
-  }
-
-  public void setDeletedAt(String deletedAt) {
-    this.deletedAt = deletedAt;
-  }
-
-  public int getArchived() {
-    return archived;
-  }
-
-  public void setArchived(int archived) {
-    this.archived = archived;
-  }
-
-  public int getStatus() {
-    return status;
-  }
-
-  public void setStatus(int status) {
-    this.status = status;
-  }
-
-  public Long getHubId() {
-    return hubId;
-  }
-
-  public void setHubId(Long hubId) {
-    this.hubId = hubId;
-  }
-
-  public Long getZoneId() {
-    return zoneId;
-  }
-
-  public void setZoneId(Long zoneId) {
-    this.zoneId = zoneId;
-  }
-
-  public int getIsOk() {
-    return isOk;
-  }
-
-  public void setIsOk(int isOk) {
-    this.isOk = isOk;
-  }
 }
