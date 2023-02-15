@@ -1,6 +1,6 @@
 package co.nvqa.common.core.hibernate;
 
-import co.nvqa.common.core.model.persisted_class.Order;
+import co.nvqa.common.core.model.persisted_class.core.Order;
 import co.nvqa.common.core.utils.CoreTestConstants;
 import co.nvqa.common.database.DbBase;
 import co.nvqa.common.utils.NvTestRuntimeException;
@@ -13,7 +13,7 @@ public class OrderDao extends DbBase {
 
   public OrderDao() {
     super(CoreTestConstants.DB_CORE_URL, StandardTestConstants.DB_USER,
-        StandardTestConstants.DB_PASS, "co.nvqa.common.core.model.persisted_class");
+        StandardTestConstants.DB_PASS, "co.nvqa.common.core.model.persisted_class.core");
   }
 
   public Double getOrderWeight(Long orderId) {
