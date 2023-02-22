@@ -67,6 +67,19 @@ public class RouteClient extends SimpleApiClient {
     return doPut("Operator Portal - Add Parcel to Route", spec, url);
   }
 
+  /**
+   * @param orderId orderId
+   * @param transactionType String between DELIVERY and PICKUP
+   */
+  public void pullFromRoute(long orderId, String transactionType) {
+    final String url = "core/2.0/orders/{orderId}/routes";
+    final RequestSpecification spec = createAuthenticatedRequest()
+        .pathParam("orderId", orderId)
+        .body(f("{\"type\":\"%s\"}", transactionType));
+
+    doPut("Operator Portal - Pull Parcel from Route", spec, url);
+  }
+
   public void archiveRoute(long routeId) {
     Response r = archiveRouteAndGetRawResponse(routeId);
     if (r.statusCode() != HttpConstants.RESPONSE_204_NO_CONTENT) {
