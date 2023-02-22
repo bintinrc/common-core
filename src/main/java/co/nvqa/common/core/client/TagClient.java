@@ -2,7 +2,7 @@ package co.nvqa.common.core.client;
 
 import co.nvqa.common.client.SimpleApiClient;
 import co.nvqa.common.constants.HttpConstants;
-import co.nvqa.common.core.model.response_wrapper.ResponseWrapper;
+import co.nvqa.common.core.model.ResponseWrapper;
 import co.nvqa.common.core.model.tag.Tag;
 import co.nvqa.common.core.model.tag.TagResponse;
 import co.nvqa.common.core.model.tag.Tags;

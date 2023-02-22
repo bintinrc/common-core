@@ -1,4 +1,4 @@
-package co.nvqa.common.core.model.response_wrapper;
+package co.nvqa.common.core.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
