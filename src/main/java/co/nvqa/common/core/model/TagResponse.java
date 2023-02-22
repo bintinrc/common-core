@@ -1,4 +1,4 @@
-package co.nvqa.common.core.model.tag;
+package co.nvqa.common.core.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

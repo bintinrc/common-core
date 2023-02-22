@@ -1,4 +1,4 @@
-package co.nvqa.common.core.model.tag;
+package co.nvqa.common.core.model;
 
 import java.util.List;
 import lombok.AllArgsConstructor;
