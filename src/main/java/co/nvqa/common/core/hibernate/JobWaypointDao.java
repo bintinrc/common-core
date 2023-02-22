@@ -1,7 +1,6 @@
 package co.nvqa.common.core.hibernate;
 
-import co.nvqa.common.core.model.persisted_class.JobWaypoint;
-import co.nvqa.common.core.model.persisted_class.OrderPickup;
+import co.nvqa.common.core.model.persisted_class.core.JobWaypoint;
 import co.nvqa.common.core.utils.CoreTestConstants;
 import co.nvqa.common.database.DbBase;
 import co.nvqa.common.utils.StandardTestConstants;
@@ -14,7 +13,7 @@ public class JobWaypointDao extends DbBase {
 
   public JobWaypointDao() {
     super(CoreTestConstants.DB_CORE_URL, StandardTestConstants.DB_USER,
-        StandardTestConstants.DB_PASS, "co.nvqa.common.core.model.persisted_class");
+        StandardTestConstants.DB_PASS, "co.nvqa.common.core.model.persisted_class.core");
   }
 
   public JobWaypoint getWaypointIdByJobId(Long jobId) {

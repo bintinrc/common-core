@@ -1,4 +1,4 @@
-package co.nvqa.common.core.model.persisted_class;
+package co.nvqa.common.core.model.persisted_class.core;
 
 import java.sql.Timestamp;
 import javax.persistence.Column;
@@ -15,17 +15,23 @@ import lombok.Setter;
 @Setter
 @Getter
 @Entity
-@Table(name = "waypoints")
-public class Waypoints {
+@Table(name = "order_pickups")
+public class OrderPickup {
 
   @Id
   @Column(name = "id")
   private Long id;
 
-  @Column(name = "zone_type")
-  private String zoneType;
+  @Column(name = "order_id")
+  private Long orderId;
 
-  @Column(name = "routing_zone_id")
-  private String routingZoneId;
+  @Column(name = "reservation_id")
+  private Long reservationId;
+
+  @Column(name = "created_at")
+  private Timestamp createdAt;
+
+  @Column(name = "deleted_at")
+  private Timestamp deletedAt;
 
 }

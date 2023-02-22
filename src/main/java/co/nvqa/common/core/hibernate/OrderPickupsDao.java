@@ -1,6 +1,6 @@
 package co.nvqa.common.core.hibernate;
 
-import co.nvqa.common.core.model.persisted_class.OrderPickup;
+import co.nvqa.common.core.model.persisted_class.core.OrderPickup;
 import co.nvqa.common.core.utils.CoreTestConstants;
 import co.nvqa.common.database.DbBase;
 import co.nvqa.common.utils.StandardTestConstants;
@@ -12,7 +12,7 @@ public class OrderPickupsDao extends DbBase {
 
   public OrderPickupsDao() {
     super(CoreTestConstants.DB_CORE_URL, StandardTestConstants.DB_USER,
-        StandardTestConstants.DB_PASS, "co.nvqa.common.core.model.persisted_class");
+        StandardTestConstants.DB_PASS, "co.nvqa.common.core.model.persisted_class.core");
   }
 
   public List<OrderPickup> getOrderPickupByOrderId(Long orderId) {
