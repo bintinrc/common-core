@@ -2,21 +2,27 @@ package co.nvqa.common.core.client;
 
 import co.nvqa.common.client.SimpleApiClient;
 import co.nvqa.common.constants.HttpConstants;
+import co.nvqa.common.core.model.order.BatchOrderInfo;
 import co.nvqa.common.core.model.order.BulkForceSuccessOrderRequest;
+import co.nvqa.common.core.model.order.DeliveryDetails;
 import co.nvqa.common.core.model.order.Order;
 import co.nvqa.common.core.model.order.Order.BillingZone;
 import co.nvqa.common.core.model.order.Order.Cod;
+import co.nvqa.common.core.model.order.Order.Dimension;
 import co.nvqa.common.core.model.order.Order.PackageContent;
 import co.nvqa.common.core.model.order.Order.PricingInfo;
 import co.nvqa.common.core.model.order.Order.ShipperRefMetadata;
 import co.nvqa.common.core.model.order.Order.Transaction;
 import co.nvqa.common.core.model.order.OrderTagsRequest;
+import co.nvqa.common.core.model.order.PricingDetails;
 import co.nvqa.common.core.model.order.RescheduleOrderRequest;
 import co.nvqa.common.core.model.order.RescheduleOrderResponse;
 import co.nvqa.common.core.model.order.RtsOrderRequest;
 import co.nvqa.common.core.model.order.SearchOrderRequest;
 import co.nvqa.common.core.model.order.SearchOrderResponse;
 import co.nvqa.common.core.model.order.SearchOrderTagResponse;
+import co.nvqa.common.core.model.order.Tag;
+import co.nvqa.common.core.model.order.UserDetails;
 import co.nvqa.common.utils.NvTestHttpException;
 import co.nvqa.common.utils.StandardTestConstants;
 import co.nvqa.commonauth.utils.TokenUtils;
@@ -35,6 +41,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import javax.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.utils.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -246,6 +253,25 @@ public class OrderClient extends SimpleApiClient {
     return fromJsonSnakeCase(r.body().asString(), RescheduleOrderResponse.class);
   }
 
+  public RescheduleOrderResponse rescheduleOrderWithBody(long orderId, String body) {
+    RescheduleOrderRequest request = fromJsonSnakeCase(body, RescheduleOrderRequest.class);
+    Response r = rescheduleOrderAsRawResponse(orderId, request);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+    r.then().contentType(ContentType.JSON);
+    return fromJson(r.body().asString(), RescheduleOrderResponse.class);
+  }
+
+  public RescheduleOrderResponse rescheduleOrder(long orderId, String date) {
+    RescheduleOrderRequest request = new RescheduleOrderRequest();
+    request.setDate(date);
+    return rescheduleOrder(orderId, request);
+  }
+
+  public RescheduleOrderResponse rescheduleOrder(long orderId, Date date) {
+    return rescheduleOrder(orderId, DateUtils.formatDate(date, "yyyy-MM-dd"));
+  }
 
   public Response rescheduleOrderAsRawResponse(long orderId, RescheduleOrderRequest payload) {
     String url = "core/orders/{orderId}/reschedule";
@@ -471,6 +497,256 @@ public class OrderClient extends SimpleApiClient {
     }
     r.then().contentType(ContentType.JSON);
     return r.body().as(Tag.class);
+  }
+
+  public void updateOrderCop(Long orderId, Double copAmount) {
+    String url = "core/2.0/orders/{orderId}/cop";
+
+    RequestSpecification spec = createAuthenticatedRequest()
+        .pathParam("orderId", orderId)
+        .body(f("{\"amount\":%f}", copAmount));
+
+    Response r = doPut("Core - Update Order Cop", spec, url);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+    r.then().contentType(ContentType.JSON);
+  }
+
+  public void updateOrderCod(Long orderId, Double codAmount) {
+    Response r = addCodValueAndGetRawResponse(orderId, codAmount);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+    r.then().contentType(ContentType.JSON);
+  }
+
+  public Response addCodValueAndGetRawResponse(Long orderId, Double codValue) {
+    String url = "core/2.0/orders/{orderId}/cod";
+    RequestSpecification spec = createAuthenticatedRequest()
+        .header("Content-Type", ContentType.JSON)
+        .pathParam("orderId", orderId)
+        .body(f("{ \"amount\": %f }", codValue));
+
+    return doPut(f("Core - Add/Update COD with value of : %f", codValue), spec, url);
+  }
+
+  public Response deleteCodAndGetRawResponse(Long orderId) {
+    String url = "core/2.0/orders/{orderId}/cod";
+    RequestSpecification spec = createAuthenticatedRequest()
+        .header("Content-Type", ContentType.JSON)
+        .pathParam("orderId", orderId);
+
+    return doDelete(f("Core - Delete COD"), spec, url);
+  }
+
+  public void deleteCod(Long orderId) {
+    Response r = deleteCodAndGetRawResponse(orderId);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+    r.then().contentType(ContentType.JSON);
+  }
+
+  public void deleteOrder(long orderId) {
+    String url = "core/orders/{orderId}";
+
+    RequestSpecification spec = createAuthenticatedRequest()
+        .pathParam("orderId", orderId);
+
+    Response r = doDelete("Core - Delete Order", spec, url);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+    r.then().contentType(ContentType.JSON);
+  }
+
+  public void getDeletedOrder(long orderId) {
+    String url = "core/orders/{orderId}";
+
+    RequestSpecification spec = createAuthenticatedRequest()
+        .pathParam("orderId", orderId);
+
+    Response r = doGet("Core - Get deleted order", spec, url);
+    if (r.statusCode() != HttpConstants.RESPONSE_500_INTERNAL_SERVER_ERROR) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+    r.then().contentType(ContentType.JSON);
+  }
+
+  public void forceCancelOrder(long orderId) {
+    String url = "core/2.0/orders/{orderId}/cancel";
+
+    RequestSpecification spec = createAuthenticatedRequest()
+        .pathParam("orderId", orderId)
+        .body("{\"force_cancel\": true, \"comments\": \"cancelled for testing purposes\"}");
+    Response r = doPut("Core - Force Cancel Order", spec, url);
+    if (r.statusCode() != HttpConstants.RESPONSE_204_NO_CONTENT) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+  }
+
+  public void updateOrderPricingWeight(long orderId, double weight) {
+    String url = "core/orders/{orderId}/pricing-weight";
+
+    RequestSpecification spec = createAuthenticatedRequest()
+        .pathParam("orderId", orderId)
+        .body(f("{\"weight\":\"%s\"}", weight));
+
+    Response r = doPost("Core - Order Weight Update", spec, url);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+    r.then().contentType(ContentType.JSON);
+  }
+
+  public PricingDetails getPricingDetails(long orderId) {
+    String url = "core/2.0/orders/pricing-details";
+
+    RequestSpecification spec = createAuthenticatedRequest()
+        .queryParam("order_id", orderId);
+    Response r = doGet("Core - Get Pricing Details", spec, url);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+    r.then().contentType(ContentType.JSON);
+    return fromJsonSnakeCase(r.body().asString(), PricingDetails.class);
+  }
+
+  public void updateDeliveryTypes(long orderId, int deliveryType) {
+    String url = "core/orders/{orderId}/deliverytypes";
+
+    RequestSpecification spec = createAuthenticatedRequest()
+        .pathParam("orderId", orderId)
+        .body(f("{\"deliveryTypeValue\":\"%s\"}", deliveryType));
+
+    Response r = doPut("Core - Delivery Types Update", spec, url);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+    r.then().contentType(ContentType.JSON);
+  }
+
+  public void updateOrderDeliveryAddress(long orderId, UserDetails to) {
+    String url = "/core/2.1/orders/{orderId}";
+
+    RequestSpecification spec = createAuthenticatedRequest()
+        .pathParam("orderId", orderId)
+        .body(toJsonSnakeCase(to));
+
+    Response r = doPatch("Core - Order Delivery Address Update", spec, url);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+    r.then().contentType(ContentType.JSON);
+  }
+
+  public BatchOrderInfo retrieveBatchOrderInfo(long batchId) {
+    String url = "core/orders/bybatchid/{batchId}";
+
+    RequestSpecification spec = createAuthenticatedRequest()
+        .pathParam("batchId", batchId);
+
+    Response r = doGet("Core - Get Batch Info", spec, url);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+    r.then().contentType(ContentType.JSON);
+
+    return fromJson(DEFAULT_SNAKE_CASE_MAPPER, r.body().asString(), BatchOrderInfo.class);
+  }
+
+  public void forceFailWaypoint(long routeId, long waypointId, long failureReasonId) {
+    String url = "core/admin/routes/{routeId}/waypoints/{waypointId}/pods";
+
+    RequestSpecification spec = createAuthenticatedRequest()
+        .pathParam("routeId", routeId)
+        .pathParam("waypointId", waypointId)
+        .body(f("{ \"action\": \"fail\", \"failure_reason_id\":%d}", failureReasonId));
+
+    Response r = doPut("Core - Admin Force Fail", spec, url);
+    if (r.statusCode() != HttpConstants.RESPONSE_204_NO_CONTENT) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+  }
+
+  public void forceSuccessWaypoint(long routeId, long waypointId) {
+    String url = "core/admin/routes/{routeId}/waypoints/{waypointId}/pods";
+
+    RequestSpecification spec = createAuthenticatedRequest()
+        .pathParam("routeId", routeId)
+        .pathParam("waypointId", waypointId)
+        .body("{ \"action\": \"success\"}");
+
+    Response r = doPut("Core - Admin Force Success", spec, url);
+    if (r.statusCode() != HttpConstants.RESPONSE_204_NO_CONTENT) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+  }
+
+  public void forceSuccessWaypointWithCodCollected(long routeId, long waypointId,
+      List<Long> orderIds) {
+    String url = "core/admin/routes/{routeId}/waypoints/{waypointId}/pods";
+    String json = f("{ \"action\": \"success\", \"cod_collected_order_ids\": %s}", orderIds);
+
+    RequestSpecification spec = createAuthenticatedRequest()
+        .pathParam("routeId", routeId)
+        .pathParam("waypointId", waypointId)
+        .body(json);
+
+    Response r = doPut("Core - Admin Force Success with COD collected", spec, url);
+    if (r.statusCode() != HttpConstants.RESPONSE_204_NO_CONTENT) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+  }
+
+  public void editDeliveryDetails(Long orderId, DeliveryDetails deliveryDetails) {
+    String url = "core/2.0/orders/{orderId}";
+
+    String json = toJsonSnakeCase(deliveryDetails);
+
+    RequestSpecification spec = createAuthenticatedRequest()
+        .header("Content-Type", ContentType.JSON)
+        .pathParam("orderId", orderId)
+        .body(json);
+
+    Response r = doPatch("Core - Edit Delivery Details", spec, url);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+    r.then().contentType(ContentType.JSON);
+  }
+
+  public void updatePriorityLevelOfTransaction(Long orderId, int priorityLevel) {
+    String url = "core/2.0/orders/{orderId}";
+
+    RequestSpecification spec = createAuthenticatedRequest()
+        .header("Accept", ContentType.JSON)
+        .header("Content-Type", ContentType.JSON)
+        .pathParam("orderId", orderId)
+        .body(f("{\"parcel_job\":{\"delivery_priority_level\":%d}}", priorityLevel));
+
+    Response r = doPatch("Core - Update Priority Level", spec, url);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+    r.then().contentType(ContentType.JSON);
+  }
+
+  public void updateParcelDimensions(Long orderId, Dimension dimension) {
+    String url = "core/orders/{orderId}/dimensions";
+    String json = toJsonSnakeCase(dimension);
+
+    RequestSpecification spec = createAuthenticatedRequest()
+        .header("Accept", ContentType.JSON)
+        .header("Content-Type", ContentType.JSON)
+        .pathParam("orderId", orderId)
+        .body(json);
+
+    Response r = doPut("Core - Edit Order Update Dimensions", spec, url);
+    if (r.statusCode() != HttpConstants.RESPONSE_204_NO_CONTENT) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
   }
 
   private Order convertJsonOrder(String jsonOrder) {
