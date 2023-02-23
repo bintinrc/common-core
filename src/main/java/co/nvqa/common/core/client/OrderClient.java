@@ -282,6 +282,22 @@ public class OrderClient extends SimpleApiClient {
     return doPost("Core - Reschedule Order", spec, url);
   }
 
+  public void rts(long orderId, RtsOrderRequest request) {
+    String url = "/core/orders/{orderId}/rts";
+    String json = toJsonSnakeCase(request);
+
+    RequestSpecification spec = createAuthenticatedRequest()
+        .header("Accept", ContentType.JSON)
+        .header("Content-Type", ContentType.JSON)
+        .pathParam("orderId", orderId)
+        .body(json);
+
+    Response r = doPut("Core - Set Returned to Sender", spec, url);
+    if (r.statusCode() != HttpConstants.RESPONSE_204_NO_CONTENT) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+  }
+
   public Response cancelOrderV1AndGetRawResponse(Long orderId, String reason) {
 
     String url = "core/orders/{orderId}/cancel";
