@@ -1,4 +1,4 @@
-package co.nvqa.common.core.model.persisted_class;
+package co.nvqa.common.core.model.persisted_class.core;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
