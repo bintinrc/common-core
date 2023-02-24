@@ -6,11 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * @author Daniel Joi Partogi Hutapea
- * <p>
- * JSON format: camel case
- */
 @Setter
 @Getter
 @AllArgsConstructor

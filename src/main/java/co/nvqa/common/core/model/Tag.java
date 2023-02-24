@@ -9,8 +9,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * @author Daniel Joi Partogi Hutapea
- * <p>
  * JSON format: camel case
  */
 @JsonIgnoreProperties(ignoreUnknown = true)

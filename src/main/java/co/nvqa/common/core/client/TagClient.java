@@ -18,12 +18,6 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-/**
- * Created on 16/7/18.
- *
- * @author Niko Susanto
- */
 @SuppressWarnings("WeakerAccess")
 @Singleton
 public class TagClient extends SimpleApiClient {
@@ -78,7 +72,7 @@ public class TagClient extends SimpleApiClient {
   }
 
   public void deleteTag(long tagId) {
-    String apiMethod = "/route/1.0/tags/{tagId}";
+    String apiMethod = "route/1.0/tags/{tagId}";
 
     LOGGER.info(f("Deleting tag with ID = '%s'...", tagId));
 
@@ -102,7 +96,7 @@ public class TagClient extends SimpleApiClient {
   public Tag findTagByName(String name) {
     Tag result = null;
 
-    String apiMethod = "/route/1.0/tags";
+    String apiMethod = "route/1.0/tags";
 
     RequestSpecification requestSpecification = createAuthenticatedRequest();
 
