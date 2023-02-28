@@ -5,7 +5,6 @@ import co.nvqa.common.constants.HttpConstants;
 import co.nvqa.common.core.model.pickup.Pickup;
 import co.nvqa.common.core.model.pickup.PickupSearchRequest;
 import co.nvqa.common.utils.NvTestHttpException;
-
 import co.nvqa.common.utils.StandardTestConstants;
 import co.nvqa.commonauth.utils.TokenUtils;
 import io.restassured.response.Response;
