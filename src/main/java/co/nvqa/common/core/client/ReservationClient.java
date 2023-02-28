@@ -7,11 +7,13 @@ import co.nvqa.common.core.model.reservation.ReservationResponse;
 import co.nvqa.common.core.model.reservation.ReservationFilter;
 import co.nvqa.common.core.model.reservation.ReservationWrapper;
 import co.nvqa.common.utils.NvTestHttpException;
+import co.nvqa.common.utils.StandardTestConstants;
+import co.nvqa.commonauth.utils.TokenUtils;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import java.util.List;
-import java.util.TimeZone;
+import javax.inject.Singleton;
 
 /**
  * Created on 18/04/18.
@@ -19,14 +21,12 @@ import java.util.TimeZone;
  * @author Felix Soewito
  */
 @SuppressWarnings({"WeakerAccess", "unused"})
+@Singleton
 public class ReservationClient extends SimpleApiClient {
 
-  public ReservationClient(String baseUrl, String bearerToken) {
-    this(baseUrl, bearerToken, null);
-  }
-
-  public ReservationClient(String baseUrl, String bearerToken, TimeZone timeZone) {
-    super(baseUrl, bearerToken, timeZone, DEFAULT_SNAKE_CASE_MAPPER);
+  public ReservationClient() {
+    super(StandardTestConstants.API_BASE_URL, TokenUtils.getOperatorAuthToken(),
+        DEFAULT_SNAKE_CASE_MAPPER);
   }
 
   public ReservationResponse createReservation(ReservationRequest request) {

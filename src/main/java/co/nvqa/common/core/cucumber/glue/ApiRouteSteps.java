@@ -9,6 +9,7 @@ import co.nvqa.common.core.model.route.RouteResponse;
 import co.nvqa.common.core.model.waypoint.Waypoint;
 import co.nvqa.common.core.utils.CoreTestUtils;
 import co.nvqa.common.utils.StandardTestUtils;
+import io.cucumber.guice.ScenarioScoped;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
 import io.restassured.response.Response;
@@ -22,6 +23,7 @@ import javax.inject.Inject;
 import lombok.Getter;
 import org.assertj.core.api.Assertions;
 
+@ScenarioScoped
 public class ApiRouteSteps extends CoreStandardSteps {
 
   @Inject
