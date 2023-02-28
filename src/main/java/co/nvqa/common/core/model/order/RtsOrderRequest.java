@@ -1,16 +1,24 @@
 package co.nvqa.common.core.model.order;
 
 import lombok.AllArgsConstructor;
+<<<<<<< HEAD
 import lombok.Builder;
+=======
+>>>>>>> master
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+<<<<<<< HEAD
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+=======
+@AllArgsConstructor
+@NoArgsConstructor
+>>>>>>> master
 public class RtsOrderRequest {
 
   private String address1;
@@ -27,6 +35,7 @@ public class RtsOrderRequest {
   private Long timewindowId;
   private Double latitude;
   private Double longitude;
+<<<<<<< HEAD
 
   public RtsOrderRequest(String address1, String address2, String city, String contact,
       String country,
@@ -46,4 +55,6 @@ public class RtsOrderRequest {
     this.timewindowId = timewindowId;
   }
 
+=======
+>>>>>>> master
 }

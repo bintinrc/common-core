@@ -56,8 +56,10 @@ public class ApiRouteSteps extends CoreStandardSteps {
     }
 
     String createdDate = DTF_CREATED_DATE.format(ZonedDateTime.now());
-    String formattedRouteDate = DTF_NORMAL_DATETIME.format(routeDate.withZoneSameInstant(ZoneId.of("UTC")));
-    String formattedRouteDateTime = DTF_ISO_8601_LITE.format(routeDate.withZoneSameInstant(ZoneId.of("UTC")));
+    String formattedRouteDate = DTF_NORMAL_DATETIME.format(
+        routeDate.withZoneSameInstant(ZoneId.of("UTC")));
+    String formattedRouteDateTime = DTF_ISO_8601_LITE.format(
+        routeDate.withZoneSameInstant(ZoneId.of("UTC")));
 
     Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
     String createRouteRequestJson = StandardTestUtils
@@ -189,7 +191,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
   @When("API Core - Operator archives invalid route with data below:")
   public void operatorArchiveRouteInvalidState(Map<String, String> mapOfData) {
     Map<String, String> expectedData = resolveKeyValues(mapOfData);
-    final long routeId = Long.valueOf(expectedData.get("routeId"));
+    final long routeId = Long.parseLong(expectedData.get("routeId"));
     retryIfAssertionErrorOrRuntimeExceptionOccurred(
         () -> {
           Response response = getRouteClient().archiveRouteAndGetRawResponse(routeId);
@@ -198,5 +200,21 @@ public class ApiRouteSteps extends CoreStandardSteps {
           put(KEY_ROUTE_RESPONSE, response);
         },
         "Unarchive route", 1000, 5);
+  }
+
+  /**
+   * Sample <p> API Core - Operator pull order from route: <p> | orderId |
+   * {KEY_LIST_OF_CREATED_ORDERS[1].id} | <p>| type    | DELIVERY or PICKUP | <p>
+   *
+   * @param dataTableAsMap Map of data from feature file.
+   */
+  @When("API Core - Operator pull order from route:")
+  public void operatorPullOrderFromRoute(Map<String, String> dataTableAsMap) {
+    final Map<String, String> map = resolveKeyValues(dataTableAsMap);
+    final long orderId = Long.parseLong(map.get("orderId"));
+    final String type = map.get("type");
+    retryIfAssertionErrorOrRuntimeExceptionOccurred(
+        () -> getRouteClient().pullFromRoute(orderId, type),
+        "Operator pull order from route");
   }
 }

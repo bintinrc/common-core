@@ -253,6 +253,7 @@ public class OrderClient extends SimpleApiClient {
     return fromJsonSnakeCase(r.body().asString(), RescheduleOrderResponse.class);
   }
 
+<<<<<<< HEAD
   public RescheduleOrderResponse rescheduleOrderWithBody(long orderId, String body) {
     RescheduleOrderRequest request = fromJsonSnakeCase(body, RescheduleOrderRequest.class);
     Response r = rescheduleOrderAsRawResponse(orderId, request);
@@ -273,6 +274,8 @@ public class OrderClient extends SimpleApiClient {
     return rescheduleOrder(orderId, DateUtils.formatDate(date, "yyyy-MM-dd"));
   }
 
+=======
+>>>>>>> master
   public Response rescheduleOrderAsRawResponse(long orderId, RescheduleOrderRequest payload) {
     String url = "core/orders/{orderId}/reschedule";
     RequestSpecification spec = createAuthenticatedRequest()
@@ -282,6 +285,7 @@ public class OrderClient extends SimpleApiClient {
     return doPost("Core - Reschedule Order", spec, url);
   }
 
+<<<<<<< HEAD
   public Response cancelOrderV1AndGetRawResponse(Long orderId, String reason) {
 
     String url = "core/orders/{orderId}/cancel";
@@ -736,6 +740,11 @@ public class OrderClient extends SimpleApiClient {
   public void updateParcelDimensions(Long orderId, Dimension dimension) {
     String url = "core/orders/{orderId}/dimensions";
     String json = toJsonSnakeCase(dimension);
+=======
+  public void rts(long orderId, RtsOrderRequest request) {
+    String url = "/core/orders/{orderId}/rts";
+    String json = toJsonSnakeCase(request);
+>>>>>>> master
 
     RequestSpecification spec = createAuthenticatedRequest()
         .header("Accept", ContentType.JSON)
@@ -743,7 +752,11 @@ public class OrderClient extends SimpleApiClient {
         .pathParam("orderId", orderId)
         .body(json);
 
+<<<<<<< HEAD
     Response r = doPut("Core - Edit Order Update Dimensions", spec, url);
+=======
+    Response r = doPut("Core - Set Returned to Sender", spec, url);
+>>>>>>> master
     if (r.statusCode() != HttpConstants.RESPONSE_204_NO_CONTENT) {
       throw new NvTestHttpException("unexpected http status: " + r.statusCode());
     }
