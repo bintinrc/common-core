@@ -33,10 +33,4 @@ public class CommonCoreModule extends AbstractModule {
       TokenUtils.getOperatorAuthToken());
   }
 
-  @Provides @Singleton
-  public RouteClient getRouteClient() {
-    return new RouteClient(StandardTestConstants.API_BASE_URL,
-        TokenUtils.getOperatorAuthToken());
-  }
-
 }

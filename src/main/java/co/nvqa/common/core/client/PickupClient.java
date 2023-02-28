@@ -6,7 +6,6 @@ import co.nvqa.common.core.model.pickup.Pickup;
 import co.nvqa.common.core.model.pickup.PickupSearchRequest;
 import co.nvqa.common.utils.JsonUtils;
 import co.nvqa.common.utils.NvTestHttpException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import java.util.Collections;
