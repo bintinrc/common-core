@@ -217,4 +217,24 @@ public class ApiRouteSteps extends CoreStandardSteps {
         () -> getRouteClient().pullFromRoute(orderId, type),
         "Operator pull order from route");
   }
+
+  /**
+   * Sample:<p>
+   * <p>
+   * When API Operator add reservation pick-ups to the route using data below:<p> | reservationId |
+   * 111111 |<p> | routeId       | 222222 |<p>
+   * <p>
+   *
+   * @param dataTableAsMap Map of data from feature file.
+   */
+  @When("API Core - Operator add reservation pick-ups to the route using data below:")
+  public void apiOperatorAddReservationPickUpsToTheRoute(Map<String, String> dataTableAsMap) {
+    Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
+
+    final long reservationResultId = Long.parseLong(resolvedDataTable.get("reservationId"));
+    final long routeId = Long.parseLong(resolvedDataTable.get("routeId"));
+    retryIfAssertionErrorOrRuntimeExceptionOccurred(
+        () -> getRouteClient().addReservationToRoute(routeId, reservationResultId),
+        "add reservation to route ");
+  }
 }

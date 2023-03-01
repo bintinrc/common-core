@@ -168,4 +168,33 @@ public class RouteClient extends SimpleApiClient {
     }
     return fromJsonSnakeCaseToList(response.getBody().asString(), Waypoint.class);
   }
+
+  public void addReservationToRoute(long routeId, long reservationId) {
+    String url = "core/2.0/reservations/{reservation_id}/route";
+
+    RequestSpecification spec = createAuthenticatedRequest()
+        .pathParam("reservation_id", reservationId)
+        .body(f("{\"new_route_id\":%d,\"route_index\":-1,\"overwrite\":true}", routeId));
+
+    Response r = doPut("Reservation V2 - Add Reservation to Route", spec, url);
+    r.then().contentType(ContentType.JSON);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+  }
+
+  public void pullReservationOutOfRoute(long reservationId) {
+    String url = "core/2.0/reservations/{reservation_id}/unroute";
+
+    RequestSpecification spec = createAuthenticatedRequest()
+        .pathParam("reservation_id", reservationId)
+        .body("{}");
+
+    Response r = doPut("Reservation V2 - Pull Reservation Out of Route", spec, url);
+    r.then().contentType(ContentType.JSON);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+    r.then().assertThat().body(equalTo(f("{\"id\":%d,\"status\":\"PENDING\"}", reservationId)));
+  }
 }

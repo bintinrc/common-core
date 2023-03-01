@@ -31,7 +31,7 @@ public class ApiPickupSteps extends CoreStandardSteps {
   @When("API Core - Operator get pickup from reservation id {string}")
   public void getPickupFromReservationId(String reservationIdString) {
     final long reservationId = Long.parseLong(resolveValue(reservationIdString));
-    final List<Pickup> pickups = getPickupClient().getPickups(reservationId);
+    final List<Pickup> pickups = getPickupClient().getPickupById(reservationId);
     put(KEY_LIST_OF_PICKUPS, pickups);
   }
 }
