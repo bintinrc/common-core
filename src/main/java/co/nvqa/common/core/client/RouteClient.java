@@ -68,7 +68,7 @@ public class RouteClient extends SimpleApiClient {
   }
 
   /**
-   * @param orderId orderId
+   * @param orderId         orderId
    * @param transactionType String between DELIVERY and PICKUP
    */
   public void pullFromRoute(long orderId, String transactionType) {
@@ -137,6 +137,17 @@ public class RouteClient extends SimpleApiClient {
     }
   }
 
+  public void assignPAJobToRoute(long paJobId, long routeId) {
+    AddPickupJobToRouteRequest request = new AddPickupJobToRouteRequest();
+    request.setNewRouteId(routeId);
+    request.setOverwrite(true);
+    Response r = addPickupJobToRouteAndGetRawResponse(paJobId, request);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+    r.then().contentType(ContentType.JSON);
+  }
+
   private Response addPickupJobToRouteAndGetRawResponse(long jobId,
       AddPickupJobToRouteRequest addPickupJobToRouteRequest) {
     final String url = "core/pickup-appointment-jobs/{jobId}/route";
@@ -147,6 +158,16 @@ public class RouteClient extends SimpleApiClient {
         .body(json);
 
     return doPut("Operator Portal - Add Pickup Job to Route", spec, url);
+  }
+
+  public void removePAJobFromRoute(long paJobId) {
+    String uri = "core/pickup-appointment-jobs/{paJobId}/unroute";
+    RequestSpecification spec = createAuthenticatedRequest().pathParam("paJobId", paJobId);
+    Response r = doPut("OPERATOR - Remove PA Job from Route", spec, uri);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+    r.then().contentType(ContentType.JSON);
   }
 
   public Response updateWaypointToPendingAndGetRawResponse(
