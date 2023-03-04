@@ -119,17 +119,16 @@ public class ApiRouteSteps extends CoreStandardSteps {
         "add parcel to route");
   }
 
-  @Given("API Core - Operator add reservation to route using data below:")
-  public void apiOperatorAddReservationToRouteUsingDataBelow(Map<String, String> dataTableAsMap) {
-    final Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
+  @When("API Core - Operator add reservation to route using data below:")
+  public void apiOperatorAddReservationPickUpsToTheRoute(Map<String, String> dataTableAsMap) {
+    Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
 
-    final String addParcelToRouteRequestTemplate = resolvedDataTable.get("addParcelToRouteRequest");
-    final long orderId = Long.parseLong(resolvedDataTable.get("orderId"));
-    final AddParcelToRouteRequest addParcelToRouteRequest = fromJsonSnakeCase(
-        addParcelToRouteRequestTemplate, AddParcelToRouteRequest.class);
-    retryIfAssertionErrorOccurred(
-        () -> getRouteClient().addParcelToRoute(orderId, addParcelToRouteRequest),
-        "add parcel to route");
+    final long reservationResultId = Long.parseLong(resolvedDataTable.get("reservationId"));
+    final long routeId = Long.parseLong(resolvedDataTable.get("routeId"));
+    retryIfAssertionErrorOrRuntimeExceptionOccurred(
+        () -> getRouteClient()
+            .addReservationToRoute(routeId, reservationResultId),
+        "add reservation to route ");
   }
 
   /**
