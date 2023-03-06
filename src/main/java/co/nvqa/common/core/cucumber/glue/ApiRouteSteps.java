@@ -233,4 +233,20 @@ public class ApiRouteSteps extends CoreStandardSteps {
         () -> getRouteClient().pullFromRoute(orderId, type),
         "Operator pull order from route");
   }
+
+  @When("API Core - Operator Edit Route Waypoint on Zonal Routing Edit Route:")
+  public void editRouteZonalRouting(Map<String, String> dataTableAsMap) {
+    Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
+    String createRouteRequestJson = StandardTestUtils
+        .replaceTokens(resolvedDataTable.get("editRouteRequest"),
+            StandardTestUtils.createDefaultTokens());
+    List<RouteRequest> request = fromJsonToList(createRouteRequestJson, RouteRequest.class);
+    retryIfAssertionErrorOrRuntimeExceptionOccurred(
+        () -> {
+          final List<RouteResponse> route = getRouteClient()
+              .zonalRoutingEditRoute(request);
+          Assertions.assertThat(route.get(0)).as("updated route is not null").isNotNull();
+        },
+        "Zonal Routing Edit Route");
+  }
 }

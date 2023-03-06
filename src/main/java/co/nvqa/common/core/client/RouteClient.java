@@ -68,7 +68,7 @@ public class RouteClient extends SimpleApiClient {
   }
 
   /**
-   * @param orderId orderId
+   * @param orderId         orderId
    * @param transactionType String between DELIVERY and PICKUP
    */
   public void pullFromRoute(long orderId, String transactionType) {
@@ -181,5 +181,23 @@ public class RouteClient extends SimpleApiClient {
     if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
       throw new NvTestHttpException("unexpected http status: " + r.statusCode());
     }
+  }
+
+  public Response zonalRoutingEditRouteAndGetRawResponse(List<RouteRequest> request) {
+    String url = "core/routes";
+    String json = toJson(request);
+    RequestSpecification spec = createAuthenticatedRequest()
+        .body(json);
+    return doPut("Core - Zonal Routing Edit Route", spec, url);
+  }
+
+  public List<RouteResponse> zonalRoutingEditRoute(List<RouteRequest> request) {
+    Response r = zonalRoutingEditRouteAndGetRawResponse(request);
+    r.then().contentType(ContentType.JSON);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+    return fromJsonToList(r.body().asString(),
+        RouteResponse.class);
   }
 }
