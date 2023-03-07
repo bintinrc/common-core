@@ -93,6 +93,12 @@ public class ApiRouteSteps extends CoreStandardSteps {
     put(KEY_CREATED_ROUTE_ID, createRouteResponse.getId());
   }
 
+  @Given("API Core - Operator create new route from zonal routing using data below:")
+  public void apiOperatorCreateNewRouteFromZonalRoutingUsingDataBelow(
+      Map<String, String> dataTableAsMap) {
+    apiOperatorCreateNewRouteUsingDataBelow(dataTableAsMap);
+  }
+
   /**
    * Sample:<p>
    * <p>
