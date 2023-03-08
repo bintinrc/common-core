@@ -2,10 +2,14 @@ package co.nvqa.common.core.cucumber.glue;
 
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.hibernate.RouteDao;
+import co.nvqa.common.core.model.persisted_class.route.AreaVariation;
+import co.nvqa.common.core.model.persisted_class.route.Coverage;
+import co.nvqa.common.core.model.persisted_class.route.Keyword;
 import co.nvqa.common.core.model.persisted_class.route.RouteGroup;
 import co.nvqa.common.core.model.persisted_class.route.RouteGroupReferences;
 import co.nvqa.common.core.model.persisted_class.route.Waypoints;
 import co.nvqa.common.model.DataEntity;
+import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import java.util.List;
 import java.util.Map;
@@ -49,5 +53,39 @@ public class DbRouteSteps extends CoreStandardSteps {
         .withFailMessage("waypoints record was not found: " + data)
         .isNotNull();
     expected.compareWithActual(actual, data);
+  }
+
+  @Then("DB Route - verify that sr_keywords record is not created for {value} area")
+  public void verifyKeywordIsNotCreated(String area) {
+    List<Keyword> actual = routeDao.getKeywords(Long.parseLong(area));
+    Assertions.assertThat(actual).as("List of found keywords").isEmpty();
+  }
+
+  @Then("DB Route - verify that sr_area_variations record is not created for {value} area")
+  public void verifyAreaVariationsIsNotCreated(String area) {
+    List<AreaVariation> actual = routeDao.getAreaVariations(area);
+    Assertions.assertThat(actual).as("List of found area variations").isEmpty();
+  }
+
+  @Then("^DB Route - verify that sr_area_variations record is not created:$")
+  public void verifyAreaVariationIsNotCreated(Map<String, String> data) {
+    AreaVariation expected = new AreaVariation(resolveKeyValues(data));
+    List<AreaVariation> actual = routeDao.getAreaVariations(expected.getArea());
+    if (!actual.isEmpty()) {
+      Assertions.assertThat(actual.stream().noneMatch(expected::matchedTo))
+          .withFailMessage("Unexpected route_qa_gl/sr_area_variations record found: " + expected)
+          .isTrue();
+    }
+  }
+
+  @Then("^DB Route - verify that sr_coverages record is not created:$")
+  public void verifyCoverageIsNotCreated(Map<String, String> data) {
+    Coverage expected = new Coverage(resolveKeyValues(data));
+    List<Coverage> actual = routeDao.getCoverageByArea(expected.getArea());
+    if (!actual.isEmpty()) {
+      Assertions.assertThat(actual.stream().noneMatch(expected::matchedTo))
+          .withFailMessage("Unexpected route_qa_gl/sr_coverages record found: " + expected)
+          .isTrue();
+    }
   }
 }
