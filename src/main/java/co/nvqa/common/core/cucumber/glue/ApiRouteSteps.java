@@ -9,6 +9,7 @@ import co.nvqa.common.core.model.route.RouteResponse;
 import co.nvqa.common.core.model.waypoint.Waypoint;
 import co.nvqa.common.core.utils.CoreTestUtils;
 import co.nvqa.common.utils.StandardTestUtils;
+import io.cucumber.guice.ScenarioScoped;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
 import io.restassured.response.Response;
@@ -22,6 +23,7 @@ import javax.inject.Inject;
 import lombok.Getter;
 import org.assertj.core.api.Assertions;
 
+@ScenarioScoped
 public class ApiRouteSteps extends CoreStandardSteps {
 
   @Inject
@@ -117,18 +119,6 @@ public class ApiRouteSteps extends CoreStandardSteps {
     retryIfAssertionErrorOccurred(
         () -> getRouteClient().addParcelToRoute(orderId, addParcelToRouteRequest),
         "add parcel to route");
-  }
-
-  @When("API Core - Operator add reservation to route using data below:")
-  public void apiOperatorAddReservationPickUpsToTheRoute(Map<String, String> dataTableAsMap) {
-    Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
-
-    final long reservationResultId = Long.parseLong(resolvedDataTable.get("reservationId"));
-    final long routeId = Long.parseLong(resolvedDataTable.get("routeId"));
-    retryIfAssertionErrorOrRuntimeExceptionOccurred(
-        () -> getRouteClient()
-            .addReservationToRoute(routeId, reservationResultId),
-        "add reservation to route ");
   }
 
   /**
@@ -248,5 +238,25 @@ public class ApiRouteSteps extends CoreStandardSteps {
           Assertions.assertThat(route.get(0)).as("updated route is not null").isNotNull();
         },
         "Zonal Routing Edit Route");
+  }
+
+  /**
+   * Sample:<p>
+   * <p>
+   * When API Operator add reservation pick-ups to the route using data below:<p> | reservationId |
+   * 111111 |<p> | routeId       | 222222 |<p>
+   * <p>
+   *
+   * @param dataTableAsMap Map of data from feature file.
+   */
+  @When("API Core - Operator add reservation to route using data below:")
+  public void apiOperatorAddReservationPickUpsToTheRoute(Map<String, String> dataTableAsMap) {
+    Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
+
+    final long reservationResultId = Long.parseLong(resolvedDataTable.get("reservationId"));
+    final long routeId = Long.parseLong(resolvedDataTable.get("routeId"));
+    retryIfAssertionErrorOrRuntimeExceptionOccurred(
+        () -> getRouteClient().addReservationToRoute(routeId, reservationResultId),
+        "add reservation to route ");
   }
 }

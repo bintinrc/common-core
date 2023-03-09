@@ -8,20 +8,20 @@ import co.nvqa.common.core.model.route.RouteRequest;
 import co.nvqa.common.core.model.route.RouteResponse;
 import co.nvqa.common.core.model.waypoint.Waypoint;
 import co.nvqa.common.utils.NvTestHttpException;
+import co.nvqa.common.utils.StandardTestConstants;
+import co.nvqa.commonauth.utils.TokenUtils;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import java.util.List;
-import java.util.TimeZone;
+import javax.inject.Singleton;
 
+@Singleton
 public class RouteClient extends SimpleApiClient {
 
-  public RouteClient(String baseUrl, String bearerToken) {
-    this(baseUrl, bearerToken, null);
-  }
-
-  public RouteClient(String baseUrl, String bearerToken, TimeZone timeZone) {
-    super(baseUrl, bearerToken, timeZone, DEFAULT_CAMEL_CASE_MAPPER);
+  public RouteClient() {
+    super(StandardTestConstants.API_BASE_URL, TokenUtils.getOperatorAuthToken(),
+        DEFAULT_CAMEL_CASE_MAPPER);
   }
 
   public RouteResponse createRoute(RouteRequest routeRequest) {
@@ -175,7 +175,6 @@ public class RouteClient extends SimpleApiClient {
     RequestSpecification spec = createAuthenticatedRequest()
         .pathParam("reservation_id", reservationId)
         .body(f("{\"new_route_id\":%d,\"route_index\":-1,\"overwrite\":true}", routeId));
-
     Response r = doPut("Core - Add Reservation to Route", spec, url);
     r.then().contentType(ContentType.JSON);
     if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
@@ -199,5 +198,20 @@ public class RouteClient extends SimpleApiClient {
     }
     return fromJsonToList(r.body().asString(),
         RouteResponse.class);
+  }
+
+  public void pullReservationOutOfRoute(long reservationId) {
+    String url = "core/2.0/reservations/{reservation_id}/unroute";
+
+    RequestSpecification spec = createAuthenticatedRequest()
+        .pathParam("reservation_id", reservationId)
+        .body("{}");
+
+    Response r = doPut("Reservation V2 - Pull Reservation Out of Route", spec, url);
+    r.then().contentType(ContentType.JSON);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+    r.then().assertThat().body(equalTo(f("{\"id\":%d,\"status\":\"PENDING\"}", reservationId)));
   }
 }

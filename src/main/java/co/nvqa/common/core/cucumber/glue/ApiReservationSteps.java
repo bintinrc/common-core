@@ -5,9 +5,8 @@ import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.model.reservation.ReservationFilter;
 import co.nvqa.common.core.model.reservation.ReservationRequest;
 import co.nvqa.common.core.model.reservation.ReservationResponse;
-import co.nvqa.common.utils.StandardTestConstants;
 import co.nvqa.common.utils.StandardTestUtils;
-import co.nvqa.commonauth.utils.TokenUtils;
+import io.cucumber.guice.ScenarioScoped;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
 import java.time.ZoneId;
@@ -18,6 +17,7 @@ import java.util.Optional;
 import javax.inject.Inject;
 import lombok.Getter;
 
+@ScenarioScoped
 public class ApiReservationSteps extends CoreStandardSteps {
 
   public static final int MAX_COMMENTS_LENGTH_ON_SHIPPER_PICKUP_PAGE = 255;
