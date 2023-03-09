@@ -11,6 +11,7 @@ import co.nvqa.common.core.model.persisted_class.route.Waypoints;
 import co.nvqa.common.model.DataEntity;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import javax.inject.Inject;
@@ -87,5 +88,17 @@ public class DbRouteSteps extends CoreStandardSteps {
           .withFailMessage("Unexpected route_qa_gl/sr_coverages record found: " + expected)
           .isTrue();
     }
+  }
+
+  @Then("^DB Route - verify that sr_coverages record is created:$")
+  public void verifyCoverage(Map<String, String> data) {
+    Coverage expected = new Coverage(resolveKeyValues(data));
+    List<Coverage> actual = expected.getId() != null ?
+        Collections.singletonList(routeDao.getCoverageById(expected.getId())) :
+        routeDao.getCoverageByArea(expected.getArea());
+    Assertions.assertThat(actual).as("List of found coverages").isNotEmpty();
+    Coverage coverage = actual.stream().filter(expected::matchedTo).findFirst()
+        .orElseThrow(() -> new AssertionError("Coverage was not found: " + expected));
+    put(KEY_COVERAGE_ID, coverage.getId());
   }
 }
