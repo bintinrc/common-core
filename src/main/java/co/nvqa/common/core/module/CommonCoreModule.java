@@ -5,6 +5,8 @@ import co.nvqa.common.core.client.OrderClient;
 import co.nvqa.common.core.client.PickupClient;
 import co.nvqa.common.core.client.ReservationClient;
 import co.nvqa.common.core.client.RouteClient;
+import co.nvqa.common.core.hibernate.OrderDetailsDao;
+import co.nvqa.common.core.model.persisted_class.core.OrderDetails;
 import co.nvqa.common.utils.StandardTestConstants;
 import co.nvqa.commonauth.utils.TokenUtils;
 import com.google.inject.AbstractModule;
@@ -37,6 +39,11 @@ public class CommonCoreModule extends AbstractModule {
   public RouteClient getRouteClient() {
     return new RouteClient(StandardTestConstants.API_BASE_URL,
         TokenUtils.getOperatorAuthToken());
+  }
+
+  @Provides @Singleton
+  public OrderDetailsDao getOrderDetailsDao() {
+    return new OrderDetailsDao();
   }
 
 }
