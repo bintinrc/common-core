@@ -337,8 +337,8 @@ public class OrderClient extends SimpleApiClient {
     r.then().contentType(ContentType.JSON);
   }
 
-  public void setReturnedToSender(RtsOrderRequest rtsOrder) {
-    Response r = setReturnedToSenderAndGetRawResponse(rtsOrder);
+  public void setReturnedToSender(long orderId, RtsOrderRequest rtsOrder) {
+    Response r = setReturnedToSenderAndGetRawResponse(orderId, rtsOrder);
     if (r.statusCode() != HttpConstants.RESPONSE_204_NO_CONTENT) {
       throw new NvTestHttpException("unexpected http status: " + r.statusCode());
     }
@@ -731,13 +731,6 @@ public class OrderClient extends SimpleApiClient {
       throw new NvTestHttpException("unexpected http status: " + r.statusCode());
     }
     r.then().contentType(ContentType.JSON);
-  }
-
-  public void rts(long orderId, RtsOrderRequest request) {
-    Response r = setReturnedToSenderAndGetRawResponse(orderId, request);
-    if (r.statusCode() != HttpConstants.RESPONSE_204_NO_CONTENT) {
-      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
-    }
   }
 
   public void updateParcelDimensions(Long orderId, Dimension dimension) {
