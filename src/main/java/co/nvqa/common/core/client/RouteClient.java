@@ -68,7 +68,7 @@ public class RouteClient extends SimpleApiClient {
   }
 
   /**
-   * @param orderId orderId
+   * @param orderId         orderId
    * @param transactionType String between DELIVERY and PICKUP
    */
   public void pullFromRoute(long orderId, String transactionType) {
@@ -167,5 +167,37 @@ public class RouteClient extends SimpleApiClient {
       throw new NvTestHttpException("unexpected http status: " + response.statusCode());
     }
     return fromJsonSnakeCaseToList(response.getBody().asString(), Waypoint.class);
+  }
+
+  public void addReservationToRoute(long routeId, long reservationId) {
+    String url = "core/2.0/reservations/{reservation_id}/route";
+
+    RequestSpecification spec = createAuthenticatedRequest()
+        .pathParam("reservation_id", reservationId)
+        .body(f("{\"new_route_id\":%d,\"route_index\":-1,\"overwrite\":true}", routeId));
+
+    Response r = doPut("Core - Add Reservation to Route", spec, url);
+    r.then().contentType(ContentType.JSON);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+  }
+
+  public Response zonalRoutingEditRouteAndGetRawResponse(List<RouteRequest> request) {
+    String url = "core/routes";
+    String json = toJson(request);
+    RequestSpecification spec = createAuthenticatedRequest()
+        .body(json);
+    return doPut("Core - Zonal Routing Edit Route", spec, url);
+  }
+
+  public List<RouteResponse> zonalRoutingEditRoute(List<RouteRequest> request) {
+    Response r = zonalRoutingEditRouteAndGetRawResponse(request);
+    r.then().contentType(ContentType.JSON);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+    return fromJsonToList(r.body().asString(),
+        RouteResponse.class);
   }
 }

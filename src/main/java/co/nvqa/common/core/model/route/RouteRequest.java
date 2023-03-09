@@ -23,4 +23,7 @@ public class RouteRequest {
   private String comments;
   private List<Integer> tags = new ArrayList<>();
   private Long zoneId;
+  private List<Long> waypoints;
+  private Long id;
+  private Long vehicleId;
 }

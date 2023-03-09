@@ -93,6 +93,12 @@ public class ApiRouteSteps extends CoreStandardSteps {
     put(KEY_CREATED_ROUTE_ID, createRouteResponse.getId());
   }
 
+  @Given("API Core - Operator create new route from zonal routing using data below:")
+  public void apiOperatorCreateNewRouteFromZonalRoutingUsingDataBelow(
+      Map<String, String> dataTableAsMap) {
+    apiOperatorCreateNewRouteUsingDataBelow(dataTableAsMap);
+  }
+
   /**
    * Sample:<p>
    * <p>
@@ -113,6 +119,18 @@ public class ApiRouteSteps extends CoreStandardSteps {
     retryIfAssertionErrorOccurred(
         () -> getRouteClient().addParcelToRoute(orderId, addParcelToRouteRequest),
         "add parcel to route");
+  }
+
+  @When("API Core - Operator add reservation to route using data below:")
+  public void apiOperatorAddReservationPickUpsToTheRoute(Map<String, String> dataTableAsMap) {
+    Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
+
+    final long reservationResultId = Long.parseLong(resolvedDataTable.get("reservationId"));
+    final long routeId = Long.parseLong(resolvedDataTable.get("routeId"));
+    retryIfAssertionErrorOrRuntimeExceptionOccurred(
+        () -> getRouteClient()
+            .addReservationToRoute(routeId, reservationResultId),
+        "add reservation to route ");
   }
 
   /**
@@ -216,5 +234,21 @@ public class ApiRouteSteps extends CoreStandardSteps {
     retryIfAssertionErrorOrRuntimeExceptionOccurred(
         () -> getRouteClient().pullFromRoute(orderId, type),
         "Operator pull order from route");
+  }
+
+  @When("API Core - Operator Edit Route Waypoint on Zonal Routing Edit Route:")
+  public void editRouteZonalRouting(Map<String, String> dataTableAsMap) {
+    Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
+    String createRouteRequestJson = StandardTestUtils
+        .replaceTokens(resolvedDataTable.get("editRouteRequest"),
+            StandardTestUtils.createDefaultTokens());
+    List<RouteRequest> request = fromJsonToList(createRouteRequestJson, RouteRequest.class);
+    retryIfAssertionErrorOrRuntimeExceptionOccurred(
+        () -> {
+          final List<RouteResponse> route = getRouteClient()
+              .zonalRoutingEditRoute(request);
+          Assertions.assertThat(route.get(0)).as("updated route is not null").isNotNull();
+        },
+        "Zonal Routing Edit Route");
   }
 }

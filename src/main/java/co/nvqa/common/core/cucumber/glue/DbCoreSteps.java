@@ -2,11 +2,13 @@ package co.nvqa.common.core.cucumber.glue;
 
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.hibernate.OrderDao;
+import co.nvqa.common.core.hibernate.OrderDetailsDao;
 import co.nvqa.common.core.hibernate.ReservationsDao;
 import co.nvqa.common.core.hibernate.RouteLogsDao;
 import co.nvqa.common.core.hibernate.RouteMonitoringDataDao;
 import co.nvqa.common.core.hibernate.ShipperPickupSearchDao;
 import co.nvqa.common.core.hibernate.WaypointsDao;
+import co.nvqa.common.core.model.persisted_class.core.OrderDetails;
 import co.nvqa.common.core.model.persisted_class.core.Reservations;
 import co.nvqa.common.core.model.persisted_class.core.RouteLogs;
 import co.nvqa.common.core.model.persisted_class.core.RouteMonitoringData;
@@ -25,6 +27,10 @@ public class DbCoreSteps extends CoreStandardSteps {
 
   @Inject
   private OrderDao orderDao;
+
+  @Inject
+  private OrderDetailsDao orderDetailsDao;
+
   @Inject
   private RouteLogsDao routeLogsDao;
 
@@ -162,5 +168,12 @@ public class DbCoreSteps extends CoreStandardSteps {
         .withFailMessage("route_monitoring_data record was not found: " + data)
         .isNotNull();
     expected.compareWithActual(actual, data);
+  }
+
+  @When("DB Core - operator get order details of order id {string}")
+  public void getOrderDetailsByOrderId(String orderId) {
+    Long resolvedOrderId = Long.parseLong(resolveValue(orderId));
+    OrderDetails orderDetails = orderDetailsDao.getOrderDetailsByOrderId(resolvedOrderId);
+    putInList(KEY_CORE_LIST_OF_ORDER_DETAILS, orderDetails);
   }
 }
