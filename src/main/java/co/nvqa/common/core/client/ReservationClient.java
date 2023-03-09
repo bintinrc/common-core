@@ -74,21 +74,6 @@ public class ReservationClient extends SimpleApiClient {
     }
   }
 
-  public void pullReservationOutOfRoute(long reservationId) {
-    String url = "core/2.0/reservations/{reservation_id}/unroute";
-
-    RequestSpecification spec = createAuthenticatedRequest()
-        .pathParam("reservation_id", reservationId)
-        .body("{}");
-
-    Response r = doPut("Reservation V2 - Pull Reservation Out of Route", spec, url);
-    r.then().contentType(ContentType.JSON);
-    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
-      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
-    }
-    r.then().assertThat().body(equalTo(f("{\"id\":%d,\"status\":\"PENDING\"}", reservationId)));
-  }
-
   public ReservationResponse updatePriorityLevelOfReservation(long pickupAddressId, long legacyShipperId,
       long priorityLevel, long reservationId) {
     String url = "reservation/2.0/reservations/{reservation_id}";

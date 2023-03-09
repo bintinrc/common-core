@@ -253,7 +253,6 @@ public class OrderClient extends SimpleApiClient {
     return fromJsonSnakeCase(r.body().asString(), RescheduleOrderResponse.class);
   }
 
-<<<<<<< HEAD
   public RescheduleOrderResponse rescheduleOrderWithBody(long orderId, String body) {
     RescheduleOrderRequest request = fromJsonSnakeCase(body, RescheduleOrderRequest.class);
     Response r = rescheduleOrderAsRawResponse(orderId, request);
@@ -274,8 +273,6 @@ public class OrderClient extends SimpleApiClient {
     return rescheduleOrder(orderId, DateUtils.formatDate(date, "yyyy-MM-dd"));
   }
 
-=======
->>>>>>> master
   public Response rescheduleOrderAsRawResponse(long orderId, RescheduleOrderRequest payload) {
     String url = "core/orders/{orderId}/reschedule";
     RequestSpecification spec = createAuthenticatedRequest()
@@ -285,7 +282,6 @@ public class OrderClient extends SimpleApiClient {
     return doPost("Core - Reschedule Order", spec, url);
   }
 
-<<<<<<< HEAD
   public Response cancelOrderV1AndGetRawResponse(Long orderId, String reason) {
 
     String url = "core/orders/{orderId}/cancel";
@@ -348,21 +344,21 @@ public class OrderClient extends SimpleApiClient {
     }
   }
 
-  public Response setReturnedToSenderAndGetRawResponse(RtsOrderRequest rtsOrder) {
+  public Response setReturnedToSenderAndGetRawResponse(long orderId, RtsOrderRequest rtsOrder) {
     String url = "core/orders/{orderId}/rts";
     String json = toJsonSnakeCase(rtsOrder);
 
     RequestSpecification spec = createAuthenticatedRequest()
         .header("Accept", ContentType.JSON)
         .header("Content-Type", ContentType.JSON)
-        .pathParam("orderId", rtsOrder.getOrderId())
+        .pathParam("orderId", orderId)
         .body(json);
 
     return doPut("Core - Set Returned to Sender", spec, url);
   }
 
   public void revertRts(RtsOrderRequest rtsOrderDetail, Long orderId) {
-    String url = "/core/orders/{orderId}/revert-rts";
+    String url = "core/orders/{orderId}/revert-rts";
 
     RequestSpecification spec = createAuthenticatedRequest()
         .header("Accept", ContentType.JSON)
@@ -632,7 +628,7 @@ public class OrderClient extends SimpleApiClient {
   }
 
   public void updateOrderDeliveryAddress(long orderId, UserDetails to) {
-    String url = "/core/2.1/orders/{orderId}";
+    String url = "core/2.1/orders/{orderId}";
 
     RequestSpecification spec = createAuthenticatedRequest()
         .pathParam("orderId", orderId)
@@ -737,14 +733,16 @@ public class OrderClient extends SimpleApiClient {
     r.then().contentType(ContentType.JSON);
   }
 
+  public void rts(long orderId, RtsOrderRequest request) {
+    Response r = setReturnedToSenderAndGetRawResponse(orderId, request);
+    if (r.statusCode() != HttpConstants.RESPONSE_204_NO_CONTENT) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+  }
+
   public void updateParcelDimensions(Long orderId, Dimension dimension) {
     String url = "core/orders/{orderId}/dimensions";
     String json = toJsonSnakeCase(dimension);
-=======
-  public void rts(long orderId, RtsOrderRequest request) {
-    String url = "/core/orders/{orderId}/rts";
-    String json = toJsonSnakeCase(request);
->>>>>>> master
 
     RequestSpecification spec = createAuthenticatedRequest()
         .header("Accept", ContentType.JSON)
@@ -752,11 +750,7 @@ public class OrderClient extends SimpleApiClient {
         .pathParam("orderId", orderId)
         .body(json);
 
-<<<<<<< HEAD
     Response r = doPut("Core - Edit Order Update Dimensions", spec, url);
-=======
-    Response r = doPut("Core - Set Returned to Sender", spec, url);
->>>>>>> master
     if (r.statusCode() != HttpConstants.RESPONSE_204_NO_CONTENT) {
       throw new NvTestHttpException("unexpected http status: " + r.statusCode());
     }
