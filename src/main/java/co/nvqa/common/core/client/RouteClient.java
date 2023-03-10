@@ -214,4 +214,20 @@ public class RouteClient extends SimpleApiClient {
     }
     r.then().assertThat().body(equalTo(f("{\"id\":%d,\"status\":\"PENDING\"}", reservationId)));
   }
+
+  public void mergeWaypointsZonalRouting(List<Long> transactionIds) {
+    String apiMethod = "route-v2/waypoints/merge";
+    String json = toJsonSnakeCase(transactionIds);
+
+    RequestSpecification requestSpecification = createAuthenticatedRequest()
+        .body(f("{\"waypoint_ids\":%s}", json));
+
+    Response response = doPut("Route V2 - Zonal Routing Merge Waypoints",
+        requestSpecification,
+        apiMethod);
+    response.then().assertThat().contentType(ContentType.JSON);
+    if (response.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + response.statusCode());
+    }
+  }
 }

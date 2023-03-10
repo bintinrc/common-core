@@ -259,4 +259,13 @@ public class ApiRouteSteps extends CoreStandardSteps {
         () -> getRouteClient().addReservationToRoute(routeId, reservationResultId),
         "add reservation to route ");
   }
+
+  @Given("API Core - Operator merge waypoints on Zonal Routing:")
+  public void apiOperatorMergeWaypoints(List<String> waypointIds) {
+    waypointIds = resolveValues(waypointIds);
+    List<Long> wpIds = waypointIds.stream().map(Long::parseLong).collect(Collectors.toList());
+    retryIfAssertionErrorOrRuntimeExceptionOccurred(
+        () -> getRouteClient().mergeWaypointsZonalRouting(wpIds),
+        "merge waypoints on zonal routing");
+  }
 }
