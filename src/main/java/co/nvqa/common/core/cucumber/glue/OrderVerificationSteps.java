@@ -55,6 +55,7 @@ public class OrderVerificationSteps extends CoreStandardSteps {
       Assertions.fail(
           f("Not all %s waypoint ids of given orders are the same: %s", waypointIds));
     }
+
   }
 
   private Order apiOperatorGetOrderDetails(Long orderId) {

@@ -2,8 +2,11 @@ package co.nvqa.common.core.cucumber.glue;
 
 import co.nvqa.common.core.client.RouteClient;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
+import co.nvqa.common.core.model.persisted_class.core.Transactions;
 import co.nvqa.common.core.model.route.AddParcelToRouteRequest;
 import co.nvqa.common.core.model.route.AddPickupJobToRouteRequest;
+import co.nvqa.common.core.model.route.MergeWaypointsResponse;
+import co.nvqa.common.core.model.route.MergeWaypointsResponse.Data;
 import co.nvqa.common.core.model.route.RouteRequest;
 import co.nvqa.common.core.model.route.RouteResponse;
 import co.nvqa.common.core.model.waypoint.Waypoint;
@@ -144,6 +147,14 @@ public class ApiRouteSteps extends CoreStandardSteps {
         "add pickup job to route");
   }
 
+  @Given("API Core - Operator remove pickup job id {string} from route")
+  public void apiOperatorRemovePickupJobFromRouteUsingDataBelow(String paJobId) {
+    final Long jobId = Long.parseLong(resolveValue(paJobId));
+    retryIfAssertionErrorOccurred(
+        () -> getRouteClient().removePAJobFromRoute(jobId),
+        "remove pickup job from route");
+  }
+
   @Given("API Core - Operator update routed waypoint to pending")
   public void operatorUpdateWaypointToPending(Map<String, String> dataTableAsMap) {
     final String json = toJsonCamelCase(resolveKeyValues(dataTableAsMap));
@@ -265,7 +276,23 @@ public class ApiRouteSteps extends CoreStandardSteps {
     waypointIds = resolveValues(waypointIds);
     List<Long> wpIds = waypointIds.stream().map(Long::parseLong).collect(Collectors.toList());
     retryIfAssertionErrorOrRuntimeExceptionOccurred(
-        () -> getRouteClient().mergeWaypointsZonalRouting(wpIds),
+        () -> {
+          final MergeWaypointsResponse result = getRouteClient().mergeWaypointsZonalRouting(wpIds);
+          put(KEY_CORE_MERGE_WAYPOINT_RESPONSE, toJsonSnakeCase(result));
+        },
         "merge waypoints on zonal routing");
+  }
+
+  @When("API Core - Operator verifies response of merge waypoint on Zonal Routing")
+  public void verifyMergeWaypointResponse(Map<String, String> dataTableAsMap) {
+    Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
+    MergeWaypointsResponse expected = new MergeWaypointsResponse(
+        fromJsonToMap(resolvedDataTable.get("expectedResponse")));
+    MergeWaypointsResponse actual = new MergeWaypointsResponse(
+        fromJsonToMap(resolvedDataTable.get("actualResponse")));
+    Assertions.assertThat(actual)
+        .withFailMessage("merge waypoints response doesnt match")
+        .isNotNull();
+    expected.compareWithActual(actual, resolvedDataTable);
   }
 }

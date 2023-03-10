@@ -23,4 +23,6 @@ public interface CoreScenarioStorageKeys {
 
   //  archive & unarchive route response
   String KEY_ROUTE_RESPONSE = "KEY_ROUTE_RESPONSE";
+
+  String KEY_CORE_MERGE_WAYPOINT_RESPONSE = "KEY_CORE_MERGE_WAYPOINT_RESPONSE";
 }
