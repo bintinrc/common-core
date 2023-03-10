@@ -44,6 +44,10 @@ public class EventDetail {
   //from update status event
   private String reason;
 
+  //get auto AV event
+  private String status;
+  private String mode;
+
   @Getter
   @Setter
   @Builder

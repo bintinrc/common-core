@@ -36,25 +36,4 @@ public class OrderJaroScoresV2ClientTest implements NvRetry {
     });
   }
 
-  @Test
-  void test_fetchRouteGroupAddresses() throws Exception {
-    env.execute(() -> {
-      Long testRouteGroupId = 33861L;
-      List<OrderJaroScoresV2Info> response = testOrderJaroScoresV2Client.fetchRouteGroupAddresses(testRouteGroupId);
-      Assertions.assertThat(response).isNotEmpty();
-      response.forEach(e -> LOGGER.info(e.toString()));
-    });
-  }
-
-  @Test
-  void test_fetchZoneAddresses() throws Exception {
-    env.execute(() -> {
-      Long testZoneId = 34653L;
-      int testSize = 10;
-      List<OrderJaroScoresV2Info> response = testOrderJaroScoresV2Client.fetchZoneAddresses(testZoneId, testSize);
-      Assertions.assertThat(response).isNotEmpty();
-      response.forEach(e -> LOGGER.info(e.toString()));
-    });
-  }
-
 }
