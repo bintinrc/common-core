@@ -91,6 +91,12 @@ public class EventDetailDeserializer extends JsonDeserializer<EventDetail> {
     if (node.get("reason") != null) {
       result.setReason(node.get("reason").asText());
     }
+    if (node.get("status") != null) {
+      result.setStatus(node.get("status").asText());
+    }
+    if (node.get("mode") != null) {
+      result.setMode(node.get("mode").asText());
+    }
     return result;
   }
 }
