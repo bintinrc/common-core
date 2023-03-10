@@ -160,6 +160,6 @@ public class ApiOrderSteps extends CoreStandardSteps {
     final RtsOrderRequest rtsRequest = fromJsonSnakeCase(rtsRequestString, RtsOrderRequest.class);
 
     retryIfAssertionErrorOrRuntimeExceptionOccurred(
-        () -> getOrderClient().rts(orderId, rtsRequest), "set RTS order");
+        () -> getOrderClient().setReturnedToSender(orderId, rtsRequest), "set RTS order");
   }
 }
