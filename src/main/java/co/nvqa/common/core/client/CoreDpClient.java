@@ -1,10 +1,13 @@
 package co.nvqa.common.core.client;
 
 import co.nvqa.common.client.SimpleApiClient;
+import co.nvqa.common.constants.HttpConstants;
 import co.nvqa.common.core.model.dp.CustomerCollectRequest;
 import co.nvqa.common.core.model.dp.LodgeInRequest;
+import co.nvqa.common.utils.NvTestHttpException;
 import co.nvqa.common.utils.StandardTestConstants;
 import co.nvqa.commonauth.utils.TokenUtils;
+import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import javax.inject.Singleton;
@@ -55,6 +58,18 @@ public class CoreDpClient extends SimpleApiClient {
         .body(json);
 
     return doDelete("CORE - UNTAG ORDER FROM DP", spec, uri);
+  }
+
+  public void dpDropOff(long orderId) {
+    String uri = "core/2.0/orders/{orderId}/dropoff";
+    RequestSpecification spec = createAuthenticatedRequest()
+        .pathParam("orderId", orderId);
+
+    Response r = doPost("CORE - DP DROP OFF", spec, uri);
+    r.then().contentType(ContentType.JSON);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
   }
 
 }
