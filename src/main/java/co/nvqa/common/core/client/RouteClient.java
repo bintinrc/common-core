@@ -4,6 +4,8 @@ import co.nvqa.common.client.SimpleApiClient;
 import co.nvqa.common.constants.HttpConstants;
 import co.nvqa.common.core.model.route.AddParcelToRouteRequest;
 import co.nvqa.common.core.model.route.AddPickupJobToRouteRequest;
+import co.nvqa.common.core.model.route.MergeWaypointsResponse;
+import co.nvqa.common.core.model.route.MergeWaypointsResponse.Data;
 import co.nvqa.common.core.model.route.RouteRequest;
 import co.nvqa.common.core.model.route.RouteResponse;
 import co.nvqa.common.core.model.waypoint.Waypoint;
@@ -149,6 +151,16 @@ public class RouteClient extends SimpleApiClient {
     return doPut("Operator Portal - Add Pickup Job to Route", spec, url);
   }
 
+  public void removePAJobFromRoute(long paJobId) {
+    String uri = "core/pickup-appointment-jobs/{paJobId}/unroute";
+    RequestSpecification spec = createAuthenticatedRequest().pathParam("paJobId", paJobId);
+    Response r = doPut("OPERATOR - Remove PA Job from Route", spec, uri);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+    r.then().contentType(ContentType.JSON);
+  }
+
   public Response updateWaypointToPendingAndGetRawResponse(
       List<Waypoint> request) {
     final String url = "core/waypoints";
@@ -213,5 +225,23 @@ public class RouteClient extends SimpleApiClient {
       throw new NvTestHttpException("unexpected http status: " + r.statusCode());
     }
     r.then().assertThat().body(equalTo(f("{\"id\":%d,\"status\":\"PENDING\"}", reservationId)));
+  }
+
+  public MergeWaypointsResponse mergeWaypointsZonalRouting(List<Long> waypointIds) {
+    String apiMethod = "route-v2/waypoints/merge";
+    String json = toJsonSnakeCase(waypointIds);
+
+    RequestSpecification requestSpecification = createAuthenticatedRequest()
+        .body(f("{\"waypoint_ids\":%s}", json));
+
+    Response response = doPut("Route V2 - Zonal Routing Merge Waypoints",
+        requestSpecification,
+        apiMethod);
+    response.then().assertThat().contentType(ContentType.JSON);
+    if (response.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + response.statusCode());
+    }
+    return fromJsonSnakeCase(response.body().asString(),
+        MergeWaypointsResponse.class);
   }
 }
