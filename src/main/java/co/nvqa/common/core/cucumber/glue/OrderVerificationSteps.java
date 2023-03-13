@@ -58,6 +58,31 @@ public class OrderVerificationSteps extends CoreStandardSteps {
 
   }
 
+  //  type = Pickup|Delivery
+  @Given("API Core - Operator verifies {string} transactions of following orders have different waypoint id:")
+  public void verifyDifferentWaypointId(String type, List<String> orderIds) {
+    orderIds = resolveValues(orderIds);
+    Map<String, Long> waypointIds = orderIds.stream().collect(Collectors.toMap(
+        orderId -> orderId,
+        orderId -> {
+          Order order = apiOperatorGetOrderDetails(Long.parseLong(orderId));
+          Transaction transaction =
+              Transaction.TYPE_PICKUP.equalsIgnoreCase(type) ? getLastTransactionWithType(order,
+                  Transaction.TYPE_PICKUP)
+                  : getLastTransactionWithType(order, Transaction.TYPE_DELIVERY);
+          Long waypointId = transaction.getWaypointId();
+          Assertions.assertThat(waypointId).as("waypoint id not null").isNotNull();
+          return waypointId;
+        }
+    ));
+
+    if (waypointIds.values().stream().distinct().count() != orderIds.size()) {
+      Assertions.fail(
+          f("Not all %s waypoint ids of given orders are the different: %s", waypointIds));
+    }
+  }
+
+
   private Order apiOperatorGetOrderDetails(Long orderId) {
     String methodInfo = f("%s - [Order ID = %d]", getCurrentMethodName(), orderId);
     return retryIfAssertionErrorOrRuntimeExceptionOccurred(() -> getOrderClient().getOrder(orderId),

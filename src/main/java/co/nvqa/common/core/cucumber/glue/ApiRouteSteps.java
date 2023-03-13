@@ -2,7 +2,6 @@ package co.nvqa.common.core.cucumber.glue;
 
 import co.nvqa.common.core.client.RouteClient;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
-import co.nvqa.common.core.model.persisted_class.core.Transactions;
 import co.nvqa.common.core.model.route.AddParcelToRouteRequest;
 import co.nvqa.common.core.model.route.AddPickupJobToRouteRequest;
 import co.nvqa.common.core.model.route.MergeWaypointsResponse;
@@ -11,6 +10,7 @@ import co.nvqa.common.core.model.route.RouteRequest;
 import co.nvqa.common.core.model.route.RouteResponse;
 import co.nvqa.common.core.model.waypoint.Waypoint;
 import co.nvqa.common.core.utils.CoreTestUtils;
+import co.nvqa.common.model.DataEntity;
 import co.nvqa.common.utils.StandardTestUtils;
 import io.cucumber.guice.ScenarioScoped;
 import io.cucumber.java.en.Given;
@@ -286,13 +286,16 @@ public class ApiRouteSteps extends CoreStandardSteps {
   @When("API Core - Operator verifies response of merge waypoint on Zonal Routing")
   public void verifyMergeWaypointResponse(Map<String, String> dataTableAsMap) {
     Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
-    MergeWaypointsResponse expected = new MergeWaypointsResponse(
-        fromJsonToMap(resolvedDataTable.get("expectedResponse")));
-    MergeWaypointsResponse actual = new MergeWaypointsResponse(
-        fromJsonToMap(resolvedDataTable.get("actualResponse")));
+    List<Data> expected = fromJson(resolvedDataTable.get("expectedResponse"),
+        MergeWaypointsResponse.class).getData();
+    List<Data> actual =
+        fromJson(resolvedDataTable.get("actualResponse"), MergeWaypointsResponse.class).getData();
     Assertions.assertThat(actual)
-        .withFailMessage("merge waypoints response doesnt match")
+        .withFailMessage("merge waypoints response is null")
         .isNotNull();
-    expected.compareWithActual(actual, resolvedDataTable);
+    Assertions.assertThat(actual.size())
+        .withFailMessage("merge waypoints response size doesnt match")
+        .isEqualTo(expected.size());
+    expected.forEach(o -> DataEntity.assertListContains(actual, o, "merged waypoints list"));
   }
 }
