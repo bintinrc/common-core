@@ -7,12 +7,14 @@ import co.nvqa.common.core.hibernate.ReservationsDao;
 import co.nvqa.common.core.hibernate.RouteLogsDao;
 import co.nvqa.common.core.hibernate.RouteMonitoringDataDao;
 import co.nvqa.common.core.hibernate.ShipperPickupSearchDao;
+import co.nvqa.common.core.hibernate.TransactionsDao;
 import co.nvqa.common.core.hibernate.WaypointsDao;
 import co.nvqa.common.core.model.persisted_class.core.OrderDetails;
 import co.nvqa.common.core.model.persisted_class.core.Reservations;
 import co.nvqa.common.core.model.persisted_class.core.RouteLogs;
 import co.nvqa.common.core.model.persisted_class.core.RouteMonitoringData;
 import co.nvqa.common.core.model.persisted_class.core.ShipperPickupSearch;
+import co.nvqa.common.core.model.persisted_class.core.Transactions;
 import co.nvqa.common.core.model.persisted_class.core.Waypoints;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
@@ -36,6 +38,10 @@ public class DbCoreSteps extends CoreStandardSteps {
 
   @Inject
   private WaypointsDao waypointsDao;
+
+  @Inject
+  private TransactionsDao transactionsDao;
+
   @Inject
   private ShipperPickupSearchDao shipperPickupSearchDao;
   @Inject
@@ -175,5 +181,16 @@ public class DbCoreSteps extends CoreStandardSteps {
     Long resolvedOrderId = Long.parseLong(resolveValue(orderId));
     OrderDetails orderDetails = orderDetailsDao.getOrderDetailsByOrderId(resolvedOrderId);
     putInList(KEY_CORE_LIST_OF_ORDER_DETAILS, orderDetails);
+  }
+
+  @When("DB Core - verify transactions record:")
+  public void verifyTransaction(Map<String, String> data) {
+    data = resolveKeyValues(data);
+    Transactions expected = new Transactions(data);
+    Transactions actual = transactionsDao.getSingleTransaction(expected.getId());
+    Assertions.assertThat(actual)
+        .withFailMessage("transactions record was not found: " + data)
+        .isNotNull();
+    expected.compareWithActual(actual, data);
   }
 }

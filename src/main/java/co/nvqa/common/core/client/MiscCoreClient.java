@@ -46,4 +46,10 @@ public class MiscCoreClient extends SimpleApiClient {
     return r.getBody().as(SalesPerson.class);
   }
 
+  public Response evictShipperCache() {
+    String url = "core/debug/shipper-pickup/cache/evictall";
+    RequestSpecification requestSpecification = createAuthenticatedRequest();
+    return doGet("Core - Evict Shipper's Cache", requestSpecification, url);
+  }
+
 }
