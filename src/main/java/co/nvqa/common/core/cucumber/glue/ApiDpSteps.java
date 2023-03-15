@@ -18,11 +18,11 @@ public class ApiDpSteps extends CoreStandardSteps {
   }
 
   /**
-   * Operator perform dp drop off with order id "{KEY_CREATED_ORDER_ID}"
+   * API Core - Operator perform dp drop off with order id "{string}"
    *
-   * @param orderIdString      example: {KEY_CREATED_ORDER_ID}
+   * @param orderIdString      example: {KEY_LIST_OF_CREATED_ORDERS[1].id}
    */
-  @And("Operator perform dp drop off with order id {string}")
+  @And("API Core - Operator perform dp drop off with order id {string}")
   public void operatorPerformDpDropOff(String orderIdString) {
     Long orderId = Long.parseLong(resolveValue(orderIdString));
 
