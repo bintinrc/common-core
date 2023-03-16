@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'co.nvqa'
-version '1.2.16-corev2fix1'
+version '1.2.17'
 
 sourceCompatibility = JavaVersion.VERSION_11
 String qaRepoUsername = System.getenv("nvqaRepositoryUsername") ?
