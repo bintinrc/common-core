@@ -91,10 +91,11 @@ public class RouteDao extends DbBase {
   }
 
   public Waypoints getWaypointsDetails(Long legacyId) {
-    String query = "FROM Waypoints WHERE legacyId = :legacyId";
+    String query = "FROM Waypoints WHERE legacyId = :legacyId and systemId = :systemId";
     var result = findAll(session ->
         session.createQuery(query, Waypoints.class)
-            .setParameter("legacyId", legacyId));
+            .setParameter("legacyId", legacyId)
+            .setParameter("systemId", StandardTestConstants.NV_SYSTEM_ID));
     return CollectionUtils.isEmpty(result) ? null : result.get(0);
   }
 }
