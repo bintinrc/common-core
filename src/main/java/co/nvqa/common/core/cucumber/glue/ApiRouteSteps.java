@@ -123,7 +123,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
         addParcelToRouteRequestTemplate, AddParcelToRouteRequest.class);
     retryIfAssertionErrorOrRuntimeExceptionOccurred(
         () -> getRouteClient().addParcelToRoute(orderId, addParcelToRouteRequest),
-        "add parcel to route");
+        2000,5);
   }
 
   /**
@@ -154,7 +154,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
     final Long jobId = Long.parseLong(resolveValue(paJobId));
     retryIfAssertionErrorOrRuntimeExceptionOccurred(
         () -> getRouteClient().removePAJobFromRoute(jobId),
-        "remove pickup job from route");
+        2000,5);
   }
 
   @Given("API Core - Operator update routed waypoint to pending")
