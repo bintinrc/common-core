@@ -149,8 +149,10 @@ public class ApiOrderSteps extends CoreStandardSteps {
   }
 
   /**
-   * @param dataTableRaw <br/> <b>orderId</b>: order ID of the order/parcel e.g. {KEY_LIST_OF_CREATED_ORDERS[1].id}<br/>
-   *                     <b>rtsRequest</b> { "reason": "Return to sender: Nobody at address", "timewindow_id":1, "date":"{date: 1 days next, yyyy-MM-dd}"}<br/>
+   * @param dataTableRaw <br/> <b>orderId</b>: order ID of the order/parcel e.g.
+   *                     {KEY_LIST_OF_CREATED_ORDERS[1].id}<br/>
+   *                     <b>rtsRequest</b> { "reason": "Return to sender: Nobody at address",
+   *                     "timewindow_id":1, "date":"{date: 1 days next, yyyy-MM-dd}"}<br/>
    */
   @When("API Core - Operator rts order:")
   public void apiOperatorRtsOrder(Map<String, String> dataTableRaw) {
