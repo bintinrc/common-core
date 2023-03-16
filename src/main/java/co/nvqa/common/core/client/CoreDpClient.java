@@ -37,7 +37,12 @@ public class CoreDpClient extends SimpleApiClient {
         .pathParam("orderId", orderId)
         .body(json);
 
-    return doPost("CORE - DRIVER DROP OFF TO DP", spec, uri);
+    Response r = doPost("CORE - DRIVER DROP OFF TO DP", spec, uri);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+
+    return r;
   }
 
   public Response customerCollect(long orderId, CustomerCollectRequest request) {
@@ -59,17 +64,4 @@ public class CoreDpClient extends SimpleApiClient {
 
     return doDelete("CORE - UNTAG ORDER FROM DP", spec, uri);
   }
-
-  public void dpDropOff(long orderId) {
-    String uri = "core/2.0/orders/{orderId}/dropoff";
-    RequestSpecification spec = createAuthenticatedRequest()
-        .pathParam("orderId", orderId);
-
-    Response r = doPost("CORE - DP DROP OFF", spec, uri);
-    r.then().contentType(ContentType.JSON);
-    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
-      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
-    }
-  }
-
 }
