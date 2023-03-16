@@ -25,7 +25,7 @@ public class ApiEventsSteps extends CoreStandardSteps {
   }
 
   /**
-   * @param mapOfData <br/> <b>orderId</b>: order ID of the order/parcel<br/>
+   * @param dataTableRaw <br/> <b>orderId</b>: order ID of the order/parcel<br/>
    *                     <b>eventName</b>: event Name (UPDATE_AV) <br/>
    *                     <b>userId</b> User ID (Address Geolocator)
    *                     <b>status</b> Status of address (UNVERIFIED)
