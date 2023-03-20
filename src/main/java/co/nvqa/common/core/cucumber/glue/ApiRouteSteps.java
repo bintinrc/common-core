@@ -106,7 +106,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
    * Sample:<p>
    * <p>
    * When API Operator add parcel to the route using data below:<p> | orderId | 111111 |<p> |
-   * addParcelToRouteRequest | {"tracking_id":"NVQASG","route_id":95139463,"type":"DELIVERY"} |<p>
+   * addParcelToRouteRequest | {"route_id":95139463,"type":"DELIVERY"} |<p>
    * <p>
    *
    * @param dataTableAsMap Map of data from feature file.

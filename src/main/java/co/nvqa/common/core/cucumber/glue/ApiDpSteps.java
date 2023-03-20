@@ -45,15 +45,28 @@ public class ApiDpSteps extends CoreStandardSteps {
     retryIfAssertionErrorOccurred(
         () -> {
           DpTagging result = getCoreDpClient().tagToDpAndAddToRoute(orderId, request);
-          Assertions.assertThat(result.getDpId()).as("dp_id")
-              .isEqualTo(request.getDpTag().getDpId());
+          if (request.getDpTag() != null) {
+            Assertions.assertThat(result.getDpId()).as("dp_id")
+                .isEqualTo(request.getDpTag().getDpId());
+          } else {
+            Assertions.assertThat(result.getDpId()).as("dp_id")
+                .isNull();
+          }
+          if (request.getAddToRoute() != null) {
+            Assertions.assertThat(result.getStatus()).as("status")
+                .isEqualTo("SUCCESS");
+            Assertions.assertThat(result.getMessage()).as("message")
+                .isEqualTo(
+                    f("Added %s to route %s", trackingId, request.getAddToRoute().getRouteId()));
+
+          } else {
+            Assertions.assertThat(result.getStatus()).as("status")
+                .isNull();
+            Assertions.assertThat(result.getMessage()).as("message")
+                .isNull();
+          }
           Assertions.assertThat(result.getOrderId()).as("order_id")
               .isEqualTo(orderId);
-          Assertions.assertThat(result.getStatus()).as("status")
-              .isEqualTo("SUCCESS");
-          Assertions.assertThat(result.getMessage()).as("message")
-              .isEqualTo(
-                  f("Added %s to route %s", trackingId, request.getAddToRoute().getRouteId()));
           Assertions.assertThat(result.getTrackingId()).as("tracking_id")
               .isEqualTo(trackingId);
         },
