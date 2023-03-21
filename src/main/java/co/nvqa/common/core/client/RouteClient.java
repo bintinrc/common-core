@@ -14,6 +14,7 @@ import co.nvqa.commonauth.utils.TokenUtils;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import java.util.Arrays;
 import java.util.List;
 import javax.inject.Singleton;
 
@@ -298,5 +299,63 @@ public class RouteClient extends SimpleApiClient {
       throw new NvTestHttpException("unexpected http status: " + r.statusCode());
     }
     return r;
+  }
+
+  public void addReservationToRouteGroup(long routeGroupId, long reservationId) {
+    addReservationsToRouteGroup(routeGroupId, reservationId);
+  }
+
+  public void addReservationsToRouteGroup(long routeGroupId, long... reservationId) {
+    String apiMethod = "route/1.0/route-groups/{routeGroupId}/references";
+
+    RequestSpecification requestSpecification = createAuthenticatedRequest()
+        .pathParam("routeGroupId", routeGroupId)
+        .queryParam("append", true)
+        .body(f("{\"transactionIds\":[], \"reservationIds\":%s}", Arrays.toString(reservationId)));
+
+    Response r = doPost("Operator Portal - Add Reservation(s) to Route Group", requestSpecification,
+        apiMethod);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+    r.then().contentType(ContentType.JSON);
+  }
+
+  public void addTransactionToRouteGroup(long routeGroupId, long transactionId) {
+    addTransactionsToRouteGroup(routeGroupId, transactionId);
+  }
+
+  public void addTransactionsToRouteGroup(long routeGroupId, Long... transactionIds) {
+    String apiMethod = "route/1.0/route-groups/{routeGroupId}/references";
+
+    RequestSpecification requestSpecification = createAuthenticatedRequest()
+        .pathParam("routeGroupId", routeGroupId)
+        .queryParam("append", true)
+        .body(f("{\"transactionIds\":%s, \"reservationIds\":[]}", Arrays.toString(transactionIds)));
+
+    Response r = doPost("Operator Portal - Add Transaction(s) to Route Group", requestSpecification,
+        apiMethod);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+    r.then().contentType(ContentType.JSON);
+  }
+
+  public void deleteRoute(long routeId) {
+    Response r = deleteRouteAndGetRawResponse(routeId);
+    r.then().assertThat().contentType(ContentType.JSON);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+    r.then().assertThat().body(equalTo(f("[%d]", routeId)));
+  }
+
+  public Response deleteRouteAndGetRawResponse(long routeId) {
+    String url = "core/routes";
+
+    RequestSpecification spec = createAuthenticatedRequest()
+        .body(f("[{\"id\":%d}]", routeId));
+
+    return doDelete("Core - Delete Route", spec, url);
   }
 }
