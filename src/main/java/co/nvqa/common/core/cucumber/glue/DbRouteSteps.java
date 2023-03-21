@@ -49,5 +49,15 @@ public class DbRouteSteps extends CoreStandardSteps {
         .withFailMessage("waypoints record was not found: " + data)
         .isNotNull();
     expected.compareWithActual(actual, data);
+    if (data.containsKey("seqNo") && data.get("seqNo").equalsIgnoreCase("null")) {
+      Assertions.assertThat(actual.getSeqNo())
+          .as("seq_no is null")
+          .isNull();
+    }
+    if (data.containsKey("routeId") && data.get("routeId").equalsIgnoreCase("null")) {
+      Assertions.assertThat(actual.getSeqNo())
+          .as("route_id is null")
+          .isNull();
+    }
   }
 }

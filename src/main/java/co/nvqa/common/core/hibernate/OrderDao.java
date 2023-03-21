@@ -1,12 +1,14 @@
 package co.nvqa.common.core.hibernate;
 
-import co.nvqa.common.core.model.persisted_class.core.Order;
+import co.nvqa.common.core.model.persisted_class.core.Orders;
+import co.nvqa.common.core.model.persisted_class.core.Transactions;
 import co.nvqa.common.core.utils.CoreTestConstants;
 import co.nvqa.common.database.DbBase;
 import co.nvqa.common.utils.NvTestRuntimeException;
 import co.nvqa.common.utils.StandardTestConstants;
 import java.util.List;
 import javax.inject.Singleton;
+import org.apache.commons.collections.CollectionUtils;
 
 @Singleton
 public class OrderDao extends DbBase {
@@ -18,9 +20,9 @@ public class OrderDao extends DbBase {
 
   public Double getOrderWeight(Long orderId) {
     Double result;
-    String query = "FROM Order WHERE id = :orderId AND deletedAt IS NULL";
-    List<Order> orders = findAll(session ->
-        session.createQuery(query, Order.class)
+    String query = "FROM Orders WHERE id = :orderId AND deletedAt IS NULL";
+    List<Orders> orders = findAll(session ->
+        session.createQuery(query, Orders.class)
             .setParameter("orderId", orderId));
     if (orders != null && !orders.isEmpty()) {
       result = orders.get(0).getWeight();
@@ -28,6 +30,14 @@ public class OrderDao extends DbBase {
     } else {
       throw new NvTestRuntimeException("order record is not found for order " + orderId);
     }
+  }
+
+  public Orders getSingleOrderDetailsById(Long orderId) {
+    String query = "FROM Orders WHERE id = :orderId";
+    var result = findAll(session ->
+        session.createQuery(query, Orders.class)
+            .setParameter("orderId", orderId));
+    return CollectionUtils.isEmpty(result) ? null : result.get(0);
   }
 
 }

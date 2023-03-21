@@ -17,12 +17,15 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
+import org.checkerframework.checker.units.qual.Area;
 
 import static org.apache.commons.lang3.StringUtils.joinWith;
 import static org.apache.commons.lang3.StringUtils.normalizeSpace;
@@ -338,7 +341,8 @@ public class Order extends DataEntity<Order> implements Serializable {
 
   @Setter
   @Getter
-  public static class Shipper{
+  public static class Shipper {
+
     public Long id;
     public String name;
     public String email;
@@ -358,7 +362,8 @@ public class Order extends DataEntity<Order> implements Serializable {
 
   @Setter
   @Getter
-  public static class ShipperRefMetadata{
+  public static class ShipperRefMetadata {
+
     public String delivery_verification_mode;
     public Boolean allow_doorstep_dropoff;
     public Boolean enforce_delivery_verification;
@@ -393,6 +398,7 @@ public class Order extends DataEntity<Order> implements Serializable {
   @Setter
   @Getter
   public static class OrderShipper {
+
     public Long id;
     public String name;
     public String email;
@@ -589,5 +595,39 @@ public class Order extends DataEntity<Order> implements Serializable {
     private String itemDescription;
     private Boolean isDangerousGood;
     private Integer quantity;
+  }
+
+  @Getter
+  @Setter
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class Data extends DataEntity<Data> {
+
+    private Double originalWeight;
+    private Dimension originalDimensions;
+    private List<PreviousAddressDetails> previousDeliveryDetails;
+  }
+
+  @Getter
+  @Setter
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class PreviousAddressDetails extends DataEntity<PreviousAddressDetails> {
+
+    private String name;
+    private String email;
+    private String contact;
+    private String country;
+    private String address1;
+    private String address2;
+    private String postcode;
+    private Double latitude;
+    private Double longitude;
+    private String comments;
+    private Integer seqNo;
+
+    public PreviousAddressDetails(Map<String, ?> data) {
+      super(data);
+    }
   }
 }
