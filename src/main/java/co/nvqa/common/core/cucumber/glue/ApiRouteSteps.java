@@ -283,6 +283,24 @@ public class ApiRouteSteps extends CoreStandardSteps {
         "merge waypoints on zonal routing");
   }
 
+  /**
+   * Sample:<p>
+   * <p>
+   * When API Core - Operator merge routed waypoints:
+   * |{KEY_LIST_OF_CREATED_ROUTES[1].id}|
+   * |{KEY_LIST_OF_CREATED_ROUTES[2].id}|
+   * <p>
+   *
+   */
+  @Given("API Core - Operator merge routed waypoints:")
+  public void apiOperatorMergeRoutedWaypoints(List<String> routeIds) {
+    routeIds = resolveValues(routeIds);
+    List<Long> resolvedRouteIds = routeIds.stream().map(Long::parseLong).collect(Collectors.toList());
+    retryIfAssertionErrorOrRuntimeExceptionOccurred(
+        () -> getRouteClient().mergeWaypointsRouteLogs(resolvedRouteIds),
+        "merge waypoints on route logs");
+  }
+
   @When("API Core - Operator verifies response of merge waypoint on Zonal Routing")
   public void verifyMergeWaypointResponse(Map<String, String> dataTableAsMap) {
     Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);

@@ -5,7 +5,6 @@ import co.nvqa.common.constants.HttpConstants;
 import co.nvqa.common.core.model.route.AddParcelToRouteRequest;
 import co.nvqa.common.core.model.route.AddPickupJobToRouteRequest;
 import co.nvqa.common.core.model.route.MergeWaypointsResponse;
-import co.nvqa.common.core.model.route.MergeWaypointsResponse.Data;
 import co.nvqa.common.core.model.route.RouteRequest;
 import co.nvqa.common.core.model.route.RouteResponse;
 import co.nvqa.common.core.model.waypoint.Waypoint;
@@ -243,5 +242,21 @@ public class RouteClient extends SimpleApiClient {
     }
     return fromJsonSnakeCase(response.body().asString(),
         MergeWaypointsResponse.class);
+  }
+
+  public void mergeWaypointsRouteLogs(List<Long> routeIds) {
+    String apiMethod = "route-v2/routes/merge-waypoints";
+    String json = toJsonSnakeCase(routeIds);
+
+    RequestSpecification requestSpecification = createAuthenticatedRequest()
+        .body(f("{\"route_ids\":%s}", json));
+
+    Response response = doPut("Route V2 - Route Logs Merge Waypoints",
+        requestSpecification,
+        apiMethod);
+    response.then().assertThat().contentType(ContentType.JSON);
+    if (response.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + response.statusCode());
+    }
   }
 }
