@@ -147,6 +147,16 @@ public class DbCoreSteps extends CoreStandardSteps {
         .withFailMessage("waypoints record was not found: " + data)
         .isNotNull();
     expected.compareWithActual(actual, data);
+    if (data.containsKey("seqNo") && data.get("seqNo").equalsIgnoreCase("null")) {
+      Assertions.assertThat(actual.getSeqNo())
+          .as("seq_no is null")
+          .isNull();
+    }
+    if (data.containsKey("routeId") && data.get("routeId").equalsIgnoreCase("null")) {
+      Assertions.assertThat(actual.getSeqNo())
+          .as("route_id is null")
+          .isNull();
+    }
   }
 
   @When("DB Core - verify shipper_pickup_search record:")
@@ -177,6 +187,17 @@ public class DbCoreSteps extends CoreStandardSteps {
         .withFailMessage("route_monitoring_data record was not found: " + data)
         .isNotNull();
     expected.compareWithActual(actual, data);
+  }
+
+  @When("DB Core - verify route_monitoring_data is hard-deleted:")
+  public void verifyRouteMonitoringData(List<String> data) {
+    data = resolveValues(data);
+    data.forEach(e -> {
+      RouteMonitoringData actual = routeMonitoringDataDao
+          .getRouteMonitoringDataByWaypointId(Long.parseLong(e));
+      Assertions.assertThat(actual)
+          .as("route_monitoring_data is hard-deleted").isNull();
+    });
   }
 
   @When("DB Core - operator get order details of order id {string}")
@@ -210,6 +231,17 @@ public class DbCoreSteps extends CoreStandardSteps {
         .withFailMessage("transactions record was not found: " + data)
         .isNotNull();
     expected.compareWithActual(actual, data);
+    if (data.containsKey("distributionPointId") && data.get("distributionPointId")
+        .equalsIgnoreCase("null")) {
+      Assertions.assertThat(actual.getDistributionPointId())
+          .as("distributionPointId is null")
+          .isNull();
+    }
+    if (data.containsKey("routeId") && data.get("routeId").equalsIgnoreCase("null")) {
+      Assertions.assertThat(actual.getRouteId())
+          .as("route_id is null")
+          .isNull();
+    }
   }
 
   @When("DB Core - verify orders record:")

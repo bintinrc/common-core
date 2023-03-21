@@ -259,4 +259,27 @@ public class RouteClient extends SimpleApiClient {
       throw new NvTestHttpException("unexpected http status: " + response.statusCode());
     }
   }
+
+  public void addToRouteDp(long orderId, long routeId) {
+    String url = "core/2.0/orders/{orderId}/routes-dp";
+    RequestSpecification requestSpecification = createAuthenticatedRequest()
+        .pathParam("orderId", orderId)
+        .body(f("{\"type\":\"%s\",\"route_id\":%s}", "DELIVERY", routeId));
+    Response response = doPut("API Core - Add To Route DP", requestSpecification, url);
+    if (response.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + response.statusCode());
+    }
+  }
+
+  public void pullOutDpOrderFromRoute(long orderId) {
+    String url = "core/2.0/orders/{orderId}/routes-dp";
+    RequestSpecification requestSpecification = createAuthenticatedRequest()
+        .pathParam("orderId", orderId)
+        .body(f("{\"type\":\"DELIVERY\"}"));
+    Response response = doDelete("API Core - Pull Out DP Order Waypoint From Route",
+        requestSpecification, url);
+    if (response.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + response.statusCode());
+    }
+  }
 }

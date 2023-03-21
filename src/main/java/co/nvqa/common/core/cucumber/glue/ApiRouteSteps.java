@@ -286,16 +286,15 @@ public class ApiRouteSteps extends CoreStandardSteps {
   /**
    * Sample:<p>
    * <p>
-   * When API Core - Operator merge routed waypoints:
-   * |{KEY_LIST_OF_CREATED_ROUTES[1].id}|
+   * When API Core - Operator merge routed waypoints: |{KEY_LIST_OF_CREATED_ROUTES[1].id}|
    * |{KEY_LIST_OF_CREATED_ROUTES[2].id}|
    * <p>
-   *
    */
   @Given("API Core - Operator merge routed waypoints:")
   public void apiOperatorMergeRoutedWaypoints(List<String> routeIds) {
     routeIds = resolveValues(routeIds);
-    List<Long> resolvedRouteIds = routeIds.stream().map(Long::parseLong).collect(Collectors.toList());
+    List<Long> resolvedRouteIds = routeIds.stream().map(Long::parseLong)
+        .collect(Collectors.toList());
     retryIfAssertionErrorOrRuntimeExceptionOccurred(
         () -> getRouteClient().mergeWaypointsRouteLogs(resolvedRouteIds),
         "merge waypoints on route logs");
@@ -315,5 +314,25 @@ public class ApiRouteSteps extends CoreStandardSteps {
         .withFailMessage("merge waypoints response size doesnt match")
         .isEqualTo(expected.size());
     expected.forEach(o -> DataEntity.assertListContains(actual, o, "merged waypoints list"));
+  }
+
+  //  DO NOT use this to add to route for normal order (non-DP order)
+  @Given("API Core - Operator new add parcel to DP holding route:")
+  public void operatorAddToDpHoldingRoute(Map<String, String> data) {
+    data = resolveKeyValues(data);
+    final Long routeId = Long.parseLong(data.get("routeId"));
+    final Long orderId = Long.parseLong(data.get("orderId"));
+    retryIfAssertionErrorOrRuntimeExceptionOccurred(
+        () -> getRouteClient().addToRouteDp(orderId, routeId),
+        "Add to route dp order");
+  }
+
+  //  DO NOT use this to pull order out from route for normal order (non-DP order)
+  @Given("API Core - Operator pull out dp order from DP holding route for order")
+  public void operatorPullOutDpOrder(List<String> data) {
+    retryIfAssertionErrorOrRuntimeExceptionOccurred(
+        () -> data.forEach(
+            e -> getRouteClient().pullOutDpOrderFromRoute(Long.parseLong(resolveValue(e)))),
+        "pull out dp order from route");
   }
 }

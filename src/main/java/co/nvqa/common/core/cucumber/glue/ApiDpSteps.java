@@ -3,6 +3,7 @@ package co.nvqa.common.core.cucumber.glue;
 import co.nvqa.common.core.client.CoreDpClient;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.model.dp.DpTagging;
+import co.nvqa.common.core.model.dp.DpUntagging;
 import co.nvqa.common.core.model.route.AddParcelToRouteRequest;
 import io.cucumber.java.en.And;
 import java.util.Map;
@@ -71,5 +72,17 @@ public class ApiDpSteps extends CoreStandardSteps {
               .isEqualTo(trackingId);
         },
         "tag to dp");
+  }
+
+  @And("API Core - Operator untag from dp and remove from holding route:")
+  public void operatorUntaTagFromDp(Map<String, String> source) {
+    final Map<String, String> resolvedDataTable = resolveKeyValues(source);
+    final String jsonRequest = resolvedDataTable.get("request");
+    final long orderId = Long.parseLong(resolvedDataTable.get("orderId"));
+    final DpUntagging request = fromJsonSnakeCase(
+        jsonRequest, DpUntagging.class);
+    retryIfAssertionErrorOccurred(
+        () -> getCoreDpClient().removeFromDpHoldingRouteAndUntagFromDp(orderId, request),
+        "untag from dp");
   }
 }

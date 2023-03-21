@@ -4,6 +4,7 @@ import co.nvqa.common.client.SimpleApiClient;
 import co.nvqa.common.constants.HttpConstants;
 import co.nvqa.common.core.model.dp.CustomerCollectRequest;
 import co.nvqa.common.core.model.dp.DpTagging;
+import co.nvqa.common.core.model.dp.DpUntagging;
 import co.nvqa.common.core.model.dp.LodgeInRequest;
 import co.nvqa.common.core.model.event.Events;
 import co.nvqa.common.utils.NvTestHttpException;
@@ -80,5 +81,19 @@ public class CoreDpClient extends SimpleApiClient {
     }
     r.then().contentType(ContentType.JSON);
     return fromJson(r.body().asString(), DpTagging.class);
+  }
+
+  public void removeFromDpHoldingRouteAndUntagFromDp(long orderId, DpUntagging request) {
+    String json = toJsonSnakeCase(request);
+    String url = "core/2.0/orders/{orderId}/dps/routes-dp";
+    RequestSpecification requestSpecification = createAuthenticatedRequest()
+        .pathParam("orderId", orderId)
+        .body(json);
+    Response response = doDelete(
+        "API Core - Remove From To DP Holding Route And Untag From DP", requestSpecification,
+        url);
+    if (response.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + response.statusCode());
+    }
   }
 }
