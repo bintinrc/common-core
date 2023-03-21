@@ -65,7 +65,7 @@ public class RouteClient extends SimpleApiClient {
         .pathParam("orderId", orderId)
         .body(json);
 
-    return doPut("Operator Portal - Add Parcel to Route", spec, url);
+    return doPut("Core - Add Parcel to Route", spec, url);
   }
 
   /**
@@ -78,7 +78,11 @@ public class RouteClient extends SimpleApiClient {
         .pathParam("orderId", orderId)
         .body(f("{\"type\":\"%s\"}", transactionType));
 
-    doPut("Operator Portal - Pull Parcel from Route", spec, url);
+    Response response = doDelete("Core - Pull Out Order From Route",
+        spec, url);
+    if (response.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + response.statusCode());
+    }
   }
 
   public void archiveRoute(long routeId) {
@@ -100,7 +104,7 @@ public class RouteClient extends SimpleApiClient {
     RequestSpecification requestSpecification = createAuthenticatedRequest()
         .pathParam("routeId", routeId);
 
-    return doPut("Operator API - Archive Route", requestSpecification, url);
+    return doPut("Route - Archive Route", requestSpecification, url);
   }
 
   public void unarchiveRoutes(List<Long> routeIds) {
@@ -110,9 +114,6 @@ public class RouteClient extends SimpleApiClient {
   }
 
   public void unarchiveRoute(long routeId) {
-    RequestSpecification requestSpecification = createAuthenticatedRequest()
-        .pathParam("routeId", routeId);
-
     Response r = unarchiveRouteAndGetRawResponse(routeId);
     if (r.statusCode() != HttpConstants.RESPONSE_204_NO_CONTENT) {
       throw new NvTestHttpException("unexpected http status: " + r.statusCode());
@@ -125,7 +126,7 @@ public class RouteClient extends SimpleApiClient {
     RequestSpecification requestSpecification = createAuthenticatedRequest()
         .pathParam("routeId", routeId);
 
-    return doPut("Operator API - Unarchive Route", requestSpecification, url);
+    return doPut("API Route - Unarchive Route", requestSpecification, url);
   }
 
   public void addPickupJobToRoute(long jobId,
@@ -147,13 +148,13 @@ public class RouteClient extends SimpleApiClient {
         .pathParam("jobId", jobId)
         .body(json);
 
-    return doPut("Operator Portal - Add Pickup Job to Route", spec, url);
+    return doPut("Core - Add Pickup Job to Route", spec, url);
   }
 
   public void removePAJobFromRoute(long paJobId) {
     String uri = "core/pickup-appointment-jobs/{paJobId}/unroute";
     RequestSpecification spec = createAuthenticatedRequest().pathParam("paJobId", paJobId);
-    Response r = doPut("OPERATOR - Remove PA Job from Route", spec, uri);
+    Response r = doPut("Core - Remove PA Job from Route", spec, uri);
     if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
       throw new NvTestHttpException("unexpected http status: " + r.statusCode());
     }
@@ -168,7 +169,7 @@ public class RouteClient extends SimpleApiClient {
     final RequestSpecification spec = createAuthenticatedRequest()
         .body(json);
 
-    return doPut("Operator Portal - Update Routed Waypoint to Pending", spec, url);
+    return doPut("Core - Update Routed Waypoint to Pending", spec, url);
   }
 
   public List<Waypoint> updateWaypointToPending(List<Waypoint> request) {
@@ -181,10 +182,10 @@ public class RouteClient extends SimpleApiClient {
   }
 
   public void addReservationToRoute(long routeId, long reservationId) {
-    String url = "core/2.0/reservations/{reservation_id}/route";
+    String url = "core/2.0/reservations/{reservationId}/route";
 
     RequestSpecification spec = createAuthenticatedRequest()
-        .pathParam("reservation_id", reservationId)
+        .pathParam("reservationId", reservationId)
         .body(f("{\"new_route_id\":%d,\"route_index\":-1,\"overwrite\":true}", routeId));
     Response r = doPut("Core - Add Reservation to Route", spec, url);
     r.then().contentType(ContentType.JSON);
@@ -212,13 +213,13 @@ public class RouteClient extends SimpleApiClient {
   }
 
   public void pullReservationOutOfRoute(long reservationId) {
-    String url = "core/2.0/reservations/{reservation_id}/unroute";
+    String url = "core/2.0/reservations/{reservationId}/unroute";
 
     RequestSpecification spec = createAuthenticatedRequest()
-        .pathParam("reservation_id", reservationId)
+        .pathParam("reservationId", reservationId)
         .body("{}");
 
-    Response r = doPut("Reservation V2 - Pull Reservation Out of Route", spec, url);
+    Response r = doPut("Core - Pull Reservation Out of Route", spec, url);
     r.then().contentType(ContentType.JSON);
     if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
       throw new NvTestHttpException("unexpected http status: " + r.statusCode());
@@ -281,5 +282,21 @@ public class RouteClient extends SimpleApiClient {
     if (response.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
       throw new NvTestHttpException("unexpected http status: " + response.statusCode());
     }
+  }
+
+  public Response getGraphqlRouteDetails(Long routeId) {
+    final String uri = "core/graphql/route";
+    String routeRequest = f(
+        "{\"query\": \"query ($id: Int!) {route (id: $id){id, hubId, date, driverId}}\",\"variables\": { \"id\": %s}}",
+        routeId);
+
+    RequestSpecification requestSpecification = createAuthenticatedRequest()
+        .body(routeRequest);
+    final Response r = doPost(f("ROUTE SEARCH - GET DETAILS OF ROUTE ID %d", routeId),
+        requestSpecification, uri);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+    return r;
   }
 }
