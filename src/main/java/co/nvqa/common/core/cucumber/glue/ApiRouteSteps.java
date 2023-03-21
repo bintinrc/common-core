@@ -90,10 +90,12 @@ public class ApiRouteSteps extends CoreStandardSteps {
       createRouteRequest.setHubId(get(KEY_DESTINATION_HUB_ID));
     }
 
-    final RouteResponse createRouteResponse = getRouteClient().createRoute(createRouteRequest);
-    putInList(KEY_LIST_OF_CREATED_ROUTES, createRouteResponse);
-    putInList(KEY_LIST_OF_CREATED_ROUTE_ID, createRouteResponse.getId());
-    put(KEY_CREATED_ROUTE_ID, createRouteResponse.getId());
+   retryIfAssertionErrorOrRuntimeExceptionOccurred(()->{
+     final RouteResponse createRouteResponse = getRouteClient().createRoute(createRouteRequest);
+     putInList(KEY_LIST_OF_CREATED_ROUTES, createRouteResponse);
+     putInList(KEY_LIST_OF_CREATED_ROUTE_ID, createRouteResponse.getId());
+     put(KEY_CREATED_ROUTE_ID, createRouteResponse.getId());
+   },2000,3);
   }
 
   @Given("API Core - Operator create new route from zonal routing using data below:")
@@ -119,9 +121,9 @@ public class ApiRouteSteps extends CoreStandardSteps {
     final long orderId = Long.parseLong(resolvedDataTable.get("orderId"));
     final AddParcelToRouteRequest addParcelToRouteRequest = fromJsonSnakeCase(
         addParcelToRouteRequestTemplate, AddParcelToRouteRequest.class);
-    retryIfAssertionErrorOccurred(
+    retryIfAssertionErrorOrRuntimeExceptionOccurred(
         () -> getRouteClient().addParcelToRoute(orderId, addParcelToRouteRequest),
-        "add parcel to route");
+        2000,5);
   }
 
   /**
@@ -142,17 +144,17 @@ public class ApiRouteSteps extends CoreStandardSteps {
     final long jobId = Long.parseLong(resolvedDataTable.get("jobId"));
     final AddPickupJobToRouteRequest addPickupJobToRouteRequest = fromJsonSnakeCase(
         addPickupJobToRouteRequestTemplate, AddPickupJobToRouteRequest.class);
-    retryIfAssertionErrorOccurred(
-        () -> getRouteClient().addPickupJobToRoute(jobId, addPickupJobToRouteRequest),
-        "add pickup job to route");
+    retryIfAssertionErrorOrRuntimeExceptionOccurred(
+        () -> getRouteClient().addPickupJobToRoute(jobId, addPickupJobToRouteRequest)
+        ,2000,3);
   }
 
   @Given("API Core - Operator remove pickup job id {string} from route")
   public void apiOperatorRemovePickupJobFromRouteUsingDataBelow(String paJobId) {
     final Long jobId = Long.parseLong(resolveValue(paJobId));
-    retryIfAssertionErrorOccurred(
+    retryIfAssertionErrorOrRuntimeExceptionOccurred(
         () -> getRouteClient().removePAJobFromRoute(jobId),
-        "remove pickup job from route");
+        2000,5);
   }
 
   @Given("API Core - Operator update routed waypoint to pending")
