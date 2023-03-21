@@ -319,6 +319,12 @@ public class ApiRouteSteps extends CoreStandardSteps {
   }
 
   //  DO NOT use this to add to route for normal order (non-DP order)
+
+  /**
+   * When API Core - Operator new add parcel to DP holding route:
+   *       | orderId | {KEY_LIST_OF_CREATED_ORDERS[1].id} |
+   *       | routeId | {KEY_LIST_OF_CREATED_ROUTES[1].id} |
+   */
   @Given("API Core - Operator new add parcel to DP holding route:")
   public void operatorAddToDpHoldingRoute(Map<String, String> data) {
     data = resolveKeyValues(data);
@@ -330,6 +336,11 @@ public class ApiRouteSteps extends CoreStandardSteps {
   }
 
   //  DO NOT use this to pull order out from route for normal order (non-DP order)
+
+  /**
+   * When API Core - Operator pull out dp order from DP holding route for order
+   *       | {KEY_LIST_OF_CREATED_ORDERS[1].id} |
+   */
   @Given("API Core - Operator pull out dp order from DP holding route for order")
   public void operatorPullOutDpOrder(List<String> data) {
     retryIfAssertionErrorOrRuntimeExceptionOccurred(
