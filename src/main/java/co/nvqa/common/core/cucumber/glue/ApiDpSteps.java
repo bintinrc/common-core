@@ -75,7 +75,7 @@ public class ApiDpSteps extends CoreStandardSteps {
   }
 
   @And("API Core - Operator untag from dp and remove from holding route:")
-  public void operatorUntaTagFromDp(Map<String, String> source) {
+  public void operatorUnTagFromDpAndRemoveFromRoute(Map<String, String> source) {
     final Map<String, String> resolvedDataTable = resolveKeyValues(source);
     final String jsonRequest = resolvedDataTable.get("request");
     final long orderId = Long.parseLong(resolvedDataTable.get("orderId"));
@@ -83,6 +83,16 @@ public class ApiDpSteps extends CoreStandardSteps {
         jsonRequest, DpUntagging.class);
     retryIfAssertionErrorOccurred(
         () -> getCoreDpClient().removeFromDpHoldingRouteAndUntagFromDp(orderId, request),
+        "untag from dp");
+  }
+
+  @And("API Core - Operator untag from dp:")
+  public void operatorUntagFromDp(Map<String, String> source) {
+    final Map<String, String> resolvedDataTable = resolveKeyValues(source);
+    final long orderId = Long.parseLong(resolvedDataTable.get("orderId"));
+    final String version = resolvedDataTable.get("version");
+    retryIfAssertionErrorOccurred(
+        () -> getCoreDpClient().untagOrderFromDp(orderId, version),
         "untag from dp");
   }
 }

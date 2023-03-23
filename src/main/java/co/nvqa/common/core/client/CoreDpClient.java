@@ -58,11 +58,12 @@ public class CoreDpClient extends SimpleApiClient {
     return doPost("CORE - CUSTOMER COLLECT FROM DP", spec, uri);
   }
 
-  public Response untagOrderFromDp(long orderId, long userId) {
-    String uri = "core/2.0/orders/{orderId}/dps";
-    String json = "{\"user_id\":" + userId + "}";
+  public Response untagOrderFromDp(long orderId, String version) {
+    String uri = "core/{version}/orders/{orderId}/dps";
+    String json = "{\"type\":\"DELIVERY\"}";
     RequestSpecification spec = createAuthenticatedRequest()
         .pathParam("orderId", orderId)
+        .pathParam("version", version)
         .body(json);
 
     return doDelete("CORE - UNTAG ORDER FROM DP", spec, uri);
