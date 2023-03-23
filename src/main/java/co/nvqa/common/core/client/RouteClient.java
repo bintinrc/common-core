@@ -2,6 +2,7 @@ package co.nvqa.common.core.client;
 
 import co.nvqa.common.client.SimpleApiClient;
 import co.nvqa.common.constants.HttpConstants;
+import co.nvqa.common.core.model.RouteGroup;
 import co.nvqa.common.core.model.route.AddParcelToRouteRequest;
 import co.nvqa.common.core.model.route.AddPickupJobToRouteRequest;
 import co.nvqa.common.core.model.route.MergeWaypointsResponse;
@@ -357,5 +358,59 @@ public class RouteClient extends SimpleApiClient {
         .body(f("[{\"id\":%d}]", routeId));
 
     return doDelete("Core - Delete Route", spec, url);
+  }
+
+  public List<RouteGroup> getRouteGroups() {
+    String apiMethod = "route/1.0/route-groups";
+    RequestSpecification requestSpecification = createAuthenticatedRequest();
+    Response r = doGet("Operator Portal - Get Route Groups", requestSpecification,
+        apiMethod);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+    return r.body().jsonPath().getList("data.routeGroups", RouteGroup.class);
+  }
+
+  public void deleteRouteGroup(long routeGroupId) {
+    String apiMethod = "route/1.0/route-groups/{routeGroupId}";
+    RequestSpecification requestSpecification = createAuthenticatedRequest()
+        .pathParam("routeGroupId", routeGroupId);
+    Response r = doDelete("Operator Portal - Delete Route Group", requestSpecification,
+        apiMethod);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+  }
+
+  public RouteGroup createRouteGroup(RouteGroup request) {
+    String apiMethod = "route/1.0/route-groups";
+    RequestSpecification requestSpecification = createAuthenticatedRequest()
+        .body(request);
+    Response r = doPost("Route - Create Route Group", requestSpecification,
+        apiMethod);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+    return r.getBody().jsonPath().getObject("data.routeGroup", RouteGroup.class);
+  }
+
+  public void addParcelToRouteByTrackingId(AddParcelToRouteRequest addParcelToRouteRequest) {
+    final Response response = addParcelToRouteByTrackingIdAndGetRawResponse(
+        addParcelToRouteRequest);
+    response.then().contentType(ContentType.JSON);
+    if (response.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + response.statusCode());
+    }
+  }
+
+  public Response addParcelToRouteByTrackingIdAndGetRawResponse(
+      AddParcelToRouteRequest addParcelToRouteRequest) {
+    final String url = "core/2.0/orders/routes";
+    final String json = toJson(DEFAULT_SNAKE_CASE_MAPPER, addParcelToRouteRequest);
+
+    final RequestSpecification spec = createAuthenticatedRequest()
+        .body(json);
+
+    return doPut("Core - Add Parcel to Route by Tracking Id", spec, url);
   }
 }
