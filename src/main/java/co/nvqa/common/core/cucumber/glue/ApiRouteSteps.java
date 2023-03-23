@@ -4,11 +4,15 @@ import co.nvqa.common.core.client.RouteClient;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.model.route.AddParcelToRouteRequest;
 import co.nvqa.common.core.model.route.AddPickupJobToRouteRequest;
+import co.nvqa.common.core.model.route.MergeWaypointsResponse;
+import co.nvqa.common.core.model.route.MergeWaypointsResponse.Data;
 import co.nvqa.common.core.model.route.RouteRequest;
 import co.nvqa.common.core.model.route.RouteResponse;
 import co.nvqa.common.core.model.waypoint.Waypoint;
 import co.nvqa.common.core.utils.CoreTestUtils;
+import co.nvqa.common.model.DataEntity;
 import co.nvqa.common.utils.StandardTestUtils;
+import io.cucumber.guice.ScenarioScoped;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
 import io.restassured.response.Response;
@@ -22,6 +26,7 @@ import javax.inject.Inject;
 import lombok.Getter;
 import org.assertj.core.api.Assertions;
 
+@ScenarioScoped
 public class ApiRouteSteps extends CoreStandardSteps {
 
   @Inject
@@ -85,10 +90,12 @@ public class ApiRouteSteps extends CoreStandardSteps {
       createRouteRequest.setHubId(get(KEY_DESTINATION_HUB_ID));
     }
 
-    final RouteResponse createRouteResponse = getRouteClient().createRoute(createRouteRequest);
-    putInList(KEY_LIST_OF_CREATED_ROUTES, createRouteResponse);
-    putInList(KEY_LIST_OF_CREATED_ROUTE_ID, createRouteResponse.getId());
-    put(KEY_CREATED_ROUTE_ID, createRouteResponse.getId());
+   retryIfAssertionErrorOrRuntimeExceptionOccurred(()->{
+     final RouteResponse createRouteResponse = getRouteClient().createRoute(createRouteRequest);
+     putInList(KEY_LIST_OF_CREATED_ROUTES, createRouteResponse);
+     putInList(KEY_LIST_OF_CREATED_ROUTE_ID, createRouteResponse.getId());
+     put(KEY_CREATED_ROUTE_ID, createRouteResponse.getId());
+   },2000,3);
   }
 
   @Given("API Core - Operator create new route from zonal routing using data below:")
@@ -101,7 +108,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
    * Sample:<p>
    * <p>
    * When API Operator add parcel to the route using data below:<p> | orderId | 111111 |<p> |
-   * addParcelToRouteRequest | {"tracking_id":"NVQASG","route_id":95139463,"type":"DELIVERY"} |<p>
+   * addParcelToRouteRequest | {"route_id":95139463,"type":"DELIVERY"} |<p>
    * <p>
    *
    * @param dataTableAsMap Map of data from feature file.
@@ -114,9 +121,9 @@ public class ApiRouteSteps extends CoreStandardSteps {
     final long orderId = Long.parseLong(resolvedDataTable.get("orderId"));
     final AddParcelToRouteRequest addParcelToRouteRequest = fromJsonSnakeCase(
         addParcelToRouteRequestTemplate, AddParcelToRouteRequest.class);
-    retryIfAssertionErrorOccurred(
+    retryIfAssertionErrorOrRuntimeExceptionOccurred(
         () -> getRouteClient().addParcelToRoute(orderId, addParcelToRouteRequest),
-        "add parcel to route");
+        2000,5);
   }
 
   /**
@@ -137,9 +144,17 @@ public class ApiRouteSteps extends CoreStandardSteps {
     final long jobId = Long.parseLong(resolvedDataTable.get("jobId"));
     final AddPickupJobToRouteRequest addPickupJobToRouteRequest = fromJsonSnakeCase(
         addPickupJobToRouteRequestTemplate, AddPickupJobToRouteRequest.class);
-    retryIfAssertionErrorOccurred(
-        () -> getRouteClient().addPickupJobToRoute(jobId, addPickupJobToRouteRequest),
-        "add pickup job to route");
+    retryIfAssertionErrorOrRuntimeExceptionOccurred(
+        () -> getRouteClient().addPickupJobToRoute(jobId, addPickupJobToRouteRequest)
+        ,2000,3);
+  }
+
+  @Given("API Core - Operator remove pickup job id {string} from route")
+  public void apiOperatorRemovePickupJobFromRouteUsingDataBelow(String paJobId) {
+    final Long jobId = Long.parseLong(resolveValue(paJobId));
+    retryIfAssertionErrorOrRuntimeExceptionOccurred(
+        () -> getRouteClient().removePAJobFromRoute(jobId),
+        2000,5);
   }
 
   @Given("API Core - Operator update routed waypoint to pending")
@@ -220,5 +235,117 @@ public class ApiRouteSteps extends CoreStandardSteps {
     retryIfAssertionErrorOrRuntimeExceptionOccurred(
         () -> getRouteClient().pullFromRoute(orderId, type),
         "Operator pull order from route");
+  }
+
+  @When("API Core - Operator Edit Route Waypoint on Zonal Routing Edit Route:")
+  public void editRouteZonalRouting(Map<String, String> dataTableAsMap) {
+    Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
+    String createRouteRequestJson = StandardTestUtils
+        .replaceTokens(resolvedDataTable.get("editRouteRequest"),
+            StandardTestUtils.createDefaultTokens());
+    List<RouteRequest> request = fromJsonToList(createRouteRequestJson, RouteRequest.class);
+    retryIfAssertionErrorOrRuntimeExceptionOccurred(
+        () -> {
+          final List<RouteResponse> route = getRouteClient()
+              .zonalRoutingEditRoute(request);
+          Assertions.assertThat(route.get(0)).as("updated route is not null").isNotNull();
+        },
+        "Zonal Routing Edit Route");
+  }
+
+  /**
+   * Sample:<p>
+   * <p>
+   * When API Operator add reservation pick-ups to the route using data below:<p> | reservationId |
+   * 111111 |<p> | routeId       | 222222 |<p>
+   * <p>
+   *
+   * @param dataTableAsMap Map of data from feature file.
+   */
+  @When("API Core - Operator add reservation to route using data below:")
+  public void apiOperatorAddReservationPickUpsToTheRoute(Map<String, String> dataTableAsMap) {
+    Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
+
+    final long reservationResultId = Long.parseLong(resolvedDataTable.get("reservationId"));
+    final long routeId = Long.parseLong(resolvedDataTable.get("routeId"));
+    retryIfAssertionErrorOrRuntimeExceptionOccurred(
+        () -> getRouteClient().addReservationToRoute(routeId, reservationResultId),
+        "add reservation to route ");
+  }
+
+  @Given("API Core - Operator merge waypoints on Zonal Routing:")
+  public void apiOperatorMergeWaypoints(List<String> waypointIds) {
+    waypointIds = resolveValues(waypointIds);
+    List<Long> wpIds = waypointIds.stream().map(Long::parseLong).collect(Collectors.toList());
+    retryIfAssertionErrorOrRuntimeExceptionOccurred(
+        () -> {
+          final MergeWaypointsResponse result = getRouteClient().mergeWaypointsZonalRouting(wpIds);
+          put(KEY_CORE_MERGE_WAYPOINT_RESPONSE, toJsonSnakeCase(result));
+        },
+        "merge waypoints on zonal routing");
+  }
+
+  /**
+   * Sample:<p>
+   * <p>
+   * When API Core - Operator merge routed waypoints: |{KEY_LIST_OF_CREATED_ROUTES[1].id}|
+   * |{KEY_LIST_OF_CREATED_ROUTES[2].id}|
+   * <p>
+   */
+  @Given("API Core - Operator merge routed waypoints:")
+  public void apiOperatorMergeRoutedWaypoints(List<String> routeIds) {
+    routeIds = resolveValues(routeIds);
+    List<Long> resolvedRouteIds = routeIds.stream().map(Long::parseLong)
+        .collect(Collectors.toList());
+    retryIfAssertionErrorOrRuntimeExceptionOccurred(
+        () -> getRouteClient().mergeWaypointsRouteLogs(resolvedRouteIds),
+        "merge waypoints on route logs");
+  }
+
+  @When("API Core - Operator verifies response of merge waypoint on Zonal Routing")
+  public void verifyMergeWaypointResponse(Map<String, String> dataTableAsMap) {
+    Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
+    List<Data> expected = fromJson(resolvedDataTable.get("expectedResponse"),
+        MergeWaypointsResponse.class).getData();
+    List<Data> actual =
+        fromJson(resolvedDataTable.get("actualResponse"), MergeWaypointsResponse.class).getData();
+    Assertions.assertThat(actual)
+        .withFailMessage("merge waypoints response is null")
+        .isNotNull();
+    Assertions.assertThat(actual.size())
+        .withFailMessage("merge waypoints response size doesnt match")
+        .isEqualTo(expected.size());
+    expected.forEach(o -> DataEntity.assertListContains(actual, o, "merged waypoints list"));
+  }
+
+  //  DO NOT use this to add to route for normal order (non-DP order)
+
+  /**
+   * When API Core - Operator new add parcel to DP holding route:
+   *       | orderId | {KEY_LIST_OF_CREATED_ORDERS[1].id} |
+   *       | routeId | {KEY_LIST_OF_CREATED_ROUTES[1].id} |
+   */
+  @Given("API Core - Operator new add parcel to DP holding route:")
+  public void operatorAddToDpHoldingRoute(Map<String, String> data) {
+    data = resolveKeyValues(data);
+    final Long routeId = Long.parseLong(data.get("routeId"));
+    final Long orderId = Long.parseLong(data.get("orderId"));
+    retryIfAssertionErrorOrRuntimeExceptionOccurred(
+        () -> getRouteClient().addToRouteDp(orderId, routeId),
+        "Add to route dp order");
+  }
+
+  //  DO NOT use this to pull order out from route for normal order (non-DP order)
+
+  /**
+   * When API Core - Operator pull out dp order from DP holding route for order
+   *       | {KEY_LIST_OF_CREATED_ORDERS[1].id} |
+   */
+  @Given("API Core - Operator pull out dp order from DP holding route for order")
+  public void operatorPullOutDpOrder(List<String> data) {
+    retryIfAssertionErrorOrRuntimeExceptionOccurred(
+        () -> data.forEach(
+            e -> getRouteClient().pullOutDpOrderFromRoute(Long.parseLong(resolveValue(e)))),
+        "pull out dp order from route");
   }
 }

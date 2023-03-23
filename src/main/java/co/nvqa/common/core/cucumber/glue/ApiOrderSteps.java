@@ -8,9 +8,9 @@ import co.nvqa.common.core.model.order.RescheduleOrderResponse;
 import co.nvqa.common.core.model.order.RtsOrderRequest;
 import co.nvqa.common.utils.JsonUtils;
 import co.nvqa.common.utils.NvTestRuntimeException;
-import co.nvqa.common.utils.StandardTestConstants;
-import co.nvqa.commonauth.utils.TokenUtils;
+import io.cucumber.guice.ScenarioScoped;
 import io.cucumber.java.en.When;
+import java.util.List;
 import java.util.Map;
 import javax.inject.Inject;
 import lombok.Getter;
@@ -18,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@ScenarioScoped
 public class ApiOrderSteps extends CoreStandardSteps {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ApiOrderSteps.class);
@@ -38,8 +39,7 @@ public class ApiOrderSteps extends CoreStandardSteps {
    * order with the same tracking id. <br/><br/><b>Note</b>: becareful that you may face unintended
    * order status due to event propagation delay to Core service
    *
-   * @param tracking key that contains order's tracking id, example:
-   *                 KEY_LIST_OF_CREATED_TRACKING_IDS
+   * @param tracking key that contains order's tracking id, example: KEY_LIST_OF_CREATED_TRACKING_IDS
    */
   @When("API Core - Operator get order details for tracking order {string}")
   public void apiOperatorGetOrderDetailsForTrackingOrder(String tracking) {
@@ -50,6 +50,11 @@ public class ApiOrderSteps extends CoreStandardSteps {
 
     putInList(KEY_LIST_OF_CREATED_ORDERS, order,
         (o1, o2) -> StringUtils.equalsAnyIgnoreCase(o1.getTrackingId(), o2.getTrackingId()));
+  }
+
+  @When("API Core - Operator get multiple order details for tracking ids:")
+  public void apiOperatorGetMultipleOrderDetails(List<String> trackingIds) {
+    trackingIds.forEach(e -> apiOperatorGetOrderDetailsForTrackingOrder(e));
   }
 
   /**
@@ -149,8 +154,10 @@ public class ApiOrderSteps extends CoreStandardSteps {
   }
 
   /**
-   * @param dataTableRaw <br/> <b>orderId</b>: order ID of the order/parcel e.g. {KEY_LIST_OF_CREATED_ORDERS[1].id}<br/>
-   *                     <b>rtsRequest</b> { "reason": "Return to sender: Nobody at address", "timewindow_id":1, "date":"{date: 1 days next, yyyy-MM-dd}"}<br/>
+   * @param dataTableRaw <br/> <b>orderId</b>: order ID of the order/parcel e.g.
+   *                     {KEY_LIST_OF_CREATED_ORDERS[1].id}<br/>
+   *                     <b>rtsRequest</b> { "reason": "Return to sender: Nobody at address",
+   *                     "timewindow_id":1, "date":"{date: 1 days next, yyyy-MM-dd}"}<br/>
    */
   @When("API Core - Operator rts order:")
   public void apiOperatorRtsOrder(Map<String, String> dataTableRaw) {
@@ -160,6 +167,6 @@ public class ApiOrderSteps extends CoreStandardSteps {
     final RtsOrderRequest rtsRequest = fromJsonSnakeCase(rtsRequestString, RtsOrderRequest.class);
 
     retryIfAssertionErrorOrRuntimeExceptionOccurred(
-        () -> getOrderClient().rts(orderId, rtsRequest), "set RTS order");
+        () -> getOrderClient().setReturnedToSender(orderId, rtsRequest), "set RTS order");
   }
 }

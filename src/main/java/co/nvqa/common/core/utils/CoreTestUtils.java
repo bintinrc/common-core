@@ -12,5 +12,4 @@ public class CoreTestUtils {
   public static ZonedDateTime getDateForNextDay() {
     return DateUtil.getStartOfDay(DateUtil.getDate()).plusDays(1);
   }
-
 }

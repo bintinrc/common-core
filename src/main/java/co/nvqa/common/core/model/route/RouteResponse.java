@@ -1,9 +1,14 @@
 package co.nvqa.common.core.model.route;
 
+import co.nvqa.common.model.DataEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -21,6 +26,25 @@ public class RouteResponse {
   private String createdAt;
   private Driver driver;
   private List<Integer> tags = new ArrayList<>();
+
+  private Boolean archived;
+  private String comments;
+  @JsonIgnore
+  private Date createdAtAsDate;
+  private String deletedAt;
+  private String date;
+  private String dateTime;
+  private Long driverId;
+  private String driverName;
+  private Integer flags;
+  private Long hubId;
+  private String largestParcelSize;
+  private String routePassword;
+  private Integer type;
+  private Vehicle vehicle;
+  private Long vehicleId;
+  private List<Waypoint> waypoints = new ArrayList<>();
+  private Long zoneId;
 
   @Setter
   @Getter
@@ -84,5 +108,41 @@ public class RouteResponse {
     private Integer minWaypoints;
     private Integer maxWaypoints;
     private Integer cost;
+  }
+
+  @Getter
+  @Setter
+  @AllArgsConstructor
+  @NoArgsConstructor
+  public static class Waypoint extends DataEntity<Waypoint>{
+    public static final String STATUS_PENDING = "pending";
+    public static final String STATUS_ROUTED = "routed";
+    public static final String STATUS_SUCCESS = "success";
+    public static final String STATUS_FAIL = "fail";
+
+    private Long id;
+    private String city;
+    private String address1;
+    private String address2;
+    private String contact;
+    private String country;
+    private String postcode;
+    private Double latitude;
+    private Double longitude;
+    private String status;
+    private String timeWindowId;
+    private String date;
+    private Long routeId;
+    private Long seqNo;
+    private Long waypointType;
+    private Long routingZoneId;
+
+    public Waypoint(Map<String, ?> data) {
+      super(data);
+    }
+
+    public Waypoint(Long id) {
+      this.id = id;
+    }
   }
 }

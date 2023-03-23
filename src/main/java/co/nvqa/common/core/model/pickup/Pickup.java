@@ -1,6 +1,9 @@
 package co.nvqa.common.core.model.pickup;
 
+import java.util.Date;
+import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,30 +16,48 @@ public class Pickup {
 
   private String address1;
   private String address2;
-  private long addressId;
+  private Long addressId;
   private String approxVol;
   private String city;
   private String comments;
   private String contact;
   private String country;
-  private long createdAt;
+  private Long createdAt;
   private Long distributionPointId;
   private Long driverId;
   private String email;
   private Long failureReasonId;
-  private long id;
-  private long latestDatetime;
+  private Long id;
+  private Long latestDatetime;
+  private Long readyDatetime;
   private String name;
   private String postcode;
   private Integer priorityLevel;
-  private long readyDatetime;
-  private long reservationId;
+  private Long reservationId;
   private Long routeId;
-  private long shipperId;
+  private Long shipperId;
   private String state;
   private String status;
-  private int timewindowId;
+  private Integer timewindowId;
   private String type;
-  private long waypointId;
+  private Long waypointId;
   private String waypointStatus;
+
+  @Getter
+  @Setter
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class Pod {
+
+    private Long id;
+    private String name;
+    private Date timestamp;
+    private Integer submittedScansQuantity;
+    private Integer shipperScansQuantity;
+    private List<String> shipperScans;
+    private Integer hubScansQuantity;
+    private List<String> hubScans;
+    private String signatureUrl;
+  }
 }

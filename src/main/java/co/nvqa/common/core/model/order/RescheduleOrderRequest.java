@@ -24,5 +24,13 @@ public class RescheduleOrderRequest {
   private String email;
   private String name;
   private Integer timeWindow;
+  private String address1;
+  private String address2;
+  private String postalCode;
+  private String city;
+  private String country;
+  private Double latitude;
+  private Double longitude;
+
 
 }

@@ -4,24 +4,25 @@ import co.nvqa.common.client.SimpleApiClient;
 import co.nvqa.common.constants.HttpConstants;
 import co.nvqa.common.core.model.route.AddParcelToRouteRequest;
 import co.nvqa.common.core.model.route.AddPickupJobToRouteRequest;
+import co.nvqa.common.core.model.route.MergeWaypointsResponse;
 import co.nvqa.common.core.model.route.RouteRequest;
 import co.nvqa.common.core.model.route.RouteResponse;
 import co.nvqa.common.core.model.waypoint.Waypoint;
 import co.nvqa.common.utils.NvTestHttpException;
+import co.nvqa.common.utils.StandardTestConstants;
+import co.nvqa.commonauth.utils.TokenUtils;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import java.util.List;
-import java.util.TimeZone;
+import javax.inject.Singleton;
 
+@Singleton
 public class RouteClient extends SimpleApiClient {
 
-  public RouteClient(String baseUrl, String bearerToken) {
-    this(baseUrl, bearerToken, null);
-  }
-
-  public RouteClient(String baseUrl, String bearerToken, TimeZone timeZone) {
-    super(baseUrl, bearerToken, timeZone, DEFAULT_CAMEL_CASE_MAPPER);
+  public RouteClient() {
+    super(StandardTestConstants.API_BASE_URL, TokenUtils.getOperatorAuthToken(),
+        DEFAULT_CAMEL_CASE_MAPPER);
   }
 
   public RouteResponse createRoute(RouteRequest routeRequest) {
@@ -68,7 +69,7 @@ public class RouteClient extends SimpleApiClient {
   }
 
   /**
-   * @param orderId orderId
+   * @param orderId         orderId
    * @param transactionType String between DELIVERY and PICKUP
    */
   public void pullFromRoute(long orderId, String transactionType) {
@@ -149,6 +150,16 @@ public class RouteClient extends SimpleApiClient {
     return doPut("Operator Portal - Add Pickup Job to Route", spec, url);
   }
 
+  public void removePAJobFromRoute(long paJobId) {
+    String uri = "core/pickup-appointment-jobs/{paJobId}/unroute";
+    RequestSpecification spec = createAuthenticatedRequest().pathParam("paJobId", paJobId);
+    Response r = doPut("OPERATOR - Remove PA Job from Route", spec, uri);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+    r.then().contentType(ContentType.JSON);
+  }
+
   public Response updateWaypointToPendingAndGetRawResponse(
       List<Waypoint> request) {
     final String url = "core/waypoints";
@@ -167,5 +178,108 @@ public class RouteClient extends SimpleApiClient {
       throw new NvTestHttpException("unexpected http status: " + response.statusCode());
     }
     return fromJsonSnakeCaseToList(response.getBody().asString(), Waypoint.class);
+  }
+
+  public void addReservationToRoute(long routeId, long reservationId) {
+    String url = "core/2.0/reservations/{reservation_id}/route";
+
+    RequestSpecification spec = createAuthenticatedRequest()
+        .pathParam("reservation_id", reservationId)
+        .body(f("{\"new_route_id\":%d,\"route_index\":-1,\"overwrite\":true}", routeId));
+    Response r = doPut("Core - Add Reservation to Route", spec, url);
+    r.then().contentType(ContentType.JSON);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+  }
+
+  public Response zonalRoutingEditRouteAndGetRawResponse(List<RouteRequest> request) {
+    String url = "core/routes";
+    String json = toJson(request);
+    RequestSpecification spec = createAuthenticatedRequest()
+        .body(json);
+    return doPut("Core - Zonal Routing Edit Route", spec, url);
+  }
+
+  public List<RouteResponse> zonalRoutingEditRoute(List<RouteRequest> request) {
+    Response r = zonalRoutingEditRouteAndGetRawResponse(request);
+    r.then().contentType(ContentType.JSON);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+    return fromJsonToList(r.body().asString(),
+        RouteResponse.class);
+  }
+
+  public void pullReservationOutOfRoute(long reservationId) {
+    String url = "core/2.0/reservations/{reservation_id}/unroute";
+
+    RequestSpecification spec = createAuthenticatedRequest()
+        .pathParam("reservation_id", reservationId)
+        .body("{}");
+
+    Response r = doPut("Reservation V2 - Pull Reservation Out of Route", spec, url);
+    r.then().contentType(ContentType.JSON);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+    r.then().assertThat().body(equalTo(f("{\"id\":%d,\"status\":\"PENDING\"}", reservationId)));
+  }
+
+  public MergeWaypointsResponse mergeWaypointsZonalRouting(List<Long> waypointIds) {
+    String apiMethod = "route-v2/waypoints/merge";
+    String json = toJsonSnakeCase(waypointIds);
+
+    RequestSpecification requestSpecification = createAuthenticatedRequest()
+        .body(f("{\"waypoint_ids\":%s}", json));
+
+    Response response = doPut("Route V2 - Zonal Routing Merge Waypoints",
+        requestSpecification,
+        apiMethod);
+    response.then().assertThat().contentType(ContentType.JSON);
+    if (response.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + response.statusCode());
+    }
+    return fromJsonSnakeCase(response.body().asString(),
+        MergeWaypointsResponse.class);
+  }
+
+  public void mergeWaypointsRouteLogs(List<Long> routeIds) {
+    String apiMethod = "route-v2/routes/merge-waypoints";
+    String json = toJsonSnakeCase(routeIds);
+
+    RequestSpecification requestSpecification = createAuthenticatedRequest()
+        .body(f("{\"route_ids\":%s}", json));
+
+    Response response = doPut("Route V2 - Route Logs Merge Waypoints",
+        requestSpecification,
+        apiMethod);
+    response.then().assertThat().contentType(ContentType.JSON);
+    if (response.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + response.statusCode());
+    }
+  }
+
+  public void addToRouteDp(long orderId, long routeId) {
+    String url = "core/2.0/orders/{orderId}/routes-dp";
+    RequestSpecification requestSpecification = createAuthenticatedRequest()
+        .pathParam("orderId", orderId)
+        .body(f("{\"type\":\"%s\",\"route_id\":%s}", "DELIVERY", routeId));
+    Response response = doPut("API Core - Add To Route DP", requestSpecification, url);
+    if (response.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + response.statusCode());
+    }
+  }
+
+  public void pullOutDpOrderFromRoute(long orderId) {
+    String url = "core/2.0/orders/{orderId}/routes-dp";
+    RequestSpecification requestSpecification = createAuthenticatedRequest()
+        .pathParam("orderId", orderId)
+        .body(f("{\"type\":\"DELIVERY\"}"));
+    Response response = doDelete("API Core - Pull Out DP Order Waypoint From Route",
+        requestSpecification, url);
+    if (response.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + response.statusCode());
+    }
   }
 }
