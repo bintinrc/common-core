@@ -129,75 +129,91 @@ public class DbCoreSteps extends CoreStandardSteps {
 
   @When("DB Core - verify route_logs record:")
   public void verifyRouteLogs(Map<String, String> data) {
-    data = resolveKeyValues(data);
-    RouteLogs expected = new RouteLogs(data);
-    RouteLogs actual = routeLogsDao.getRouteLogs(expected.getId());
-    Assertions.assertThat(actual)
-        .withFailMessage("Roure logs was not found: " + data)
-        .isNotNull();
-    expected.compareWithActual(actual, data);
+    Map<String, String> resolvedData = resolveKeyValues(data);
+    RouteLogs expected = new RouteLogs(resolvedData);
+
+    retryIfAssertionErrorOccurred(() -> {
+      RouteLogs actual = routeLogsDao.getRouteLogs(expected.getId());
+      Assertions.assertThat(actual)
+          .withFailMessage("Roure logs was not found: " + resolvedData)
+          .isNotNull();
+      expected.compareWithActual(actual, resolvedData);
+    }, f("verify route_logs records"), 10_000, 3);
   }
 
   @When("DB Core - verify waypoints record:")
   public void verifyWaypoints(Map<String, String> data) {
-    data = resolveKeyValues(data);
-    Waypoints expected = new Waypoints(data);
-    Waypoints actual = waypointsDao.getWaypointsDetails(expected.getId());
-    Assertions.assertThat(actual)
-        .withFailMessage("waypoints record was not found: " + data)
-        .isNotNull();
-    expected.compareWithActual(actual, data);
-    if (data.containsKey("seqNo") && data.get("seqNo").equalsIgnoreCase("null")) {
-      Assertions.assertThat(actual.getSeqNo())
-          .as("seq_no is null")
-          .isNull();
-    }
-    if (data.containsKey("routeId") && data.get("routeId").equalsIgnoreCase("null")) {
-      Assertions.assertThat(actual.getSeqNo())
-          .as("route_id is null")
-          .isNull();
-    }
+    Map<String, String> resolvedData = resolveKeyValues(data);
+    Waypoints expected = new Waypoints(resolvedData);
+
+    retryIfAssertionErrorOccurred(() -> {
+      Waypoints actual = waypointsDao.getWaypointsDetails(expected.getId());
+      Assertions.assertThat(actual)
+          .withFailMessage("waypoints record was not found: " + resolvedData)
+          .isNotNull();
+      expected.compareWithActual(actual, resolvedData);
+      if (resolvedData.containsKey("seqNo") && resolvedData.get("seqNo").equalsIgnoreCase("null")) {
+        Assertions.assertThat(actual.getSeqNo())
+            .as("seq_no is null")
+            .isNull();
+      }
+      if (resolvedData.containsKey("routeId") && resolvedData.get("routeId")
+          .equalsIgnoreCase("null")) {
+        Assertions.assertThat(actual.getSeqNo())
+            .as("route_id is null")
+            .isNull();
+      }
+    }, "verify waypoints records", 10_000, 3);
   }
 
   @When("DB Core - verify shipper_pickup_search record:")
   public void verifyShipperPickupSearch(Map<String, String> data) {
-    data = resolveKeyValues(data);
-    ShipperPickupSearch expected = new ShipperPickupSearch(data);
-    ShipperPickupSearch actual = null;
-    if (expected.getReservationId() != null) {
-      actual = shipperPickupSearchDao.getShipperPickupSearchByReservationId(
-          expected.getReservationId());
-    }
-    Assertions.assertThat(actual)
-        .withFailMessage("shipper_pickup_search record was not found: " + data)
-        .isNotNull();
-    expected.compareWithActual(actual, data);
+    Map<String, String> resolvedData = resolveKeyValues(data);
+    ShipperPickupSearch expected = new ShipperPickupSearch(resolvedData);
+
+    retryIfAssertionErrorOccurred(() -> {
+      ShipperPickupSearch actual = null;
+      if (expected.getReservationId() != null) {
+        actual = shipperPickupSearchDao.getShipperPickupSearchByReservationId(
+            expected.getReservationId());
+      }
+      Assertions.assertThat(actual)
+          .withFailMessage("shipper_pickup_search record was not found: " + data)
+          .isNotNull();
+      expected.compareWithActual(actual, resolvedData);
+    }, "verify shipper_pickup_search records", 10_000, 3);
   }
 
   @When("DB Core - verify route_monitoring_data record:")
   public void verifyRouteMonitoringData(Map<String, String> data) {
-    data = resolveKeyValues(data);
-    RouteMonitoringData expected = new RouteMonitoringData(data);
-    RouteMonitoringData actual = null;
-    if (expected.getWaypointId() != null) {
-      actual = routeMonitoringDataDao.getRouteMonitoringDataByWaypointId(
-          expected.getWaypointId());
-    }
-    Assertions.assertThat(actual)
-        .withFailMessage("route_monitoring_data record was not found: " + data)
-        .isNotNull();
-    expected.compareWithActual(actual, data);
+    Map<String, String> resolvedData = resolveKeyValues(data);
+    RouteMonitoringData expected = new RouteMonitoringData(resolvedData);
+
+    retryIfAssertionErrorOccurred(() -> {
+      RouteMonitoringData actual = null;
+      if (expected.getWaypointId() != null) {
+        actual = routeMonitoringDataDao.getRouteMonitoringDataByWaypointId(
+            expected.getWaypointId());
+      }
+      Assertions.assertThat(actual)
+          .withFailMessage("route_monitoring_data record was not found: " + data)
+          .isNotNull();
+      expected.compareWithActual(actual, resolvedData);
+    }, "verify route_monitoring_data records", 10_000, 3);
   }
 
   @When("DB Core - verify route_monitoring_data is hard-deleted:")
   public void verifyRouteMonitoringData(List<String> data) {
-    data = resolveValues(data);
-    data.forEach(e -> {
-      RouteMonitoringData actual = routeMonitoringDataDao
-          .getRouteMonitoringDataByWaypointId(Long.parseLong(e));
-      Assertions.assertThat(actual)
-          .as("route_monitoring_data is hard-deleted").isNull();
-    });
+    List<String> resolvedData = resolveValues(data);
+    retryIfAssertionErrorOccurred(() -> {
+      resolvedData.forEach(e -> {
+        RouteMonitoringData actual = routeMonitoringDataDao
+            .getRouteMonitoringDataByWaypointId(Long.parseLong(e));
+        Assertions.assertThat(actual)
+            .as("route_monitoring_data is hard-deleted").isNull();
+      });
+    }, "verify route_monitoring_data records", 10_000, 3);
+
   }
 
   @When("DB Core - operator get order details of order id {string}")
@@ -211,47 +227,53 @@ public class DbCoreSteps extends CoreStandardSteps {
   public void verifyOrdersDataUpdated(Map<String, String> source) {
     Long resolvedOrderId = Long.parseLong(resolveValue(source.get("orderId")));
     Map<String, String> resolvedMap = resolveKeyValues(source);
-    String orderData = orderDao.getSingleOrderDetailsById(resolvedOrderId).getData();
-    List<PreviousAddressDetails> previousAddressDetails = fromJsonCamelCase(orderData, Data.class)
-        .getPreviousDeliveryDetails();
-    PreviousAddressDetails actual = previousAddressDetails.get(previousAddressDetails.size() - 1);
-    PreviousAddressDetails expected = new PreviousAddressDetails(resolvedMap);
-    Assertions.assertThat(actual)
-        .withFailMessage("previous address details not found")
-        .isNotNull();
-    expected.compareWithActual(actual, resolvedMap);
+    retryIfAssertionErrorOccurred(() -> {
+      String orderData = orderDao.getSingleOrderDetailsById(resolvedOrderId).getData();
+      List<PreviousAddressDetails> previousAddressDetails = fromJsonCamelCase(orderData, Data.class)
+          .getPreviousDeliveryDetails();
+      PreviousAddressDetails actual = previousAddressDetails.get(previousAddressDetails.size() - 1);
+      PreviousAddressDetails expected = new PreviousAddressDetails(resolvedMap);
+      Assertions.assertThat(actual)
+          .withFailMessage("previous address details not found")
+          .isNotNull();
+      expected.compareWithActual(actual, resolvedMap);
+    }, "verify previousDeliveryDetails", 10_000, 3);
   }
 
   @When("DB Core - verify transactions record:")
   public void verifyTransaction(Map<String, String> data) {
-    data = resolveKeyValues(data);
-    Transactions expected = new Transactions(data);
-    Transactions actual = transactionsDao.getSingleTransaction(expected.getId());
-    Assertions.assertThat(actual)
-        .withFailMessage("transactions record was not found: " + data)
-        .isNotNull();
-    expected.compareWithActual(actual, data);
-    if (data.containsKey("distributionPointId") && data.get("distributionPointId")
-        .equalsIgnoreCase("null")) {
-      Assertions.assertThat(actual.getDistributionPointId())
-          .as("distributionPointId is null")
-          .isNull();
-    }
-    if (data.containsKey("routeId") && data.get("routeId").equalsIgnoreCase("null")) {
-      Assertions.assertThat(actual.getRouteId())
-          .as("route_id is null")
-          .isNull();
-    }
+    Map<String, String> resolvedData = resolveKeyValues(data);
+    Transactions expected = new Transactions(resolvedData);
+    retryIfAssertionErrorOccurred(() -> {
+      Transactions actual = transactionsDao.getSingleTransaction(expected.getId());
+      Assertions.assertThat(actual)
+          .withFailMessage("transactions record was not found: " + resolvedData)
+          .isNotNull();
+      expected.compareWithActual(actual, resolvedData);
+      if (data.containsKey("distributionPointId") && data.get("distributionPointId")
+          .equalsIgnoreCase("null")) {
+        Assertions.assertThat(actual.getDistributionPointId())
+            .as("distributionPointId is null")
+            .isNull();
+      }
+      if (data.containsKey("routeId") && data.get("routeId").equalsIgnoreCase("null")) {
+        Assertions.assertThat(actual.getRouteId())
+            .as("route_id is null")
+            .isNull();
+      }
+    }, "verify transactions records", 10_000, 3);
   }
 
   @When("DB Core - verify orders record:")
   public void verifyOrderRecords(Map<String, String> data) {
-    data = resolveKeyValues(data);
-    Orders expected = new Orders(data);
-    Orders actual = orderDao.getSingleOrderDetailsById(expected.getId());
-    Assertions.assertThat(actual)
-        .withFailMessage("orders record was not found: " + data)
-        .isNotNull();
-    expected.compareWithActual(actual, data);
+    Map<String, String> resolvedData = resolveKeyValues(data);
+    Orders expected = new Orders(resolvedData);
+    retryIfAssertionErrorOccurred(() -> {
+      Orders actual = orderDao.getSingleOrderDetailsById(expected.getId());
+      Assertions.assertThat(actual)
+          .withFailMessage("orders record was not found: " + resolvedData)
+          .isNotNull();
+      expected.compareWithActual(actual, resolvedData);
+    }, "verify orders records", 10_000, 3);
   }
 }
