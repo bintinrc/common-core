@@ -3,7 +3,10 @@ package co.nvqa.common.core.client;
 import co.nvqa.common.client.SimpleApiClient;
 import co.nvqa.common.constants.HttpConstants;
 import co.nvqa.common.core.model.dp.CustomerCollectRequest;
+import co.nvqa.common.core.model.dp.DpTagging;
+import co.nvqa.common.core.model.dp.DpUntagging;
 import co.nvqa.common.core.model.dp.LodgeInRequest;
+import co.nvqa.common.core.model.event.Events;
 import co.nvqa.common.utils.NvTestHttpException;
 import co.nvqa.common.utils.StandardTestConstants;
 import co.nvqa.commonauth.utils.TokenUtils;
@@ -63,5 +66,34 @@ public class CoreDpClient extends SimpleApiClient {
         .body(json);
 
     return doDelete("CORE - UNTAG ORDER FROM DP", spec, uri);
+  }
+
+  public DpTagging tagToDpAndAddToRoute(long orderId, DpTagging request) {
+    String uri = "core/2.0/orders/{orderId}/dps/routes-dp";
+    String json = toJsonSnakeCase(request);
+    RequestSpecification requestSpecification = createAuthenticatedRequest()
+        .pathParam("orderId", orderId)
+        .body(json);
+
+    Response r = doPut("Core - Tag to DP and Add to Route", requestSpecification, uri);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+    r.then().contentType(ContentType.JSON);
+    return fromJson(r.body().asString(), DpTagging.class);
+  }
+
+  public void removeFromDpHoldingRouteAndUntagFromDp(long orderId, DpUntagging request) {
+    String json = toJsonSnakeCase(request);
+    String url = "core/2.0/orders/{orderId}/dps/routes-dp";
+    RequestSpecification requestSpecification = createAuthenticatedRequest()
+        .pathParam("orderId", orderId)
+        .body(json);
+    Response response = doDelete(
+        "API Core - Remove From To DP Holding Route And Untag From DP", requestSpecification,
+        url);
+    if (response.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + response.statusCode());
+    }
   }
 }

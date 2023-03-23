@@ -108,7 +108,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
    * Sample:<p>
    * <p>
    * When API Operator add parcel to the route using data below:<p> | orderId | 111111 |<p> |
-   * addParcelToRouteRequest | {"tracking_id":"NVQASG","route_id":95139463,"type":"DELIVERY"} |<p>
+   * addParcelToRouteRequest | {"route_id":95139463,"type":"DELIVERY"} |<p>
    * <p>
    *
    * @param dataTableAsMap Map of data from feature file.
@@ -285,6 +285,23 @@ public class ApiRouteSteps extends CoreStandardSteps {
         "merge waypoints on zonal routing");
   }
 
+  /**
+   * Sample:<p>
+   * <p>
+   * When API Core - Operator merge routed waypoints: |{KEY_LIST_OF_CREATED_ROUTES[1].id}|
+   * |{KEY_LIST_OF_CREATED_ROUTES[2].id}|
+   * <p>
+   */
+  @Given("API Core - Operator merge routed waypoints:")
+  public void apiOperatorMergeRoutedWaypoints(List<String> routeIds) {
+    routeIds = resolveValues(routeIds);
+    List<Long> resolvedRouteIds = routeIds.stream().map(Long::parseLong)
+        .collect(Collectors.toList());
+    retryIfAssertionErrorOrRuntimeExceptionOccurred(
+        () -> getRouteClient().mergeWaypointsRouteLogs(resolvedRouteIds),
+        "merge waypoints on route logs");
+  }
+
   @When("API Core - Operator verifies response of merge waypoint on Zonal Routing")
   public void verifyMergeWaypointResponse(Map<String, String> dataTableAsMap) {
     Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
@@ -299,5 +316,36 @@ public class ApiRouteSteps extends CoreStandardSteps {
         .withFailMessage("merge waypoints response size doesnt match")
         .isEqualTo(expected.size());
     expected.forEach(o -> DataEntity.assertListContains(actual, o, "merged waypoints list"));
+  }
+
+  //  DO NOT use this to add to route for normal order (non-DP order)
+
+  /**
+   * When API Core - Operator new add parcel to DP holding route:
+   *       | orderId | {KEY_LIST_OF_CREATED_ORDERS[1].id} |
+   *       | routeId | {KEY_LIST_OF_CREATED_ROUTES[1].id} |
+   */
+  @Given("API Core - Operator new add parcel to DP holding route:")
+  public void operatorAddToDpHoldingRoute(Map<String, String> data) {
+    data = resolveKeyValues(data);
+    final Long routeId = Long.parseLong(data.get("routeId"));
+    final Long orderId = Long.parseLong(data.get("orderId"));
+    retryIfAssertionErrorOrRuntimeExceptionOccurred(
+        () -> getRouteClient().addToRouteDp(orderId, routeId),
+        "Add to route dp order");
+  }
+
+  //  DO NOT use this to pull order out from route for normal order (non-DP order)
+
+  /**
+   * When API Core - Operator pull out dp order from DP holding route for order
+   *       | {KEY_LIST_OF_CREATED_ORDERS[1].id} |
+   */
+  @Given("API Core - Operator pull out dp order from DP holding route for order")
+  public void operatorPullOutDpOrder(List<String> data) {
+    retryIfAssertionErrorOrRuntimeExceptionOccurred(
+        () -> data.forEach(
+            e -> getRouteClient().pullOutDpOrderFromRoute(Long.parseLong(resolveValue(e)))),
+        "pull out dp order from route");
   }
 }
