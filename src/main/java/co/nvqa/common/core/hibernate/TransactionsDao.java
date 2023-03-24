@@ -4,6 +4,7 @@ import co.nvqa.common.core.model.persisted_class.core.Transactions;
 import co.nvqa.common.core.utils.CoreTestConstants;
 import co.nvqa.common.database.DbBase;
 import co.nvqa.common.utils.StandardTestConstants;
+import java.util.List;
 import javax.inject.Singleton;
 import org.apache.commons.collections.CollectionUtils;
 
@@ -21,5 +22,12 @@ public class TransactionsDao extends DbBase {
         session.createQuery(query, Transactions.class)
             .setParameter("transactionId", transactionId));
     return CollectionUtils.isEmpty(result) ? null : result.get(0);
+  }
+
+  public List<Transactions> getMultipleTransactions(Long orderId) {
+    String query = "FROM Transactions WHERE orderId = :orderId";
+    return findAll(session ->
+        session.createQuery(query, Transactions.class)
+            .setParameter("orderId", orderId));
   }
 }
