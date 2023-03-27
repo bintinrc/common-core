@@ -60,9 +60,9 @@ public class DbCoreSteps extends CoreStandardSteps {
   @Given("DB Core - verify order weight updated to highest weight within range")
   public void dbOperatorVerifiesHighestOrderWeight(Map<String, String> source) {
     Map<String, String> expectedData = resolveKeyValues(source);
-    final long orderId = Long.valueOf(expectedData.get("order_id"));
-    final double expectedWeight = Double.valueOf(source.get("weight"));
-    if (Boolean.valueOf(expectedData.get("use_weight_range"))) {
+    final long orderId = Long.parseLong(expectedData.get("order_id"));
+    final double expectedWeight = Double.parseDouble(source.get("weight"));
+    if (Boolean.parseBoolean(expectedData.get("use_weight_range"))) {
       dbOperatorVerifiesOrderWeightRangeUpdated(expectedData);
     } else {
       retryIfAssertionErrorOccurred(() -> {
@@ -78,8 +78,8 @@ public class DbCoreSteps extends CoreStandardSteps {
   public void dbOperatorVerifiesOrderWeightRangeUpdated(Map<String, String> source) {
 
     Map<String, String> expectedData = resolveKeyValues(source);
-    final long orderId = Long.valueOf(expectedData.get("order_id"));
-    final double expectedWeight = Double.valueOf(source.get("weight"));
+    final long orderId = Long.parseLong(expectedData.get("order_id"));
+    final double expectedWeight = Double.parseDouble(source.get("weight"));
     final Double higherBound = expectedWeight;
     final Double lowerBound = expectedWeight - 0.5;
 
@@ -125,6 +125,15 @@ public class DbCoreSteps extends CoreStandardSteps {
       Assertions.assertThat(result.getRoutingZoneId())
           .as("Assertion for Zone Id column value is as expected").isNull();
     }, "Validating verified Zone Type value is as expected", 2000, 3);
+  }
+
+  @Then("DB Core - operator get waypoints details for {string}")
+  public void dbCoreGetWaypointDetails(String waypointId) {
+    Long resolvedWayPointIdKey = Long.parseLong(resolveValue(waypointId));
+    retryIfAssertionErrorOrRuntimeExceptionOccurred(() -> {
+      Waypoints result = waypointsDao.getWaypointsDetails(resolvedWayPointIdKey);
+      put(KEY_CORE_WAYPOINT_DETAILS, result);
+    }, "get core waypoint details", 2000, 3);
   }
 
   @When("DB Core - verify route_logs record:")
@@ -262,6 +271,42 @@ public class DbCoreSteps extends CoreStandardSteps {
             .isNull();
       }
     }, "verify transactions records", 10_000, 3);
+  }
+
+  @Given("DB Core - verify transactions after RTS:")
+  public void dbOperatorVerifiesTxnAfterRts(Map<String, String> data) {
+    Map<String, String> resolvedData = resolveKeyValues(data);
+    final Long orderId = Long.parseLong(resolvedData.get("orderId"));
+    final Long routeId = Long.parseLong(resolvedData.get("routeId"));
+    retryIfAssertionErrorOccurred(() -> {
+      List<Transactions> result = transactionsDao.getMultipleTransactions(orderId);
+      Assertions.assertThat(result.size()).as("number of transactions")
+          .isEqualTo(Integer.parseInt(data.get("number_of_txn")));
+      Assertions.assertThat(result.get(0).getStatus()).as("pickup status").isEqualTo("Success");
+
+      if (Integer.parseInt(data.get("number_of_txn")) == 2) {
+        Assertions.assertThat(result.get(1).getStatus()).as("delivery status")
+            .isEqualTo(data.get("delivery_status"));
+        Assertions.assertThat(result.get(1).getRouteId() == 0).as("route id is null").isTrue();
+        put(KEY_WAYPOINT_ID, result.get(1).getWaypointId());
+      } else {
+        Assertions.assertThat(result.get(1).getStatus()).as("old delivery status")
+            .isEqualTo(data.get("old_delivery_status"));
+        Long actualRouteId = result.get(1).getRouteId();
+        Assertions.assertThat(actualRouteId).as("old route id").isEqualTo(routeId);
+        Assertions.assertThat(result.get(2).getStatus()).as("new delivery status")
+            .isEqualTo(data.get("new_delivery_status"));
+        Assertions.assertThat(result.get(2).getType()).as("new delivery type")
+            .isEqualTo(data.get("new_delivery_type"));
+        if (result.get(1).getStatus().equalsIgnoreCase("Fail")) {
+          Assertions.assertThat(result.get(2).getRouteId() == 0).as("new route id is null")
+              .isTrue();
+        } else {
+          Assertions.assertThat(result.get(2).getRouteId()).as("old route id")
+              .isEqualTo(routeId);
+        }
+      }
+    }, "check transactions");
   }
 
   @When("DB Core - verify orders record:")
