@@ -287,7 +287,7 @@ public class DbCoreSteps extends CoreStandardSteps {
       if (Integer.parseInt(data.get("number_of_txn")) == 2) {
         Assertions.assertThat(result.get(1).getStatus()).as("delivery status")
             .isEqualTo(data.get("delivery_status"));
-        Assertions.assertThat(result.get(1).getRouteId() == 0).as("route id is null").isTrue();
+        Assertions.assertThat(result.get(1).getRouteId()).as("route id is null").isNull();
         put(KEY_WAYPOINT_ID, result.get(1).getWaypointId());
       } else {
         Assertions.assertThat(result.get(1).getStatus()).as("old delivery status")
@@ -299,8 +299,8 @@ public class DbCoreSteps extends CoreStandardSteps {
         Assertions.assertThat(result.get(2).getType()).as("new delivery type")
             .isEqualTo(data.get("new_delivery_type"));
         if (result.get(1).getStatus().equalsIgnoreCase("Fail")) {
-          Assertions.assertThat(result.get(2).getRouteId() == 0).as("new route id is null")
-              .isTrue();
+          Assertions.assertThat(result.get(2).getRouteId()).as("new route id is null")
+              .isNull();
         } else {
           Assertions.assertThat(result.get(2).getRouteId()).as("old route id")
               .isEqualTo(routeId);
