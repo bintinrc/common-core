@@ -78,7 +78,7 @@ public class DbRouteSteps extends CoreStandardSteps {
     Assertions.assertThat(actual).as("List of found area variations").isEmpty();
   }
 
-  @Then("^DB Route - verify that sr_area_variations record is not created:$")
+  @Then("DB Route - verify that sr_area_variations record is not created:")
   public void verifyAreaVariationIsNotCreated(Map<String, String> data) {
     AreaVariation expected = new AreaVariation(resolveKeyValues(data));
     List<AreaVariation> actual = routeDao.getAreaVariations(expected.getArea());
@@ -89,7 +89,7 @@ public class DbRouteSteps extends CoreStandardSteps {
     }
   }
 
-  @Then("^DB Route - verify that sr_coverages record is not created:$")
+  @Then("DB Route - verify that sr_coverages record is not created:")
   public void verifyCoverageIsNotCreated(Map<String, String> data) {
     Coverage expected = new Coverage(resolveKeyValues(data));
     List<Coverage> actual = routeDao.getCoverageByArea(expected.getArea());
@@ -100,7 +100,7 @@ public class DbRouteSteps extends CoreStandardSteps {
     }
   }
 
-  @Then("^DB Route - verify that sr_coverages record is created:$")
+  @Then("DB Route - verify that sr_coverages record is created:")
   public void verifyCoverage(Map<String, String> data) {
     Coverage expected = new Coverage(resolveKeyValues(data));
     List<Coverage> actual = expected.getId() != null ?
