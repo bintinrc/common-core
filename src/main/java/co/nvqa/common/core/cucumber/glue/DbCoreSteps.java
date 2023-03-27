@@ -127,6 +127,15 @@ public class DbCoreSteps extends CoreStandardSteps {
     }, "Validating verified Zone Type value is as expected", 2000, 3);
   }
 
+  @Then("DB Core - operator get waypoints details for {string}")
+  public void dbCoreGetWaypointDetails(String waypointId) {
+    Long resolvedWayPointIdKey = Long.parseLong(resolveValue(waypointId));
+    retryIfAssertionErrorOrRuntimeExceptionOccurred(() -> {
+      Waypoints result = waypointsDao.getWaypointsDetails(resolvedWayPointIdKey);
+      put(KEY_CORE_WAYPOINT_DETAILS, result);
+    }, "get core waypoint details", 2000, 3);
+  }
+
   @When("DB Core - verify route_logs record:")
   public void verifyRouteLogs(Map<String, String> data) {
     Map<String, String> resolvedData = resolveKeyValues(data);
