@@ -60,6 +60,25 @@ public class ApiOrderSteps extends CoreStandardSteps {
   /**
    * <br/><b>Output key</b>: <ul><li>KEY_LIST_OF_CREATED_ORDERS: list of orders</li></ul>
    * <p>
+   * read the order state and put it into the scenario manager in list form, it wont replace the
+   * previous order with the same tracking id. this is intended to check if you have done certain
+   * action to same order and you need previous data prior to the action being done
+   *
+   * @param tracking key that contains order's tracking id, example: KEY_LIST_OF_CREATED_TRACKING_IDS
+   */
+  @When("API Core - Operator get order details for previous order {string}")
+  public void apiOperatorGetOrderDetailsForPreviousOrder(String tracking) {
+    final String trackingId = resolveValue(tracking);
+    final Order order = retryIfAssertionErrorOrRuntimeExceptionOccurred(
+        () -> getOrderClient().searchOrderByTrackingId(trackingId),
+        "Order client search order by tracking id");
+    
+    putInList(KEY_LIST_OF_CREATED_ORDERS, order);
+  }
+
+  /**
+   * <br/><b>Output key</b>: <ul><li>KEY_LIST_OF_CREATED_ORDERS: list of orders</li></ul>
+   * <p>
    * similar as the other step, but this step will re attempt to read the latest parcel info until
    * it reach the expected granular status, it won't throw any exception and warn the user if the
    * expected granular status never reached
