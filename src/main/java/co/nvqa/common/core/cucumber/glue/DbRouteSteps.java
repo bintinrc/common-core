@@ -66,14 +66,16 @@ public class DbRouteSteps extends CoreStandardSteps {
     }
   }
 
-  @Then("DB Route - verify that sr_keywords record is not created for {value} area")
-  public void verifyKeywordIsNotCreated(String area) {
+  @Then("DB Route - verify that sr_keywords record is not created for {string} area")
+  public void verifyKeywordIsNotCreated(String areaKey) {
+    String area = resolveValue(areaKey);
     List<Keyword> actual = routeDao.getKeywords(Long.parseLong(area));
     Assertions.assertThat(actual).as("List of found keywords").isEmpty();
   }
 
-  @Then("DB Route - verify that sr_area_variations record is not created for {value} area")
-  public void verifyAreaVariationsIsNotCreated(String area) {
+  @Then("DB Route - verify that sr_area_variations record is not created for {string} area")
+  public void verifyAreaVariationsIsNotCreated(String areaKey) {
+    String area = resolveValue(areaKey);
     List<AreaVariation> actual = routeDao.getAreaVariations(area);
     Assertions.assertThat(actual).as("List of found area variations").isEmpty();
   }
