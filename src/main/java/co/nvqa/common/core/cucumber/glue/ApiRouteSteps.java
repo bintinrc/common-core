@@ -18,7 +18,9 @@ import io.cucumber.java.en.When;
 import io.restassured.response.Response;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -347,5 +349,47 @@ public class ApiRouteSteps extends CoreStandardSteps {
         () -> data.forEach(
             e -> getRouteClient().pullOutDpOrderFromRoute(Long.parseLong(resolveValue(e)))),
         "pull out dp order from route");
+  }
+
+  /**
+   *<b>Example datatable</b>
+   *<ul>
+   *   <li><b>When API Core - Operator edit route details:</b></li>
+   *   <li><pre>| routeId  | {KEY_LIST_OF_CREATED_ROUTES[1].id} |</pre></li>
+   *   <li><pre>| driverId | {ninja-driver-id-1}                |</pre></li>
+   *   <li><pre>| hubId    | {hub-id}                           |</pre></li>
+   *   <li><pre>| tags     | [1,2,3]                            | (Optional)</pre></li>
+   *   <li><pre>| zoneId   | {zone-id}                          |</pre></li>
+   *</ul>
+   */
+  @When("API Core - Operator edit route details:")
+  public void operatorEditRouteDetails(Map<String, String> data) {
+    data = resolveKeyValues(data);
+    final List<Object> routeRequest = new ArrayList<>();
+
+    HashMap<String, Object> request = new HashMap<String, Object>();
+    request.put("id", Long.parseLong(data.get("routeId")));
+    request.put("driverId", Long.parseLong(data.get("driverId")));
+    request.put("hubId", Long.parseLong(data.get("hubId")));
+    request.put("zoneId", Long.parseLong(data.get("zoneId")));
+
+    final List<Integer> listTags = new ArrayList<>();
+
+    if(data.containsKey("tags")) {
+      if(!data.get("tags").equalsIgnoreCase("[]")) {
+        String[] tags = data.get("tags")
+            .replaceAll("\"\\\\[|\\\\]\", \"\"", "")
+            .split("\\,", -1);
+        for (String tag : tags) {
+          listTags.add(Integer.valueOf(tag));
+        }
+      }
+    }
+
+    request.put("tags", listTags);
+    routeRequest.add(request);
+
+    retryIfAssertionErrorOrRuntimeExceptionOccurred(
+        () -> getRouteClient().editRouteDetails(routeRequest), "Edit Route Details");
   }
 }

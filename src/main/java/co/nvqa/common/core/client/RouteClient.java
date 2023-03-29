@@ -14,6 +14,7 @@ import co.nvqa.commonauth.utils.TokenUtils;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import java.util.HashMap;
 import java.util.List;
 import javax.inject.Singleton;
 
@@ -278,6 +279,16 @@ public class RouteClient extends SimpleApiClient {
         .body(f("{\"type\":\"DELIVERY\"}"));
     Response response = doDelete("API Core - Pull Out DP Order Waypoint From Route",
         requestSpecification, url);
+    if (response.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + response.statusCode());
+    }
+  }
+
+  public void editRouteDetails(List<Object> routeRequest) {
+    String url = "core/routes/details";
+    RequestSpecification rs = createAuthenticatedRequest()
+        .body(routeRequest);
+    Response response = doPut("API Core - Operator edit route details:", rs, url);
     if (response.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
       throw new NvTestHttpException("unexpected http status: " + response.statusCode());
     }
