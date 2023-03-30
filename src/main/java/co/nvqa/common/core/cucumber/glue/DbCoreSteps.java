@@ -19,12 +19,14 @@ import co.nvqa.common.core.model.persisted_class.core.RouteMonitoringData;
 import co.nvqa.common.core.model.persisted_class.core.ShipperPickupSearch;
 import co.nvqa.common.core.model.persisted_class.core.Transactions;
 import co.nvqa.common.core.model.persisted_class.core.Waypoints;
+import co.nvqa.common.utils.NvTestRuntimeException;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.assertj.core.api.Assertions;
 
@@ -233,7 +235,7 @@ public class DbCoreSteps extends CoreStandardSteps {
   }
 
   @When("DB Core - operator verify orders.data.previousDeliveryDetails is updated correctly:")
-  public void verifyOrdersDataUpdated(Map<String, String> source) {
+  public void verifyOrdersDataPreviousDelivery(Map<String, String> source) {
     Long resolvedOrderId = Long.parseLong(resolveValue(source.get("orderId")));
     Map<String, String> resolvedMap = resolveKeyValues(source);
     retryIfAssertionErrorOccurred(() -> {
@@ -247,6 +249,23 @@ public class DbCoreSteps extends CoreStandardSteps {
           .isNotNull();
       expected.compareWithActual(actual, resolvedMap);
     }, "verify previousDeliveryDetails", 10_000, 3);
+  }
+
+  @When("DB Core - operator verify orders.data.previousPickupDetails is updated correctly:")
+  public void verifyOrdersDataPreviousPickup(Map<String, String> source) {
+    Long resolvedOrderId = Long.parseLong(resolveValue(source.get("orderId")));
+    Map<String, String> resolvedMap = resolveKeyValues(source);
+    retryIfAssertionErrorOccurred(() -> {
+      String orderData = orderDao.getSingleOrderDetailsById(resolvedOrderId).getData();
+      List<PreviousAddressDetails> previousAddressDetails = fromJsonCamelCase(orderData, Data.class)
+          .getPreviousPickupDetails();
+      PreviousAddressDetails actual = previousAddressDetails.get(previousAddressDetails.size() - 1);
+      PreviousAddressDetails expected = new PreviousAddressDetails(resolvedMap);
+      Assertions.assertThat(actual)
+          .withFailMessage("previous address details not found")
+          .isNotNull();
+      expected.compareWithActual(actual, resolvedMap);
+    }, "verify previousPickupDetails", 10_000, 3);
   }
 
   @When("DB Core - verify transactions record:")
@@ -304,6 +323,55 @@ public class DbCoreSteps extends CoreStandardSteps {
         } else {
           Assertions.assertThat(result.get(2).getRouteId()).as("old route id")
               .isEqualTo(routeId);
+        }
+      }
+    }, "check transactions");
+  }
+
+  @Given("DB Core - verify number of transactions is correct after new transactions created")
+  public void dbOperatorVerifiesCreatedTransactions(Map<String, String> mapOfData) {
+
+    retryIfAssertionErrorOccurred(() -> {
+      Map<String, String> expectedData = resolveKeyValues(mapOfData);
+      List<Transactions> result = transactionsDao
+          .getMultipleTransactions(Long.parseLong((expectedData.get("order_id"))));
+      if (mapOfData.containsKey("number_of_transactions")) {
+        Assertions.assertThat(result.size()).as("number of transactions")
+            .isEqualTo(Integer.parseInt(expectedData.get("number_of_transactions")));
+      }
+      if (mapOfData.containsKey("number_of_pickup_txn")) {
+        List<Transactions> pickupTxns = result.stream()
+            .filter(e -> e.getType().equalsIgnoreCase("PP")).collect(
+                Collectors.toList());
+        Assertions.assertThat(pickupTxns.size()).as("number of pickup transactions")
+            .isEqualTo(Integer.parseInt(expectedData.get("number_of_pickup_txn")));
+        //to check newly created pickup transaction address details
+        if (mapOfData.containsKey("pickup_address")) {
+          Transactions txn = pickupTxns.stream()
+              .filter(e -> e.getStatus().equalsIgnoreCase("PENDING")).findAny().orElseThrow(
+                  () -> new NvTestRuntimeException("new transaction status is not pending"));
+          String actualPickupAddress = f("%s %s %s %s", txn.getAddress1(), txn.getAddress2(),
+              txn.getPostcode(), txn.getCountry());
+          Assertions.assertThat(actualPickupAddress).as("pickup transaction address details")
+              .isEqualToIgnoringCase(expectedData.get("pickup_address"));
+        }
+      }
+
+      if (mapOfData.containsKey("number_of_delivery_txn")) {
+        List<Transactions> deliveryTxns = result.stream()
+            .filter(e -> e.getType().equalsIgnoreCase("DD")).collect(
+                Collectors.toList());
+        Assertions.assertThat(deliveryTxns.size()).as("number of delivery transactions")
+            .isEqualTo(Integer.parseInt(expectedData.get("number_of_delivery_txn")));
+        //to check newly created delivery transaction address details
+        if (mapOfData.containsKey("delivery_address")) {
+          Transactions txn = deliveryTxns.stream()
+              .filter(e -> e.getStatus().equalsIgnoreCase("PENDING")).findAny().orElseThrow(
+                  () -> new NvTestRuntimeException("new transaction status is not pending"));
+          String actualDeliveryAddress = f("%s %s %s %s", txn.getAddress1(), txn.getAddress2(),
+              txn.getPostcode(), txn.getCountry());
+          Assertions.assertThat(actualDeliveryAddress).as("delivery transaction address details")
+              .isEqualToIgnoringCase(expectedData.get("delivery_address"));
         }
       }
     }, "check transactions");
