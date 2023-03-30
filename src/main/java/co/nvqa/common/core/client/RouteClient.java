@@ -284,10 +284,11 @@ public class RouteClient extends SimpleApiClient {
     }
   }
 
-  public void editRouteDetails(List<Object> routeRequest) {
+  public void editRouteDetails(List<RouteRequest> routeRequest) {
     String url = "core/routes/details";
+    String json = toJson(routeRequest);
     RequestSpecification rs = createAuthenticatedRequest()
-        .body(routeRequest);
+        .body(json);
     Response response = doPut("API Core - Operator edit route details:", rs, url);
     if (response.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
       throw new NvTestHttpException("unexpected http status: " + response.statusCode());

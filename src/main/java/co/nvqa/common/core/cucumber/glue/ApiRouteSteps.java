@@ -92,12 +92,12 @@ public class ApiRouteSteps extends CoreStandardSteps {
       createRouteRequest.setHubId(get(KEY_DESTINATION_HUB_ID));
     }
 
-   retryIfAssertionErrorOrRuntimeExceptionOccurred(()->{
-     final RouteResponse createRouteResponse = getRouteClient().createRoute(createRouteRequest);
-     putInList(KEY_LIST_OF_CREATED_ROUTES, createRouteResponse);
-     putInList(KEY_LIST_OF_CREATED_ROUTE_ID, createRouteResponse.getId());
-     put(KEY_CREATED_ROUTE_ID, createRouteResponse.getId());
-   },2000,3);
+    retryIfAssertionErrorOrRuntimeExceptionOccurred(() -> {
+      final RouteResponse createRouteResponse = getRouteClient().createRoute(createRouteRequest);
+      putInList(KEY_LIST_OF_CREATED_ROUTES, createRouteResponse);
+      putInList(KEY_LIST_OF_CREATED_ROUTE_ID, createRouteResponse.getId());
+      put(KEY_CREATED_ROUTE_ID, createRouteResponse.getId());
+    }, 2000, 3);
   }
 
   @Given("API Core - Operator create new route from zonal routing using data below:")
@@ -125,7 +125,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
         addParcelToRouteRequestTemplate, AddParcelToRouteRequest.class);
     retryIfAssertionErrorOrRuntimeExceptionOccurred(
         () -> getRouteClient().addParcelToRoute(orderId, addParcelToRouteRequest),
-        2000,5);
+        2000, 5);
   }
 
   /**
@@ -148,7 +148,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
         addPickupJobToRouteRequestTemplate, AddPickupJobToRouteRequest.class);
     retryIfAssertionErrorOrRuntimeExceptionOccurred(
         () -> getRouteClient().addPickupJobToRoute(jobId, addPickupJobToRouteRequest)
-        ,2000,3);
+        , 2000, 3);
   }
 
   @Given("API Core - Operator remove pickup job id {string} from route")
@@ -156,7 +156,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
     final Long jobId = Long.parseLong(resolveValue(paJobId));
     retryIfAssertionErrorOrRuntimeExceptionOccurred(
         () -> getRouteClient().removePAJobFromRoute(jobId),
-        2000,5);
+        2000, 5);
   }
 
   @Given("API Core - Operator update routed waypoint to pending")
@@ -323,9 +323,8 @@ public class ApiRouteSteps extends CoreStandardSteps {
   //  DO NOT use this to add to route for normal order (non-DP order)
 
   /**
-   * When API Core - Operator new add parcel to DP holding route:
-   *       | orderId | {KEY_LIST_OF_CREATED_ORDERS[1].id} |
-   *       | routeId | {KEY_LIST_OF_CREATED_ROUTES[1].id} |
+   * When API Core - Operator new add parcel to DP holding route: | orderId |
+   * {KEY_LIST_OF_CREATED_ORDERS[1].id} | | routeId | {KEY_LIST_OF_CREATED_ROUTES[1].id} |
    */
   @Given("API Core - Operator new add parcel to DP holding route:")
   public void operatorAddToDpHoldingRoute(Map<String, String> data) {
@@ -340,8 +339,8 @@ public class ApiRouteSteps extends CoreStandardSteps {
   //  DO NOT use this to pull order out from route for normal order (non-DP order)
 
   /**
-   * When API Core - Operator pull out dp order from DP holding route for order
-   *       | {KEY_LIST_OF_CREATED_ORDERS[1].id} |
+   * When API Core - Operator pull out dp order from DP holding route for order |
+   * {KEY_LIST_OF_CREATED_ORDERS[1].id} |
    */
   @Given("API Core - Operator pull out dp order from DP holding route for order")
   public void operatorPullOutDpOrder(List<String> data) {
@@ -352,44 +351,23 @@ public class ApiRouteSteps extends CoreStandardSteps {
   }
 
   /**
-   *<b>Example datatable</b>
-   *<ul>
-   *   <li><b>When API Core - Operator edit route details:</b></li>
-   *   <li><pre>| routeId  | {KEY_LIST_OF_CREATED_ROUTES[1].id} |</pre></li>
-   *   <li><pre>| driverId | {ninja-driver-id-1}                |</pre></li>
-   *   <li><pre>| hubId    | {hub-id}                           |</pre></li>
-   *   <li><pre>| tags     | [1,2,3]                            | (Optional)</pre></li>
-   *   <li><pre>| zoneId   | {zone-id}                          |</pre></li>
-   *</ul>
+   * <b>Example datatable</b>
+   * <ul>
+   * <b>When API Core - Operator edit route details:</b>
+   * <p>
+   * | editRouteRequest | [ { "id": {KEY_LIST_OF_CREATED_ROUTES[1].id}, "driverId": {ninja-driver-id}, "hubId": {hub-id}, "tags": [ {tag-ids} ], "zoneId": {zone-id} } ] |
+   * </p>
+   * </ul>
    */
   @When("API Core - Operator edit route details:")
-  public void operatorEditRouteDetails(Map<String, String> data) {
-    data = resolveKeyValues(data);
-    final List<Object> routeRequest = new ArrayList<>();
-
-    HashMap<String, Object> request = new HashMap<String, Object>();
-    request.put("id", Long.parseLong(data.get("routeId")));
-    request.put("driverId", Long.parseLong(data.get("driverId")));
-    request.put("hubId", Long.parseLong(data.get("hubId")));
-    request.put("zoneId", Long.parseLong(data.get("zoneId")));
-
-    final List<Integer> listTags = new ArrayList<>();
-
-    if(data.containsKey("tags")) {
-      if(!data.get("tags").equalsIgnoreCase("[]")) {
-        String[] tags = data.get("tags")
-            .replaceAll("\"\\\\[|\\\\]\", \"\"", "")
-            .split("\\,", -1);
-        for (String tag : tags) {
-          listTags.add(Integer.valueOf(tag));
-        }
-      }
-    }
-
-    request.put("tags", listTags);
-    routeRequest.add(request);
+  public void operatorEditRouteDetails(Map<String, String> dataTableAsMap) {
+    Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
+    String editRouteRequestJson = StandardTestUtils
+        .replaceTokens(resolvedDataTable.get("editRouteRequest"),
+            StandardTestUtils.createDefaultTokens());
+    List<RouteRequest> editRouteRequest = fromJsonToList(editRouteRequestJson, RouteRequest.class);
 
     retryIfAssertionErrorOrRuntimeExceptionOccurred(
-        () -> getRouteClient().editRouteDetails(routeRequest), "Edit Route Details");
+        () -> getRouteClient().editRouteDetails(editRouteRequest), "Edit Route Details");
   }
 }
