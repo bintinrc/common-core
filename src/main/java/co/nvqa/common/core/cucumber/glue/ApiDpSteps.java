@@ -95,4 +95,14 @@ public class ApiDpSteps extends CoreStandardSteps {
         () -> getCoreDpClient().untagOrderFromDp(orderId, version),
         "untag from dp");
   }
+
+  @And("API Core - Operator overstay order from dp:")
+  public void operatorOverstayFromDp(Map<String, String> source) {
+    final Map<String, String> resolvedDataTable = resolveKeyValues(source);
+    final long orderId = Long.parseLong(resolvedDataTable.get("orderId"));
+    final long dpId = Long.parseLong(resolvedDataTable.get("dpId"));
+    retryIfAssertionErrorOccurred(
+        () -> getCoreDpClient().overstayFromDp(orderId, dpId),
+        "overstay from dp");
+  }
 }

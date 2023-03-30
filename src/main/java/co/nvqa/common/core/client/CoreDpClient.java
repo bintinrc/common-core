@@ -69,6 +69,15 @@ public class CoreDpClient extends SimpleApiClient {
     return doDelete("CORE - UNTAG ORDER FROM DP", spec, uri);
   }
 
+  public Response overstayFromDp(long orderId, long dpId) {
+    String uri = "core/2.0/orders/{orderId}/overstay";
+    String json = f("{\"action\": 2,\"distribution_point_id\": %d}", dpId);
+    RequestSpecification spec = createAuthenticatedRequest()
+        .pathParam("orderId", orderId)
+        .body(json);
+    return doDelete("CORE - OVERSTAY FROM DP", spec, uri);
+  }
+
   public DpTagging tagToDpAndAddToRoute(long orderId, DpTagging request) {
     String uri = "core/2.0/orders/{orderId}/dps/routes-dp";
     String json = toJsonSnakeCase(request);
