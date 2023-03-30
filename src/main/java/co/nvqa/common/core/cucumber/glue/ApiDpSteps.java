@@ -105,4 +105,15 @@ public class ApiDpSteps extends CoreStandardSteps {
         () -> getCoreDpClient().overstayFromDp(orderId, dpId),
         "overstay from dp");
   }
+
+  @And("API Core - Operator lodge in order at dp:")
+  public void operatorLodgeInAtDp(Map<String, String> source) {
+    final Map<String, String> resolvedDataTable = resolveKeyValues(source);
+    final long orderId = Long.parseLong(resolvedDataTable.get("orderId"));
+    final String json = resolvedDataTable.get("request");
+    final Boolean isReverify = Boolean.parseBoolean(resolvedDataTable.get("isReverify"));
+    retryIfAssertionErrorOccurred(
+        () -> getCoreDpClient().lodgeInAtDp(orderId, json, isReverify),
+        "lodge in at dp");
+  }
 }

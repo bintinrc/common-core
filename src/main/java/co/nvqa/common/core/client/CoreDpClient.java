@@ -110,4 +110,18 @@ public class CoreDpClient extends SimpleApiClient {
       throw new NvTestHttpException("unexpected http status: " + response.statusCode());
     }
   }
+
+  public void lodgeInAtDp(long orderId, String json, Boolean isReverify) {
+    String url = "core/2.0/orders/{orderId}/lodgein";
+    RequestSpecification requestSpecification = createAuthenticatedRequest()
+        .pathParam("orderId", orderId)
+        .queryParam("toReverify", isReverify)
+        .body(json);
+    Response response = doPost(
+        "Core - Lodge In at DP", requestSpecification,
+        url);
+    if (response.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + response.statusCode());
+    }
+  }
 }
