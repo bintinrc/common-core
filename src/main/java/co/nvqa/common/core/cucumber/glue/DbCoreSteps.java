@@ -3,6 +3,7 @@ package co.nvqa.common.core.cucumber.glue;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.hibernate.OrderDao;
 import co.nvqa.common.core.hibernate.OrderDetailsDao;
+import co.nvqa.common.core.hibernate.OrderJaroScoresV2Dao;
 import co.nvqa.common.core.hibernate.ReservationsDao;
 import co.nvqa.common.core.hibernate.RouteLogsDao;
 import co.nvqa.common.core.hibernate.RouteMonitoringDataDao;
@@ -12,6 +13,7 @@ import co.nvqa.common.core.hibernate.WaypointsDao;
 import co.nvqa.common.core.model.order.Order.Data;
 import co.nvqa.common.core.model.order.Order.PreviousAddressDetails;
 import co.nvqa.common.core.model.persisted_class.core.OrderDetails;
+import co.nvqa.common.core.model.persisted_class.core.OrderJaroScoresV2;
 import co.nvqa.common.core.model.persisted_class.core.Orders;
 import co.nvqa.common.core.model.persisted_class.core.Reservations;
 import co.nvqa.common.core.model.persisted_class.core.RouteLogs;
@@ -19,12 +21,16 @@ import co.nvqa.common.core.model.persisted_class.core.RouteMonitoringData;
 import co.nvqa.common.core.model.persisted_class.core.ShipperPickupSearch;
 import co.nvqa.common.core.model.persisted_class.core.Transactions;
 import co.nvqa.common.core.model.persisted_class.core.Waypoints;
+import co.nvqa.common.model.DataEntity;
+import co.nvqa.common.utils.NvTestRuntimeException;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.assertj.core.api.Assertions;
 
@@ -52,6 +58,8 @@ public class DbCoreSteps extends CoreStandardSteps {
 
   @Inject
   private ReservationsDao reservationDao;
+  @Inject
+  private OrderJaroScoresV2Dao orderJaroScoresV2Dao;
 
   @Override
   public void init() {
@@ -233,7 +241,7 @@ public class DbCoreSteps extends CoreStandardSteps {
   }
 
   @When("DB Core - operator verify orders.data.previousDeliveryDetails is updated correctly:")
-  public void verifyOrdersDataUpdated(Map<String, String> source) {
+  public void verifyOrdersDataPreviousDelivery(Map<String, String> source) {
     Long resolvedOrderId = Long.parseLong(resolveValue(source.get("orderId")));
     Map<String, String> resolvedMap = resolveKeyValues(source);
     retryIfAssertionErrorOccurred(() -> {
@@ -247,6 +255,23 @@ public class DbCoreSteps extends CoreStandardSteps {
           .isNotNull();
       expected.compareWithActual(actual, resolvedMap);
     }, "verify previousDeliveryDetails", 10_000, 3);
+  }
+
+  @When("DB Core - operator verify orders.data.previousPickupDetails is updated correctly:")
+  public void verifyOrdersDataPreviousPickup(Map<String, String> source) {
+    Long resolvedOrderId = Long.parseLong(resolveValue(source.get("orderId")));
+    Map<String, String> resolvedMap = resolveKeyValues(source);
+    retryIfAssertionErrorOccurred(() -> {
+      String orderData = orderDao.getSingleOrderDetailsById(resolvedOrderId).getData();
+      List<PreviousAddressDetails> previousAddressDetails = fromJsonCamelCase(orderData, Data.class)
+          .getPreviousPickupDetails();
+      PreviousAddressDetails actual = previousAddressDetails.get(previousAddressDetails.size() - 1);
+      PreviousAddressDetails expected = new PreviousAddressDetails(resolvedMap);
+      Assertions.assertThat(actual)
+          .withFailMessage("previous address details not found")
+          .isNotNull();
+      expected.compareWithActual(actual, resolvedMap);
+    }, "verify previousPickupDetails", 10_000, 3);
   }
 
   @When("DB Core - verify transactions record:")
@@ -287,7 +312,7 @@ public class DbCoreSteps extends CoreStandardSteps {
       if (Integer.parseInt(data.get("number_of_txn")) == 2) {
         Assertions.assertThat(result.get(1).getStatus()).as("delivery status")
             .isEqualTo(data.get("delivery_status"));
-        Assertions.assertThat(result.get(1).getRouteId() == 0).as("route id is null").isTrue();
+        Assertions.assertThat(result.get(1).getRouteId()).as("route id is null").isNull();
         put(KEY_WAYPOINT_ID, result.get(1).getWaypointId());
       } else {
         Assertions.assertThat(result.get(1).getStatus()).as("old delivery status")
@@ -299,11 +324,60 @@ public class DbCoreSteps extends CoreStandardSteps {
         Assertions.assertThat(result.get(2).getType()).as("new delivery type")
             .isEqualTo(data.get("new_delivery_type"));
         if (result.get(1).getStatus().equalsIgnoreCase("Fail")) {
-          Assertions.assertThat(result.get(2).getRouteId() == 0).as("new route id is null")
-              .isTrue();
+          Assertions.assertThat(result.get(2).getRouteId()).as("new route id is null")
+              .isNull();
         } else {
           Assertions.assertThat(result.get(2).getRouteId()).as("old route id")
               .isEqualTo(routeId);
+        }
+      }
+    }, "check transactions");
+  }
+
+  @Given("DB Core - verify number of transactions is correct after new transactions created")
+  public void dbOperatorVerifiesCreatedTransactions(Map<String, String> mapOfData) {
+
+    retryIfAssertionErrorOccurred(() -> {
+      Map<String, String> expectedData = resolveKeyValues(mapOfData);
+      List<Transactions> result = transactionsDao
+          .getMultipleTransactions(Long.parseLong((expectedData.get("order_id"))));
+      if (mapOfData.containsKey("number_of_transactions")) {
+        Assertions.assertThat(result.size()).as("number of transactions")
+            .isEqualTo(Integer.parseInt(expectedData.get("number_of_transactions")));
+      }
+      if (mapOfData.containsKey("number_of_pickup_txn")) {
+        List<Transactions> pickupTxns = result.stream()
+            .filter(e -> e.getType().equalsIgnoreCase("PP")).collect(
+                Collectors.toList());
+        Assertions.assertThat(pickupTxns.size()).as("number of pickup transactions")
+            .isEqualTo(Integer.parseInt(expectedData.get("number_of_pickup_txn")));
+        //to check newly created pickup transaction address details
+        if (mapOfData.containsKey("pickup_address")) {
+          Transactions txn = pickupTxns.stream()
+              .filter(e -> e.getStatus().equalsIgnoreCase("PENDING")).findAny().orElseThrow(
+                  () -> new NvTestRuntimeException("new transaction status is not pending"));
+          String actualPickupAddress = f("%s %s %s %s", txn.getAddress1(), txn.getAddress2(),
+              txn.getPostcode(), txn.getCountry());
+          Assertions.assertThat(actualPickupAddress).as("pickup transaction address details")
+              .isEqualToIgnoringCase(expectedData.get("pickup_address"));
+        }
+      }
+
+      if (mapOfData.containsKey("number_of_delivery_txn")) {
+        List<Transactions> deliveryTxns = result.stream()
+            .filter(e -> e.getType().equalsIgnoreCase("DD")).collect(
+                Collectors.toList());
+        Assertions.assertThat(deliveryTxns.size()).as("number of delivery transactions")
+            .isEqualTo(Integer.parseInt(expectedData.get("number_of_delivery_txn")));
+        //to check newly created delivery transaction address details
+        if (mapOfData.containsKey("delivery_address")) {
+          Transactions txn = deliveryTxns.stream()
+              .filter(e -> e.getStatus().equalsIgnoreCase("PENDING")).findAny().orElseThrow(
+                  () -> new NvTestRuntimeException("new transaction status is not pending"));
+          String actualDeliveryAddress = f("%s %s %s %s", txn.getAddress1(), txn.getAddress2(),
+              txn.getPostcode(), txn.getCountry());
+          Assertions.assertThat(actualDeliveryAddress).as("delivery transaction address details")
+              .isEqualToIgnoringCase(expectedData.get("delivery_address"));
         }
       }
     }, "check transactions");
@@ -320,5 +394,25 @@ public class DbCoreSteps extends CoreStandardSteps {
           .isNotNull();
       expected.compareWithActual(actual, resolvedData);
     }, "verify orders records", 10_000, 3);
+  }
+
+  @When("DB Core - verify order_jaro_scores_v2 record:")
+  public void dbOperatorVerifyJaroScores(List<Map<String, String>> data) {
+    List<Map<String, String>> resolvedMap = resolveListOfMaps(data);
+    List<OrderJaroScoresV2> expected = new ArrayList<>();
+    resolvedMap.forEach(e -> {
+      OrderJaroScoresV2 jaroScore = new OrderJaroScoresV2(e);
+      expected.add(jaroScore);
+    });
+    retryIfAssertionErrorOccurred(() -> {
+      OrderJaroScoresV2 actualJaroScores = expected.get(0);
+      List<OrderJaroScoresV2> actual = orderJaroScoresV2Dao
+          .getMultipleOjs(actualJaroScores.getWaypointId());
+      Assertions.assertThat(actual)
+          .as("List of Jaro Scores for waypoint id" + actualJaroScores.getWaypointId())
+          .isNotEmpty();
+      actual
+          .forEach(o -> DataEntity.assertListContains(expected, o, "ojs list"));
+    }, "verify order_jaro_scores_v2 records", 10_000, 3);
   }
 }
