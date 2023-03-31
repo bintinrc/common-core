@@ -3,6 +3,7 @@ package co.nvqa.common.core.cucumber.glue;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.hibernate.OrderDao;
 import co.nvqa.common.core.hibernate.OrderDetailsDao;
+import co.nvqa.common.core.hibernate.OrderJaroScoresV2Dao;
 import co.nvqa.common.core.hibernate.ReservationsDao;
 import co.nvqa.common.core.hibernate.RouteLogsDao;
 import co.nvqa.common.core.hibernate.RouteMonitoringDataDao;
@@ -12,6 +13,7 @@ import co.nvqa.common.core.hibernate.WaypointsDao;
 import co.nvqa.common.core.model.order.Order.Data;
 import co.nvqa.common.core.model.order.Order.PreviousAddressDetails;
 import co.nvqa.common.core.model.persisted_class.core.OrderDetails;
+import co.nvqa.common.core.model.persisted_class.core.OrderJaroScoresV2;
 import co.nvqa.common.core.model.persisted_class.core.Orders;
 import co.nvqa.common.core.model.persisted_class.core.Reservations;
 import co.nvqa.common.core.model.persisted_class.core.RouteLogs;
@@ -19,11 +21,13 @@ import co.nvqa.common.core.model.persisted_class.core.RouteMonitoringData;
 import co.nvqa.common.core.model.persisted_class.core.ShipperPickupSearch;
 import co.nvqa.common.core.model.persisted_class.core.Transactions;
 import co.nvqa.common.core.model.persisted_class.core.Waypoints;
+import co.nvqa.common.model.DataEntity;
 import co.nvqa.common.utils.NvTestRuntimeException;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -54,6 +58,8 @@ public class DbCoreSteps extends CoreStandardSteps {
 
   @Inject
   private ReservationsDao reservationDao;
+  @Inject
+  private OrderJaroScoresV2Dao orderJaroScoresV2Dao;
 
   @Override
   public void init() {
@@ -388,5 +394,25 @@ public class DbCoreSteps extends CoreStandardSteps {
           .isNotNull();
       expected.compareWithActual(actual, resolvedData);
     }, "verify orders records", 10_000, 3);
+  }
+
+  @When("DB Core - verify order_jaro_scores_v2 record:")
+  public void dbOperatorVerifyJaroScores(List<Map<String, String>> data) {
+    List<Map<String, String>> resolvedMap = resolveListOfMaps(data);
+    List<OrderJaroScoresV2> expected = new ArrayList<>();
+    resolvedMap.forEach(e -> {
+      OrderJaroScoresV2 jaroScore = new OrderJaroScoresV2(e);
+      expected.add(jaroScore);
+    });
+    retryIfAssertionErrorOccurred(() -> {
+      OrderJaroScoresV2 actualJaroScores = expected.get(0);
+      List<OrderJaroScoresV2> actual = orderJaroScoresV2Dao
+          .getMultipleOjs(actualJaroScores.getWaypointId());
+      Assertions.assertThat(actual)
+          .as("List of Jaro Scores for waypoint id" + actualJaroScores.getWaypointId())
+          .isNotEmpty();
+      actual
+          .forEach(o -> DataEntity.assertListContains(expected, o, "ojs list"));
+    }, "verify order_jaro_scores_v2 records", 10_000, 3);
   }
 }
