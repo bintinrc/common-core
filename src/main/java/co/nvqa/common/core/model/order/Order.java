@@ -606,6 +606,7 @@ public class Order extends DataEntity<Order> implements Serializable {
     private Double originalWeight;
     private Dimension originalDimensions;
     private List<PreviousAddressDetails> previousDeliveryDetails;
+    private List<PreviousAddressDetails> previousPickupDetails;
   }
 
   @Getter

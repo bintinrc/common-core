@@ -15,6 +15,7 @@ import co.nvqa.commonauth.utils.TokenUtils;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+
 import java.util.Arrays;
 import java.util.List;
 import javax.inject.Singleton;
@@ -398,13 +399,21 @@ public class RouteClient extends SimpleApiClient {
     final Response response = addParcelToRouteByTrackingIdAndGetRawResponse(
         addParcelToRouteRequest);
     response.then().contentType(ContentType.JSON);
+  }
+
+  public void editRouteDetails(List<RouteRequest> routeRequest) {
+    String url = "core/routes/details";
+    String json = toJson(routeRequest);
+    RequestSpecification rs = createAuthenticatedRequest()
+        .body(json);
+    Response response = doPut("API Core - Operator edit route details:", rs, url);
     if (response.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
       throw new NvTestHttpException("unexpected http status: " + response.statusCode());
     }
   }
 
-  public Response addParcelToRouteByTrackingIdAndGetRawResponse(
-      AddParcelToRouteRequest addParcelToRouteRequest) {
+  public Response addParcelToRouteByTrackingIdAndGetRawResponse(AddParcelToRouteRequest
+      addParcelToRouteRequest) {
     final String url = "core/2.0/orders/routes";
     final String json = toJson(DEFAULT_SNAKE_CASE_MAPPER, addParcelToRouteRequest);
 

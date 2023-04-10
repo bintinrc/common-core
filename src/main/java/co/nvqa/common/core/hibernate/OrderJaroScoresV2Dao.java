@@ -1,5 +1,6 @@
 package co.nvqa.common.core.hibernate;
 
+import co.nvqa.common.core.model.persisted_class.core.OrderJaroScoresV2;
 import co.nvqa.common.core.model.persisted_class.core.Transactions;
 import co.nvqa.common.core.utils.CoreTestConstants;
 import co.nvqa.common.database.DbBase;
@@ -9,25 +10,25 @@ import javax.inject.Singleton;
 import org.apache.commons.collections.CollectionUtils;
 
 @Singleton
-public class TransactionsDao extends DbBase {
+public class OrderJaroScoresV2Dao extends DbBase {
 
-  public TransactionsDao() {
+  public OrderJaroScoresV2Dao() {
     super(CoreTestConstants.DB_CORE_URL, StandardTestConstants.DB_USER,
         StandardTestConstants.DB_PASS, "co.nvqa.common.core.model.persisted_class.core");
   }
 
-  public Transactions getSingleTransaction(Long transactionId) {
-    String query = "FROM Transactions WHERE id = :transactionId";
+  public OrderJaroScoresV2 getSingleOjs(Long waypointId) {
+    String query = "FROM OrderJaroScoresV2 WHERE waypointId = :waypointId";
     var result = findAll(session ->
-        session.createQuery(query, Transactions.class)
-            .setParameter("transactionId", transactionId));
+        session.createQuery(query, OrderJaroScoresV2.class)
+            .setParameter("waypointId", waypointId));
     return CollectionUtils.isEmpty(result) ? null : result.get(0);
   }
 
-  public List<Transactions> getMultipleTransactions(Long orderId) {
-    String query = "FROM Transactions WHERE orderId = :orderId";
+  public List<OrderJaroScoresV2> getMultipleOjs(Long waypointId) {
+    String query = "FROM OrderJaroScoresV2 WHERE waypointId = :waypointId";
     return findAll(session ->
-        session.createQuery(query, Transactions.class)
-            .setParameter("orderId", orderId));
+        session.createQuery(query, OrderJaroScoresV2.class)
+            .setParameter("waypointId", waypointId));
   }
 }

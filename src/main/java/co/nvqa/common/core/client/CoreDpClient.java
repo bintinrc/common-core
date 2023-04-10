@@ -58,14 +58,28 @@ public class CoreDpClient extends SimpleApiClient {
     return doPost("CORE - CUSTOMER COLLECT FROM DP", spec, uri);
   }
 
-  public Response untagOrderFromDp(long orderId, long userId) {
-    String uri = "core/2.0/orders/{orderId}/dps";
-    String json = "{\"user_id\":" + userId + "}";
+  public Response untagOrderFromDp(long orderId, String version) {
+    String uri = "core/{version}/orders/{orderId}/dps";
+    String json = "{\"type\":\"DELIVERY\"}";
+    RequestSpecification spec = createAuthenticatedRequest()
+        .pathParam("orderId", orderId)
+        .pathParam("version", version)
+        .body(json);
+
+    return doDelete("CORE - UNTAG ORDER FROM DP", spec, uri);
+  }
+
+  public void overstayFromDp(long orderId, long dpId) {
+    String uri = "core/2.0/orders/{orderId}/overstay";
+    String json = f("{\"action\": 2,\"distribution_point_id\": %d}", dpId);
     RequestSpecification spec = createAuthenticatedRequest()
         .pathParam("orderId", orderId)
         .body(json);
 
-    return doDelete("CORE - UNTAG ORDER FROM DP", spec, uri);
+    Response r = doPost("CORE - OVERSTAY FROM DP", spec, uri);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
   }
 
   public DpTagging tagToDpAndAddToRoute(long orderId, DpTagging request) {
@@ -91,6 +105,20 @@ public class CoreDpClient extends SimpleApiClient {
         .body(json);
     Response response = doDelete(
         "API Core - Remove From To DP Holding Route And Untag From DP", requestSpecification,
+        url);
+    if (response.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + response.statusCode());
+    }
+  }
+
+  public void lodgeInAtDp(long orderId, String json, Boolean isReverify) {
+    String url = "core/2.0/orders/{orderId}/lodgein";
+    RequestSpecification requestSpecification = createAuthenticatedRequest()
+        .pathParam("orderId", orderId)
+        .queryParam("toReverify", isReverify)
+        .body(json);
+    Response response = doPost(
+        "Core - Lodge In at DP", requestSpecification,
         url);
     if (response.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
       throw new NvTestHttpException("unexpected http status: " + response.statusCode());
