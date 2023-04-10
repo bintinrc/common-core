@@ -34,7 +34,7 @@ public class MiscCoreClient extends SimpleApiClient {
   }
 
   public SalesPerson createSalesPerson(SalesPerson salesPerson) {
-    String apiMethod = "/core/1.0/sales";
+    String apiMethod = "core/1.0/sales";
 
     RequestSpecification requestSpecification = createAuthenticatedRequest()
         .body(salesPerson);

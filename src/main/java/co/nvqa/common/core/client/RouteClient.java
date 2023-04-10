@@ -2,21 +2,30 @@ package co.nvqa.common.core.client;
 
 import co.nvqa.common.client.SimpleApiClient;
 import co.nvqa.common.constants.HttpConstants;
+import co.nvqa.common.core.model.ResponseWrapper;
 import co.nvqa.common.core.model.RouteGroup;
+import co.nvqa.common.core.model.coverage.CreateCoverageRequest;
+import co.nvqa.common.core.model.coverage.CreateCoverageResponse;
+import co.nvqa.common.core.model.pickup.MilkRunGroup;
 import co.nvqa.common.core.model.route.AddParcelToRouteRequest;
 import co.nvqa.common.core.model.route.AddPickupJobToRouteRequest;
 import co.nvqa.common.core.model.route.MergeWaypointsResponse;
+import co.nvqa.common.core.model.route.ParcelRouteTransferRequest;
+import co.nvqa.common.core.model.route.ParcelRouteTransferResponse;
 import co.nvqa.common.core.model.route.RouteRequest;
 import co.nvqa.common.core.model.route.RouteResponse;
 import co.nvqa.common.core.model.waypoint.Waypoint;
 import co.nvqa.common.utils.NvTestHttpException;
 import co.nvqa.common.utils.StandardTestConstants;
 import co.nvqa.commonauth.utils.TokenUtils;
+import com.fasterxml.jackson.databind.JsonNode;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import javax.inject.Singleton;
 
@@ -421,5 +430,149 @@ public class RouteClient extends SimpleApiClient {
         .body(json);
 
     return doPut("Core - Add Parcel to Route by Tracking Id", spec, url);
+  }
+
+  public void startRoute(long routeId) {
+    Response r = startRouteAndGetRawResponse(routeId);
+    r.then().statusCode(
+        isOneOf(HttpConstants.RESPONSE_200_SUCCESS, HttpConstants.RESPONSE_204_NO_CONTENT));
+  }
+
+  public Response startRouteAndGetRawResponse(long routeId) {
+    String apiMethod = "core/v2/drivers/1/routes/{routeId}/start";
+
+    RequestSpecification requestSpecification = createAuthenticatedRequest()
+        .pathParam("routeId", routeId);
+
+    return doGet("API Core - Start Route", requestSpecification, apiMethod);
+  }
+
+  public void setRouteTags(long routeId, long tagId) {
+    String apiMethod = "route/1.0/routes/tags";
+
+    RequestSpecification requestSpecification = createAuthenticatedRequest()
+        .body(f("[{\"routeId\":%d,\"tagIds\":[%d]}]", routeId, tagId));
+
+    Response r = doPut("Operator Portal - Set Route Tags", requestSpecification, apiMethod);
+    r.then().assertThat().contentType(ContentType.JSON);
+    r.then().assertThat().statusCode(HttpConstants.RESPONSE_200_SUCCESS);
+  }
+
+  public void unmergeTransactionsZonalRouting(List<Long> transactionIds) {
+    String apiMethod = "core/transactions/unmerge";
+    String json = toJsonSnakeCase(transactionIds);
+
+    RequestSpecification requestSpecification = createAuthenticatedRequest()
+        .body(f("{\"transactionIds\":%s}", json));
+
+    Response response = doPut("Core - Unmerge Transactions", requestSpecification,
+        apiMethod);
+    response.then().assertThat().contentType(ContentType.JSON);
+    response.then().assertThat().statusCode(HttpConstants.RESPONSE_200_SUCCESS);
+  }
+
+  public long getDeliveryWaypointId(String trackingId) {
+    Response response = getDeliveryWaypointIdAsRawResponse(trackingId);
+    response.then().assertThat().statusCode(HttpConstants.RESPONSE_200_SUCCESS);
+    response.then().assertThat().contentType(ContentType.JSON);
+    return response.jsonPath().<Integer>get("delivery.waypointId");
+  }
+
+  public Response getDeliveryWaypointIdAsRawResponse(String trackingId) {
+    String apiMethod = "core/orders/search";
+
+    RequestSpecification requestSpecification = createAuthenticatedRequest()
+        .param("scan", trackingId);
+
+    return doGet("API Core - Get Delivery Waypoint ID", requestSpecification, apiMethod);
+  }
+
+  public CreateCoverageResponse createCoverage(CreateCoverageRequest request) {
+    String url = "route-v2/coverages";
+
+    RequestSpecification requestSpecification = createAuthenticatedRequest()
+        .body(toJsonSnakeCase(request));
+
+    Response response = doPost("API Route - Create Coverage", requestSpecification, url);
+    return fromJsonSnakeCase(response.getBody().asString(), CreateCoverageResponse.class);
+  }
+
+  public void deleteCoverage(long coverageId) {
+    String url = "route-v2/coverages/{coverageId}";
+
+    RequestSpecification requestSpecification = createAuthenticatedRequest()
+        .pathParam("coverageId", coverageId);
+
+    doDelete("API Route - Delete Coverage", requestSpecification, url);
+  }
+
+  public Response parcelRouteTransferAndGetRawResponse(ParcelRouteTransferRequest request) {
+    String url = "core/2.0/routes-orders-transfers";
+    RequestSpecification requestSpecification = createAuthenticatedRequest()
+        .body(toJsonSnakeCase(request));
+    return doPost("Parcel Route Transfer", requestSpecification, url);
+  }
+
+  public ParcelRouteTransferResponse parcelRouteTransfer(ParcelRouteTransferRequest request) {
+    Response response = parcelRouteTransferAndGetRawResponse(request);
+    if (response.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + response.statusCode());
+    }
+    return fromJsonSnakeCase(response.body().asString(), ParcelRouteTransferResponse.class);
+  }
+
+  public RouteResponse getRouteDetails(long routeId) {
+    String apiMethod = "route/2.0/routes/{route-id}/manifest";
+
+    RequestSpecification requestSpecification = createAuthenticatedRequest()
+        .pathParam("route-id", routeId);
+
+    Response r = doGet(f("API Route - Get Route ID %d Details", routeId),
+        requestSpecification, apiMethod);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+    r.then().contentType(ContentType.JSON);
+    return convertValueCamelCase(r.body().as(JsonNode.class).get("data").get("route"),
+        RouteResponse.class);
+  }
+
+  public void deleteDriverTypeRule(long driverTypeId) {
+    String url = "route/rbe/rules/drivertype/{driver_type_id}";
+    RequestSpecification spec = createAuthenticatedRequest()
+        .pathParam("driver_type_id", driverTypeId);
+
+    Response r = doDelete("Delete Driver Type Rule", spec, url);
+    r.then().contentType(ContentType.JSON);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+  }
+
+  public List<MilkRunGroup> getMilkrunGroups(Date date) {
+    String apiMethod = "route/1.0/milkrun-groups";
+    String dateStr = new SimpleDateFormat("yyyyMMdd").format(date);
+    RequestSpecification requestSpecification = createAuthenticatedRequest()
+        .queryParam("date", dateStr);
+
+    Response r = doGet("API Route - Get Milkrun Groups", requestSpecification, apiMethod);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+    r.then().contentType(ContentType.JSON);
+    return r.body().jsonPath().getList("data", MilkRunGroup.class);
+  }
+
+  public void deleteMilkrunGroup(long groupId) {
+    String apiMethod = "route/1.0/milkrun-groups/{group-id}";
+    RequestSpecification requestSpecification = createAuthenticatedRequest()
+        .pathParam("group-id", groupId);
+
+    Response r = doDelete("API Route - Delete Milkrun Group", requestSpecification,
+        apiMethod);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+    r.then().contentType(ContentType.JSON);
   }
 }
