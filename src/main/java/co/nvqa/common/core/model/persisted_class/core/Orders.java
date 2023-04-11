@@ -23,6 +23,8 @@ public class Orders extends DataEntity<Orders> {
   private Long id;
   @Column(name = "tracking_id")
   private String trackingId;
+  @Column(name = "stamp_id")
+  private String stampId;
   private String status;
   @Column(name = "granular_status")
   private String granularStatus;
@@ -89,7 +91,8 @@ public class Orders extends DataEntity<Orders> {
   private Double insurance;
   @Column(name = "parcel_size_id")
   private Integer parcelSizeId;
-
+  @Column(name = "latest_inbound_scan_id")
+  private Long latestInboundScanId;
 
   public Orders(Map<String, ?> data) {
     super(data);

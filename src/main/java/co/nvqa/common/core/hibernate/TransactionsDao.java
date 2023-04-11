@@ -30,4 +30,12 @@ public class TransactionsDao extends DbBase {
         session.createQuery(query, Transactions.class)
             .setParameter("orderId", orderId));
   }
+
+  public List<Transactions> findTransactionByOrderIdAndType(Long orderId, String type) {
+    String query = "FROM Transactions WHERE orderId = :orderId AND type = :type";
+    return findAll(session ->
+        session.createQuery(query, Transactions.class)
+            .setParameter("orderId", orderId)
+            .setParameter("type", type));
+  }
 }

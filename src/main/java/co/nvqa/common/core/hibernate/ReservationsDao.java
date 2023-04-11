@@ -4,8 +4,8 @@ import co.nvqa.common.core.model.persisted_class.core.Reservations;
 import co.nvqa.common.core.utils.CoreTestConstants;
 import co.nvqa.common.database.DbBase;
 import co.nvqa.common.utils.StandardTestConstants;
-import java.util.List;
 import javax.inject.Singleton;
+import org.apache.commons.collections.CollectionUtils;
 
 @Singleton
 public class ReservationsDao extends DbBase {
@@ -15,13 +15,12 @@ public class ReservationsDao extends DbBase {
         StandardTestConstants.DB_PASS, "co.nvqa.common.core.model.persisted_class.core");
   }
 
-  public List <Reservations> getReservationsDetailsByReservationId(Long reservationId) {
-    List<Reservations> results;
+  public Reservations getReservationsDetailsByReservationId(Long reservationId) {
     String query = "FROM Reservations "
         + "WHERE id = :reservationId";
-    results = findAll(session ->
+    var result = findAll(session ->
         session.createQuery(query, Reservations.class)
             .setParameter("reservationId", reservationId));
-    return results;
+    return CollectionUtils.isEmpty(result) ? null : result.get(0);
   }
 }

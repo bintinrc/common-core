@@ -62,9 +62,9 @@ public class DbCoreSteps extends CoreStandardSteps {
   public void coreGetWaypointFromReservationId(String reservationId) {
     Long resolvedReservationIdKey = Long.parseLong(resolveValue(reservationId));
     retryIfAssertionErrorOrRuntimeExceptionOccurred(() -> {
-      List<Reservations> results = reservationDao.getReservationsDetailsByReservationId(
+      Reservations result = reservationDao.getReservationsDetailsByReservationId(
           resolvedReservationIdKey);
-      put(KEY_WAYPOINT_ID, results.get(0).getWaypointId());
+      put(KEY_WAYPOINT_ID, result.getWaypointId());
     }, "Validating verified WayPoint Id value is as expected", 2000, 3);
   }
 
