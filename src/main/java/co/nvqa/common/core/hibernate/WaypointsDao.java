@@ -25,6 +25,15 @@ public class WaypointsDao extends DbBase {
     return results;
   }
 
+  public List<Waypoints> getWaypointsDetailsByRouteId(Long routeId) {
+    List<Waypoints> results;
+    String query = "FROM Waypoints WHERE routeId = :routeId ORDER BY seqNo";
+    results = findAll(session ->
+        session.createQuery(query, Waypoints.class)
+            .setParameter("routeId", routeId));
+    return results;
+  }
+
   public Waypoints getWaypointsDetails(Long wayPointId) {
     String query = "FROM Waypoints WHERE id = :waypointId";
     var result = findAll(session ->

@@ -1,7 +1,6 @@
 package co.nvqa.common.core.hibernate;
 
 import co.nvqa.common.core.model.persisted_class.core.Orders;
-import co.nvqa.common.core.model.persisted_class.core.Transactions;
 import co.nvqa.common.core.utils.CoreTestConstants;
 import co.nvqa.common.database.DbBase;
 import co.nvqa.common.utils.NvTestRuntimeException;
@@ -37,6 +36,14 @@ public class OrderDao extends DbBase {
     var result = findAll(session ->
         session.createQuery(query, Orders.class)
             .setParameter("orderId", orderId));
+    return CollectionUtils.isEmpty(result) ? null : result.get(0);
+  }
+
+  public Orders getSingleOrderDetailsByTrackingId(String trackingId) {
+    String query = "FROM Orders WHERE trackingId = :trackingId";
+    var result = findAll(session ->
+        session.createQuery(query, Orders.class)
+            .setParameter("trackingId", trackingId));
     return CollectionUtils.isEmpty(result) ? null : result.get(0);
   }
 

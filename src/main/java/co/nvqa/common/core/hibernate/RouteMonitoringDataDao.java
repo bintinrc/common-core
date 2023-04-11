@@ -24,4 +24,11 @@ public class RouteMonitoringDataDao extends DbBase {
     return CollectionUtils.isEmpty(result) ? null : result.get(0);
   }
 
+  public List<RouteMonitoringData> getListOfRouteMonitoringDataByWaypointId(Long waypointId) {
+    String query = "FROM RouteMonitoringData WHERE waypointId = :waypointId";
+    return findAll(session ->
+        session.createQuery(query, RouteMonitoringData.class)
+            .setParameter("waypointId", waypointId));
+  }
+
 }

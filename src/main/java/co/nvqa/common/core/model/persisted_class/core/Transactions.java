@@ -73,6 +73,10 @@ public class Transactions extends DataEntity<Transactions> {
   @Column(name = "dnr_id")
   private Integer dnrId;
 
+  @Column(name = "seq_no")
+  private Integer seqNo;
+  private Integer transit;
+
   public Transactions(Map<String, ?> data) {
     super(data);
   }

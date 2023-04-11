@@ -30,6 +30,9 @@ public class Orders extends DataEntity<Orders> {
   @Column(name = "deleted_at")
   private Double deletedAt;
   private String data;
+  @Column(name = "shipper_id")
+  private Long shipperId;
+  private Integer rts;
 
   @Column(name = "from_address1")
   private String fromAddress1;
@@ -68,6 +71,25 @@ public class Orders extends DataEntity<Orders> {
   private String toContact;
   @Column(name = "to_email")
   private String toEmail;
+
+  @Column(name = "service_type")
+  private String serviceType;
+  @Column(name = "confirm_code")
+  private String confirmCode;
+  @Column(name = "multi_parcel_ref_no")
+  private String multiParcelRefNo;
+  @Column(name = "async_handle")
+  private String asyncHandle;
+  @Column(name = "shipper_order_ref_no")
+  private String shipperOrderRefNo;
+  @Column(name = "customs_detail")
+  private String customsDetail;
+  @Column(name = "invoiced_amount")
+  private Double invoicedAmount;
+  private Double insurance;
+  @Column(name = "parcel_size_id")
+  private Integer parcelSizeId;
+
 
   public Orders(Map<String, ?> data) {
     super(data);
