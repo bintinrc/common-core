@@ -24,4 +24,11 @@ public class RouteLogsDao extends DbBase {
     return CollectionUtils.isEmpty(result) ? null : result.get(0);
   }
 
+  public List<RouteLogs> getMultipleRouteLogsbyDriverId(Long driverId) {
+    String query = "FROM RouteLogs WHERE driverId = :driverId AND archived = 0 AND deletedAt IS NULL";
+    return findAll(session ->
+        session.createQuery(query, RouteLogs.class)
+            .setParameter("driverId", driverId));
+  }
+
 }
