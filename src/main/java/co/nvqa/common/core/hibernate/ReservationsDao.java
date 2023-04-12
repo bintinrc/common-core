@@ -20,7 +20,7 @@ public class ReservationsDao extends DbBase {
     String query = "FROM Reservations WHERE id = :reservationId";
     var result = findAll(session ->
         session.createQuery(query, Reservations.class)
-            .setParameter("id", reservationId));
+            .setParameter("reservationId", reservationId));
     return CollectionUtils.isEmpty(result) ? null : result.get(0);
   }
 

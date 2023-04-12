@@ -1,8 +1,10 @@
 package co.nvqa.common.core.hibernate;
 
+import co.nvqa.common.core.model.order.Order.Dimension;
 import co.nvqa.common.core.model.persisted_class.core.Orders;
 import co.nvqa.common.core.utils.CoreTestConstants;
 import co.nvqa.common.database.DbBase;
+import co.nvqa.common.utils.JsonUtils;
 import co.nvqa.common.utils.NvTestRuntimeException;
 import co.nvqa.common.utils.StandardTestConstants;
 import java.util.List;
@@ -37,6 +39,24 @@ public class OrderDao extends DbBase {
         session.createQuery(query, Orders.class)
             .setParameter("orderId", orderId));
     return CollectionUtils.isEmpty(result) ? null : result.get(0);
+  }
+
+  public Dimension getOrderData(Long orderId) {
+    String query = "FROM Orders WHERE id = :orderId";
+    var result = findAll(session ->
+        session.createQuery(query, Orders.class)
+            .setParameter("orderId", orderId));
+    Orders order = CollectionUtils.isEmpty(result) ? null : result.get(0);
+    return JsonUtils.fromJsonSnakeCase(order.getData(), Dimension.class);
+  }
+
+  public Dimension getOrderDimensions(Long orderId) {
+    String query = "FROM Orders WHERE id = :orderId";
+    var result = findAll(session ->
+        session.createQuery(query, Orders.class)
+            .setParameter("orderId", orderId));
+    Orders order = CollectionUtils.isEmpty(result) ? null : result.get(0);
+    return JsonUtils.fromJsonSnakeCase(order.getDimensions(), Dimension.class);
   }
 
   public Orders getSingleOrderDetailsByTrackingId(String trackingId) {

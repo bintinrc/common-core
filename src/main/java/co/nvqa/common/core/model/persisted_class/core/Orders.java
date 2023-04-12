@@ -97,6 +97,7 @@ public class Orders extends DataEntity<Orders> {
   private Long latestInboundScanId;
   @Column(name = "shipper_ref_metadata")
   private String shipperRefMetadata;
+  private String dimensions;
 
   public Orders(Map<String, ?> data) {
     super(data);
