@@ -47,4 +47,12 @@ public class OrderDao extends DbBase {
     return CollectionUtils.isEmpty(result) ? null : result.get(0);
   }
 
+  public Orders getSingleOrderDetailsByStampId(String stampId) {
+    String query = "FROM Orders WHERE stampId = :stampId";
+    var result = findAll(session ->
+        session.createQuery(query, Orders.class)
+            .setParameter("stampId", stampId));
+    return CollectionUtils.isEmpty(result) ? null : result.get(0);
+  }
+
 }

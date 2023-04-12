@@ -4,6 +4,7 @@ import co.nvqa.common.core.model.persisted_class.core.Reservations;
 import co.nvqa.common.core.utils.CoreTestConstants;
 import co.nvqa.common.database.DbBase;
 import co.nvqa.common.utils.StandardTestConstants;
+import java.util.List;
 import javax.inject.Singleton;
 import org.apache.commons.collections.CollectionUtils;
 
@@ -16,11 +17,24 @@ public class ReservationsDao extends DbBase {
   }
 
   public Reservations getReservationsDetailsByReservationId(Long reservationId) {
-    String query = "FROM Reservations "
-        + "WHERE id = :reservationId";
+    String query = "FROM Reservations WHERE id = :reservationId";
     var result = findAll(session ->
         session.createQuery(query, Reservations.class)
-            .setParameter("reservationId", reservationId));
+            .setParameter("id", reservationId));
     return CollectionUtils.isEmpty(result) ? null : result.get(0);
+  }
+
+  public List<Reservations> getMultipleReservationsByAddressId(Long addressId) {
+    String query = "FROM Reservations WHERE addressId = :addressId";
+    return findAll(session ->
+        session.createQuery(query, Reservations.class)
+            .setParameter("addressId", addressId));
+  }
+
+  public List<Reservations> getReservationsDetailsByShipperId(Long shipperId) {
+    String query = "FROM Reservations WHERE shipperId = :shipperId";
+    return findAll(session ->
+        session.createQuery(query, Reservations.class)
+            .setParameter("shipperId", shipperId));
   }
 }

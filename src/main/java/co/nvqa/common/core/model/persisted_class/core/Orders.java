@@ -35,6 +35,8 @@ public class Orders extends DataEntity<Orders> {
   @Column(name = "shipper_id")
   private Long shipperId;
   private Integer rts;
+  @Column(name = "pricing_info")
+  private String pricingInfo;
 
   @Column(name = "from_address1")
   private String fromAddress1;
@@ -93,6 +95,8 @@ public class Orders extends DataEntity<Orders> {
   private Integer parcelSizeId;
   @Column(name = "latest_inbound_scan_id")
   private Long latestInboundScanId;
+  @Column(name = "shipper_ref_metadata")
+  private String shipperRefMetadata;
 
   public Orders(Map<String, ?> data) {
     super(data);

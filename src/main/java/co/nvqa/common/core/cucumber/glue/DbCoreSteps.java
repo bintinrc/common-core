@@ -227,7 +227,7 @@ public class DbCoreSteps extends CoreStandardSteps {
     final Long orderId = Long.parseLong(resolvedData.get("orderId"));
     final Long routeId = Long.parseLong(resolvedData.get("routeId"));
     retryIfAssertionErrorOccurred(() -> {
-      List<Transactions> result = transactionsDao.getMultipleTransactions(orderId);
+      List<Transactions> result = transactionsDao.getMultipleTransactionsByOrderId(orderId);
       Assertions.assertThat(result.size()).as("number of transactions")
           .isEqualTo(Integer.parseInt(data.get("number_of_txn")));
       Assertions.assertThat(result.get(0).getStatus()).as("pickup status").isEqualTo("Success");
@@ -263,7 +263,7 @@ public class DbCoreSteps extends CoreStandardSteps {
     retryIfAssertionErrorOccurred(() -> {
       Map<String, String> expectedData = resolveKeyValues(mapOfData);
       List<Transactions> result = transactionsDao
-          .getMultipleTransactions(Long.parseLong((expectedData.get("order_id"))));
+          .getMultipleTransactionsByOrderId(Long.parseLong((expectedData.get("order_id"))));
       if (mapOfData.containsKey("number_of_transactions")) {
         Assertions.assertThat(result.size()).as("number of transactions")
             .isEqualTo(Integer.parseInt(expectedData.get("number_of_transactions")));
