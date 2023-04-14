@@ -57,7 +57,7 @@ public class RouteClient extends SimpleApiClient {
     RequestSpecification spec = createAuthenticatedRequest()
         .body(json);
 
-    return doPost("Operator Portal - Create Route", spec, url);
+    return doPost("Core - Create Route", spec, url);
   }
 
   public void addParcelToRoute(long orderId, AddParcelToRouteRequest addParcelToRouteRequest) {
@@ -324,7 +324,7 @@ public class RouteClient extends SimpleApiClient {
         .queryParam("append", true)
         .body(f("{\"transactionIds\":[], \"reservationIds\":%s}", Arrays.toString(reservationId)));
 
-    Response r = doPost("Operator Portal - Add Reservation(s) to Route Group", requestSpecification,
+    Response r = doPost("Route - Add Reservation(s) to Route Group", requestSpecification,
         apiMethod);
     if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
       throw new NvTestHttpException("unexpected http status: " + r.statusCode());
@@ -344,7 +344,7 @@ public class RouteClient extends SimpleApiClient {
         .queryParam("append", true)
         .body(f("{\"transactionIds\":%s, \"reservationIds\":[]}", Arrays.toString(transactionIds)));
 
-    Response r = doPost("Operator Portal - Add Transaction(s) to Route Group", requestSpecification,
+    Response r = doPost("Route - Add Transaction(s) to Route Group", requestSpecification,
         apiMethod);
     if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
       throw new NvTestHttpException("unexpected http status: " + r.statusCode());
@@ -373,7 +373,7 @@ public class RouteClient extends SimpleApiClient {
   public List<RouteGroup> getRouteGroups() {
     String apiMethod = "route/1.0/route-groups";
     RequestSpecification requestSpecification = createAuthenticatedRequest();
-    Response r = doGet("Operator Portal - Get Route Groups", requestSpecification,
+    Response r = doGet("Route - Get Route Groups", requestSpecification,
         apiMethod);
     if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
       throw new NvTestHttpException("unexpected http status: " + r.statusCode());
@@ -385,7 +385,7 @@ public class RouteClient extends SimpleApiClient {
     String apiMethod = "route/1.0/route-groups/{routeGroupId}";
     RequestSpecification requestSpecification = createAuthenticatedRequest()
         .pathParam("routeGroupId", routeGroupId);
-    Response r = doDelete("Operator Portal - Delete Route Group", requestSpecification,
+    Response r = doDelete("Route - Delete Route Group", requestSpecification,
         apiMethod);
     if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
       throw new NvTestHttpException("unexpected http status: " + r.statusCode());
@@ -453,7 +453,7 @@ public class RouteClient extends SimpleApiClient {
     RequestSpecification requestSpecification = createAuthenticatedRequest()
         .body(f("[{\"routeId\":%d,\"tagIds\":[%d]}]", routeId, tagId));
 
-    Response r = doPut("Operator Portal - Set Route Tags", requestSpecification, apiMethod);
+    Response r = doPut("Route - Set Route Tags", requestSpecification, apiMethod);
     r.then().assertThat().contentType(ContentType.JSON);
     r.then().assertThat().statusCode(HttpConstants.RESPONSE_200_SUCCESS);
   }
