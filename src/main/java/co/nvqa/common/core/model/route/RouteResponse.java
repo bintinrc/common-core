@@ -1,5 +1,6 @@
 package co.nvqa.common.core.model.route;
 
+import co.nvqa.common.core.model.order.Order.Transaction;
 import co.nvqa.common.model.DataEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
@@ -136,6 +137,7 @@ public class RouteResponse {
     private Long seqNo;
     private Long waypointType;
     private Long routingZoneId;
+    private List<Transaction> transactions = new ArrayList<>();
 
     public Waypoint(Map<String, ?> data) {
       super(data);

@@ -1,6 +1,7 @@
 package co.nvqa.common.core.model.order;
 
 import co.nvqa.common.model.DataEntity;
+import co.nvqa.common.utils.JsonUtils;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonParser;
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
@@ -362,11 +364,66 @@ public class Order extends DataEntity<Order> implements Serializable {
 
   @Setter
   @Getter
-  public static class ShipperRefMetadata {
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @JsonDeserialize(using = ShipperRefMetadataDeserializer.class)
+  public static class ShipperRefMetadata extends DataEntity<ShipperRefMetadata> implements
+      Serializable {
 
     public String delivery_verification_mode;
     public Boolean allow_doorstep_dropoff;
     public Boolean enforce_delivery_verification;
+    private String deliveryVerificationIdentity;
+    private Boolean allowDoorstepDropoff;
+    private Boolean enforceDeliveryVerification;
+    private String deliveryVerificationMode;
+    private String collectionPoint;
+    private Grab grab;
+    private List<ItemInfo> items;
+    private String item;
+    private String packageId;
+
+    public ShipperRefMetadata(Map<String, ?> data) {
+      fromMap(data);
+    }
+  }
+
+  @Getter
+  @Setter
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class Grab implements Serializable {
+
+    private String bookingId;
+    private String experimentalL2Zone;
+  }
+
+  @Getter
+  @Setter
+  public static class ItemInfo {
+
+    private String itemName;
+    private Integer itemQuantity;
+    private Integer length;
+    private Integer width;
+    private Integer height;
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) {
+        return true;
+      }
+      if (!(o instanceof ItemInfo)) {
+        return false;
+      }
+      ItemInfo itemInfo = (ItemInfo) o;
+      return (itemName.equals(itemInfo.itemName) && (itemQuantity.equals(itemInfo.itemQuantity)));
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(itemName);
+    }
   }
 
   @Setter
@@ -542,6 +599,48 @@ public class Order extends DataEntity<Order> implements Serializable {
         String dimensionsInString = jsonParser.readValueAs(String.class);
         return mapper.readValue(dimensionsInString, Dimension.class);
       }
+    }
+  }
+
+  public static class ShipperRefMetadataDeserializer extends JsonDeserializer<ShipperRefMetadata> {
+
+    @Override
+    public ShipperRefMetadata deserialize(JsonParser p, DeserializationContext ctxt)
+        throws IOException {
+      JsonNode node = p.getCodec().readTree(p);
+      ShipperRefMetadata result = new ShipperRefMetadata();
+      if (node.get("delivery_verification_identity") != null) {
+        result.setDeliveryVerificationIdentity(node.get("delivery_verification_identity").asText());
+      }
+      if (node.get("grab") != null) {
+        result.setGrab(
+            JsonUtils.fromJsonSnakeCase(node.get("grab").toString(), Grab.class));
+      }
+      if (node.get("items") != null) {
+        if (node.get("items").isArray()) {
+          result.setItems(
+              JsonUtils.fromJsonSnakeCaseToList(node.get("items").toString(), ItemInfo.class));
+        } else {
+          result.setItem(node.get("items").asText());
+        }
+      }
+      if (node.get("delivery_verification_mode") != null) {
+        result.setDeliveryVerificationMode(node.get("delivery_verification_mode").asText());
+      }
+      if (node.get("collection_point") != null) {
+        result.setCollectionPoint(node.get("collection_point").asText());
+      }
+      if (node.get("allow_doorstep_dropoff") != null) {
+        result.setAllowDoorstepDropoff(node.get("allow_doorstep_dropoff").asBoolean());
+      }
+      if (node.get("enforce_delivery_verification") != null) {
+        result
+            .setEnforceDeliveryVerification(node.get("enforce_delivery_verification").asBoolean());
+      }
+      if (node.get("package_id") != null) {
+        result.setPackageId(node.get("package_id").asText());
+      }
+      return result;
     }
   }
 

@@ -23,7 +23,6 @@ import lombok.Setter;
 public class RouteLogs extends DataEntity<RouteLogs> {
 
   @Id
-  @Column(name = "id")
   private Long id;
   @Column(name = "deleted_at")
   private String deletedAt;
@@ -37,6 +36,8 @@ public class RouteLogs extends DataEntity<RouteLogs> {
   private Long hubId;
   @Column(name = "zone_id")
   private Long zoneId;
+  @Column(name = "driverId")
+  private Long driverId;
 
   public RouteLogs(Map<String, ?> data) {
     super(data);

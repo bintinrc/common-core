@@ -80,7 +80,7 @@ public class TagClient extends SimpleApiClient {
         .contentType(ContentType.JSON)
         .pathParam("tagId", tagId);
 
-    Response response = doDelete("Operator Portal - Delete Tag", requestSpecification, apiMethod);
+    Response response = doDelete("Route - Delete Tag", requestSpecification, apiMethod);
     response.then().assertThat().statusCode(HttpConstants.RESPONSE_200_SUCCESS);
     LOGGER.info(f("Deleting tag with ID = '%s' is done.", tagId));
   }
@@ -100,7 +100,7 @@ public class TagClient extends SimpleApiClient {
 
     RequestSpecification requestSpecification = createAuthenticatedRequest();
 
-    Response response = doGet("Operator Portal - Find Tag By Name", requestSpecification,
+    Response response = doGet("Route - Find Tag By Name", requestSpecification,
         apiMethod);
     response.then().assertThat().contentType(ContentType.JSON);
     response.then().assertThat().statusCode(HttpConstants.RESPONSE_200_SUCCESS);
