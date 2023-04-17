@@ -42,7 +42,7 @@ public class RouteMonitoringClient extends SimpleApiClient {
 
   public Response getRouteMonitoringAsRawResponse(String date, List<Long> hubIds,
       List<Long> zoneIds, int pageSize, long routeId) {
-    String url = "/core/3.0/routes/monitoring";
+    String url = "core/3.0/routes/monitoring";
     String hubIdsString = Arrays.toString(hubIds.toArray());
     String zoneIdsString = Arrays.toString(zoneIds.toArray());
     RequestSpecification requestSpecification = createAuthenticatedRequest()

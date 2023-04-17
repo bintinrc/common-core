@@ -161,7 +161,7 @@ public class OrderClient extends SimpleApiClient {
     String json = toJsonSnakeCase(request);
     RequestSpecification spec = createAuthenticatedRequest()
         .body(json);
-    Response r = doPost("Operator Portal - Bulk Force Success Order", spec, url);
+    Response r = doPost("Core - Bulk Force Success Order", spec, url);
     r.then().contentType(ContentType.JSON);
     if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
       throw new NvTestHttpException("unexpected http status: " + r.statusCode());

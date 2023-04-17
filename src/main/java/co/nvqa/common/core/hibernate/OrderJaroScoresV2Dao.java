@@ -6,6 +6,7 @@ import co.nvqa.common.core.utils.CoreTestConstants;
 import co.nvqa.common.database.DbBase;
 import co.nvqa.common.utils.StandardTestConstants;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.inject.Singleton;
 import org.apache.commons.collections.CollectionUtils;
 
@@ -30,5 +31,10 @@ public class OrderJaroScoresV2Dao extends DbBase {
     return findAll(session ->
         session.createQuery(query, OrderJaroScoresV2.class)
             .setParameter("waypointId", waypointId));
+  }
+
+  public void unarchiveJaroScores(Long waypointId) {
+    String query = "UPDATE OrderJaroScoresV2 SET archived = 0" + " WHERE waypointId =" + waypointId;
+    saveOrUpdate(s -> s.createQuery(query));
   }
 }

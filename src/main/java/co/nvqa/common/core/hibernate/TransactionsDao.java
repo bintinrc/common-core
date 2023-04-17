@@ -24,10 +24,25 @@ public class TransactionsDao extends DbBase {
     return CollectionUtils.isEmpty(result) ? null : result.get(0);
   }
 
-  public List<Transactions> getMultipleTransactions(Long orderId) {
+  public List<Transactions> getMultipleTransactionsByOrderId(Long orderId) {
     String query = "FROM Transactions WHERE orderId = :orderId";
     return findAll(session ->
         session.createQuery(query, Transactions.class)
             .setParameter("orderId", orderId));
+  }
+
+  public List<Transactions> getMultipleTransactionsByRouteId(Long routeId) {
+    String query = "FROM Transactions WHERE routeId = :routeId";
+    return findAll(session ->
+        session.createQuery(query, Transactions.class)
+            .setParameter("routeId", routeId));
+  }
+
+  public List<Transactions> findTransactionByOrderIdAndType(Long orderId, String type) {
+    String query = "FROM Transactions WHERE orderId = :orderId AND type = :type";
+    return findAll(session ->
+        session.createQuery(query, Transactions.class)
+            .setParameter("orderId", orderId)
+            .setParameter("type", type));
   }
 }

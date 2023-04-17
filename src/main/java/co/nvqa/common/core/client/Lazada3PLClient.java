@@ -34,7 +34,7 @@ public class Lazada3PLClient extends SimpleApiClient {
     RequestSpecification spec = createAuthenticatedRequest()
         .body(json);
 
-    return doPost("Operator Portal - Post Lazada 3PL", spec, url);
+    return doPost("Core - Post Lazada 3PL", spec, url);
   }
 
 }

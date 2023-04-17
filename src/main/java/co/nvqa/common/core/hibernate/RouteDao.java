@@ -5,6 +5,7 @@ import co.nvqa.common.core.model.persisted_class.route.Coverage;
 import co.nvqa.common.core.model.persisted_class.route.Keyword;
 import co.nvqa.common.core.model.persisted_class.route.RouteGroup;
 import co.nvqa.common.core.model.persisted_class.route.RouteGroupReferences;
+import co.nvqa.common.core.model.persisted_class.route.WaypointPhotos;
 import co.nvqa.common.core.model.persisted_class.route.Waypoints;
 import co.nvqa.common.core.utils.CoreTestConstants;
 import co.nvqa.common.database.DbBase;
@@ -98,4 +99,13 @@ public class RouteDao extends DbBase {
             .setParameter("systemId", StandardTestConstants.NV_SYSTEM_ID));
     return CollectionUtils.isEmpty(result) ? null : result.get(0);
   }
+
+  public List<WaypointPhotos> getWaypointPhotosByWaypointId(Long waypointId) {
+    String query = "FROM WaypointPhotos WHERE waypointId = :waypointId";
+
+    return findAll(session ->
+        session.createQuery(query, WaypointPhotos.class)
+            .setParameter("waypointId", waypointId));
+  }
+
 }
