@@ -71,7 +71,6 @@ public class ApiEventsSteps extends CoreStandardSteps {
   public void apiOperatorGetOrderEventByOrderId(String createdOrderId) {
     final long orderId = Long.parseLong(resolveValue(createdOrderId));
 
-    pause4s();
     final Events events = getEventClient().getOrderEventsByOrderId(orderId);
     putInList(KEY_CORE_LIST_OF_ORDER_EVENTS,events);
   }
