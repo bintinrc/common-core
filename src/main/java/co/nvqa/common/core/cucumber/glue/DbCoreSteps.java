@@ -1,21 +1,27 @@
 package co.nvqa.common.core.cucumber.glue;
 
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
+import co.nvqa.common.core.hibernate.OrderDao;
 import co.nvqa.common.core.hibernate.OrderDetailsDao;
 import co.nvqa.common.core.hibernate.OrderJaroScoresV2Dao;
+import co.nvqa.common.core.hibernate.OutboundScansDao;
 import co.nvqa.common.core.hibernate.ReservationsDao;
 import co.nvqa.common.core.hibernate.RouteLogsDao;
 import co.nvqa.common.core.hibernate.RouteMonitoringDataDao;
 import co.nvqa.common.core.hibernate.ShipperPickupSearchDao;
 import co.nvqa.common.core.hibernate.TransactionsDao;
+import co.nvqa.common.core.hibernate.WarehouseSweepsDao;
 import co.nvqa.common.core.hibernate.WaypointsDao;
 import co.nvqa.common.core.model.persisted_class.core.OrderDetails;
 import co.nvqa.common.core.model.persisted_class.core.OrderJaroScoresV2;
+import co.nvqa.common.core.model.persisted_class.core.Orders;
+import co.nvqa.common.core.model.persisted_class.core.OutboundScans;
 import co.nvqa.common.core.model.persisted_class.core.Reservations;
 import co.nvqa.common.core.model.persisted_class.core.RouteLogs;
 import co.nvqa.common.core.model.persisted_class.core.RouteMonitoringData;
 import co.nvqa.common.core.model.persisted_class.core.ShipperPickupSearch;
 import co.nvqa.common.core.model.persisted_class.core.Transactions;
+import co.nvqa.common.core.model.persisted_class.core.WarehouseSweeps;
 import co.nvqa.common.core.model.persisted_class.core.Waypoints;
 import co.nvqa.common.model.DataEntity;
 import co.nvqa.common.utils.NvTestRuntimeException;
@@ -29,34 +35,39 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.assertj.core.api.Assertions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DbCoreSteps extends CoreStandardSteps {
 
   @Inject
+  private OrderDao orderDao;
+  @Inject
   private OrderDetailsDao orderDetailsDao;
-
   @Inject
   private RouteLogsDao routeLogsDao;
-
   @Inject
   private WaypointsDao waypointsDao;
-
   @Inject
   private TransactionsDao transactionsDao;
-
   @Inject
   private ShipperPickupSearchDao shipperPickupSearchDao;
   @Inject
   private RouteMonitoringDataDao routeMonitoringDataDao;
-
   @Inject
   private ReservationsDao reservationDao;
   @Inject
   private OrderJaroScoresV2Dao orderJaroScoresV2Dao;
+  @Inject
+  private WarehouseSweepsDao warehouseSweepsDao;
+  @Inject
+  private OutboundScansDao outboundScansDao;
 
   @Override
   public void init() {
   }
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(DbCoreSteps.class);
 
   @And("DB Core - get waypoint Id from reservation id {string}")
   public void coreGetWaypointFromReservationId(String reservationId) {
@@ -324,5 +335,63 @@ public class DbCoreSteps extends CoreStandardSteps {
       actual
           .forEach(o -> DataEntity.assertListContains(expected, o, "ojs list"));
     }, "verify order_jaro_scores_v2 records", 10_000, 3);
+  }
+
+  @When("DB Core - verify warehouse_sweeps record:")
+  public void verifyWarehouseSweeps(Map<String, String> dataTableRaw) {
+    Map<String, String> dataTable = resolveKeyValues(dataTableRaw);
+    String trackingId = dataTable.get("trackingId");
+    Long hubId = Long.valueOf(dataTable.get("hubId"));
+    Long orderId = Long.valueOf(dataTable.get("orderId"));
+
+    retryIfAssertionErrorOrRuntimeExceptionOccurred(() -> {
+          List<WarehouseSweeps> warehouseSweepRecords = warehouseSweepsDao
+              .findWarehouseSweepRecord(trackingId);
+
+          LOGGER.info(warehouseSweepRecords.toString());
+
+          Assertions.assertThat(warehouseSweepRecords.size())
+              .as("Expected 1 record in warehouse_sweeps table").isEqualTo(1);
+
+          WarehouseSweeps theRecord = warehouseSweepRecords.get(0);
+
+          Assertions.assertThat(theRecord.getScan())
+              .as("Expected scan in warehouse_sweeps table").isEqualTo(trackingId);
+          Assertions.assertThat(theRecord.getHubId())
+              .as("Expected hub_id in warehouse_sweeps table").isEqualTo(hubId);
+          Assertions.assertThat(theRecord.getOrderId())
+              .as("Expected order_id in warehouse_sweeps table").isEqualTo(orderId);
+
+          putInList(KEY_CORE_WAREHOUSE_SWEEPS, theRecord);
+
+        }, "Verify record in warehouse_sweeps table", 2000, 10
+    );
+  }
+
+  @When("DB Core - verify outbound_scans record:")
+  public void verifyOutboundScans(Map<String, String> dataTableRaw) {
+    Map<String, String> dataTable = resolveKeyValues(dataTableRaw);
+    Long routeId = Long.valueOf(dataTable.get("routeId"));
+    Long hubId = Long.valueOf(dataTable.get("hubId"));
+    Long orderId = Long.valueOf(dataTable.get("orderId"));
+
+    retryIfAssertionErrorOrRuntimeExceptionOccurred(() -> {
+          List<OutboundScans> outboundScansRecords = outboundScansDao
+              .getOutboundScansByOrderId(orderId);
+
+          LOGGER.info(outboundScansRecords.toString());
+
+          Assertions.assertThat(outboundScansRecords.size())
+              .as("Expected 1 record in outbound_scans table").isEqualTo(1);
+
+          OutboundScans theRecord = outboundScansRecords.get(0);
+
+          Assertions.assertThat(theRecord.getHubId())
+              .as("Expected hub_id in outbound_scans table").isEqualTo(hubId);
+          Assertions.assertThat(theRecord.getRouteId())
+              .as("Expected route_id in outbound_scans table").isEqualTo(routeId);
+
+        }, "Verify record in outbound_scans table", 2000, 10
+    );
   }
 }
