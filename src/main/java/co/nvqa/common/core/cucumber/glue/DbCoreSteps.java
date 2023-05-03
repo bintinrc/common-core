@@ -14,7 +14,6 @@ import co.nvqa.common.core.hibernate.WarehouseSweepsDao;
 import co.nvqa.common.core.hibernate.WaypointsDao;
 import co.nvqa.common.core.model.persisted_class.core.OrderDetails;
 import co.nvqa.common.core.model.persisted_class.core.OrderJaroScoresV2;
-import co.nvqa.common.core.model.persisted_class.core.Orders;
 import co.nvqa.common.core.model.persisted_class.core.OutboundScans;
 import co.nvqa.common.core.model.persisted_class.core.Reservations;
 import co.nvqa.common.core.model.persisted_class.core.RouteLogs;
@@ -35,8 +34,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.assertj.core.api.Assertions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class DbCoreSteps extends CoreStandardSteps {
 
@@ -66,8 +63,6 @@ public class DbCoreSteps extends CoreStandardSteps {
   @Override
   public void init() {
   }
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(DbCoreSteps.class);
 
   @And("DB Core - get waypoint Id from reservation id {string}")
   public void coreGetWaypointFromReservationId(String reservationId) {
@@ -348,8 +343,6 @@ public class DbCoreSteps extends CoreStandardSteps {
           List<WarehouseSweeps> warehouseSweepRecords = warehouseSweepsDao
               .findWarehouseSweepRecord(trackingId);
 
-          LOGGER.info(warehouseSweepRecords.toString());
-
           Assertions.assertThat(warehouseSweepRecords.size())
               .as("Expected 1 record in warehouse_sweeps table").isEqualTo(1);
 
@@ -378,8 +371,6 @@ public class DbCoreSteps extends CoreStandardSteps {
     retryIfAssertionErrorOrRuntimeExceptionOccurred(() -> {
           List<OutboundScans> outboundScansRecords = outboundScansDao
               .getOutboundScansByOrderId(orderId);
-
-          LOGGER.info(outboundScansRecords.toString());
 
           Assertions.assertThat(outboundScansRecords.size())
               .as("Expected 1 record in outbound_scans table").isEqualTo(1);
