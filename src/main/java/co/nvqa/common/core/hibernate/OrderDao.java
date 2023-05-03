@@ -47,7 +47,7 @@ public class OrderDao extends DbBase {
         session.createQuery(query, Orders.class)
             .setParameter("orderId", orderId));
     Orders order = CollectionUtils.isEmpty(result) ? null : result.get(0);
-    return JsonUtils.fromJsonSnakeCase(order.getData(), Dimension.class);
+    return JsonUtils.fromJsonCamelCase(order.getData(), Dimension.class);
   }
 
   public Dimension getOrderDimensions(Long orderId) {

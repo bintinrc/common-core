@@ -9,6 +9,7 @@ import co.nvqa.common.core.model.order.RtsOrderRequest;
 import co.nvqa.common.utils.JsonUtils;
 import co.nvqa.common.utils.NvTestRuntimeException;
 import io.cucumber.guice.ScenarioScoped;
+import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import java.util.List;
 import java.util.Map;
@@ -187,5 +188,14 @@ public class ApiOrderSteps extends CoreStandardSteps {
 
     retryIfAssertionErrorOrRuntimeExceptionOccurred(
         () -> getOrderClient().setReturnedToSender(orderId, rtsRequest), "set RTS order");
+  }
+
+  @Then("API Operator update order pricing_weight to {double} using order-weight-update")
+  public void apiOperatorUpdateOrderPricing_weightToUsingOrderWeightUpdate(double weight) {
+    final long orderId = Long.valueOf()
+    put(KEY_EXPECTED_NEW_WEIGHT, weight);
+    retryIfAssertionErrorOrRuntimeExceptionOccurred(
+        () -> getOrderClient().updateOrderPricingWeight(orderId, weight),
+        "update order pricing weight using Order Weight Update ");
   }
 }

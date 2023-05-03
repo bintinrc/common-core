@@ -21,6 +21,7 @@ public interface CoreScenarioStorageKeys {
   String KEY_LIST_OF_RESERVATIONS = "KEY_LIST_OF_RESERVATIONS";
 
   String KEY_SAVED_ORDER_WEIGHT = "KEY_SAVED_ORDER_WEIGHT";
+  String KEY_EXPECTED_OLD_WEIGHT = "KEY_EXPECTED_OLD_WEIGHT";
 
   //  archive & unarchive route response
   String KEY_ROUTE_RESPONSE = "KEY_ROUTE_RESPONSE";
