@@ -1,7 +1,5 @@
 package co.nvqa.common.core.utils;
 
-import io.cucumber.java.hu.De;
-
 public interface CoreScenarioStorageKeys {
 
   String KEY_LIST_OF_CREATED_RESERVATIONS = "KEY_LIST_OF_CREATED_RESERVATIONS";
@@ -28,4 +26,6 @@ public interface CoreScenarioStorageKeys {
   String KEY_COVERAGE_ID = "KEY_COVERAGE_ID";
 
   String KEY_CORE_MERGE_WAYPOINT_RESPONSE = "KEY_CORE_MERGE_WAYPOINT_RESPONSE";
+
+  String KEY_CORE_WAREHOUSE_SWEEPS = "KEY_CORE_WAREHOUSE_SWEEPS";
 }
