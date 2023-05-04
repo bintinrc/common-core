@@ -95,6 +95,8 @@ public class Orders extends DataEntity<Orders> {
   private Integer parcelSizeId;
   @Column(name = "latest_inbound_scan_id")
   private Long latestInboundScanId;
+  @Column(name = "latest_warehouse_sweep_id")
+  private Long latestWarehouseSweepId;
   @Column(name = "shipper_ref_metadata")
   private String shipperRefMetadata;
   private String dimensions;

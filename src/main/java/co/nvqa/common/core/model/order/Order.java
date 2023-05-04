@@ -197,7 +197,7 @@ public class Order extends DataEntity<Order> implements Serializable {
   }
 
   public void setId(String id) {
-    this.id = (Long.valueOf(id));
+    this.id = (Long.parseLong(id));
   }
 
   public void setDeliveryTimeslot(String deliveryTimeslot) {

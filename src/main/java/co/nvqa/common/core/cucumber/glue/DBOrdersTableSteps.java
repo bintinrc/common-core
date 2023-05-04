@@ -61,24 +61,24 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
 
   @Given("DB Core - verify orders.weight and dimensions updated correctly for order id {string}")
   public void dbOperatorVerifiesOrdersWeightDims(String id, Map<String, String> source) {
-    Long orderId = Long.valueOf(resolveValue(id));
+    Long orderId = Long.parseLong(resolveValue(id));
     retryIfAssertionErrorOccurred(() -> {
       if (source.containsKey("orders.weight")) {
         final Double actualOrdersWeight = orderDao.getOrderWeight(orderId);
         Assertions.assertThat(actualOrdersWeight).as("orders.weight equal")
-            .isEqualTo(Double.valueOf(source.get("orders.weight")), Assertions.offset(0.1));
+            .isEqualTo(Double.parseDouble(source.get("orders.weight")), Assertions.offset(0.1));
       }
       if (source.containsKey("orders.dimensions.weight")) {
         final Double actualOrdersDimWeight = orderDao.getOrderDimensions(orderId).getWeight();
         Assertions.assertThat(actualOrdersDimWeight).as("orders.dimensions.weight equal")
-            .isEqualTo(Double.valueOf(source.get("orders.dimensions.weight")),
+            .isEqualTo(Double.parseDouble(source.get("orders.dimensions.weight")),
                 Assertions.offset(0.1));
       }
       if (source.containsKey("orders.data.originalWeight")) {
         final Double actualOrdersDataOriginalWeight = orderDao.getOrderData(orderId)
             .getOriginalWeight();
         Assertions.assertThat(actualOrdersDataOriginalWeight).as("orders.data.originalWeight equal")
-            .isEqualTo(Double.valueOf(source.get("orders.data.originalWeight")),
+            .isEqualTo(Double.parseDouble(source.get("orders.data.originalWeight")),
                 Assertions.offset(0.1));
         put(KEY_EXPECTED_OLD_WEIGHT, actualOrdersDataOriginalWeight);
       }
@@ -87,7 +87,7 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
             .getOriginalDimensions().getWeight();
         Assertions.assertThat(actualOrdersDataOriginalDimWeight)
             .as("orders.data.originalDimensions.weight equal")
-            .isEqualTo(Double.valueOf(source.get("orders.data.originalDimensions.weight")),
+            .isEqualTo(Double.parseDouble(source.get("orders.data.originalDimensions.weight")),
                 Assertions.offset(0.1));
       }
     }, f("verify orders weight & dimensions of order id %s", orderId), 10_000, 3);
@@ -96,12 +96,12 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
   @Given("DB Core - verify orders.weight is updated to highest weight correctly")
   public void operatorVerifiesUpdatedWeight(Map<String, String> data) {
     Map<String, String> resolvedMap = resolveKeyValues(data);
-    final Long orderId = Long.valueOf(resolvedMap.get("orderId"));
-    final Double length = Double.valueOf(resolvedMap.get("length"));
-    final Double width = Double.valueOf(resolvedMap.get("width"));
-    final Double height = Double.valueOf(resolvedMap.get("height"));
-    final Double measuredWeight = Double.valueOf(resolvedMap.get("weight"));
-    final Double shipperSubmittedWeight = Double.valueOf(resolvedMap.get("shipperSubmittedWeight"));
+    final Long orderId = Long.parseLong(resolvedMap.get("orderId"));
+    final Double length = Double.parseDouble(resolvedMap.get("length"));
+    final Double width = Double.parseDouble(resolvedMap.get("width"));
+    final Double height = Double.parseDouble(resolvedMap.get("height"));
+    final Double measuredWeight = Double.parseDouble(resolvedMap.get("weight"));
+    final Double shipperSubmittedWeight = Double.parseDouble(resolvedMap.get("shipperSubmittedWeight"));
     retryIfAssertionErrorOccurred(() -> {
       Double actualWeight = orderDao.getOrderWeight(orderId);
       Assertions.assertThat(actualWeight).as("order weight is not null").isNotNull();
