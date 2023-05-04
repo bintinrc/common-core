@@ -8,6 +8,7 @@ import co.nvqa.common.core.model.reservation.ReservationResponse;
 import co.nvqa.common.core.model.route.RouteResponse;
 import io.cucumber.guice.ScenarioScoped;
 import io.cucumber.java.After;
+import io.cucumber.java.Before;
 import java.util.List;
 import java.util.Objects;
 import javax.inject.Inject;
@@ -43,7 +44,8 @@ public class HookSteps extends CoreStandardSteps {
     }
     routes.forEach(r -> {
       try {
-        getRouteClient().archiveRoute(r.getId());
+        doWithRetry(() -> getRouteClient().archiveRoute(r.getId()),
+            "After hook: @ArchiveRouteCommonV2");
         LOGGER.debug("Route ID = {} archived successfully", r.getId());
       } catch (Throwable t) {
         LOGGER.warn("error to archive route: " + t.getMessage());
