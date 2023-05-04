@@ -8,6 +8,7 @@ import io.cucumber.guice.ScenarioScoped;
 import io.cucumber.java.en.Then;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import javax.inject.Inject;
 import lombok.Getter;
 import org.assertj.core.api.Assertions;
@@ -61,5 +62,16 @@ public class ApiEventsSteps extends CoreStandardSteps {
       }
     }
 
+  }
+
+  /**
+   * <br/> <b>orderId</b>: order ID of the order/parcel<br/>
+  */
+  @Then("API Core - Operator get the order event from Order Id {string}")
+  public void apiOperatorGetOrderEventByOrderId(String createdOrderId) {
+    final long orderId = Long.parseLong(resolveValue(createdOrderId));
+
+    final Events events = getEventClient().getOrderEventsByOrderId(orderId);
+    putInList(KEY_CORE_LIST_OF_ORDER_EVENTS,events);
   }
 }
