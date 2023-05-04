@@ -74,7 +74,8 @@ public class ReservationClient extends SimpleApiClient {
     }
   }
 
-  public ReservationResponse updatePriorityLevelOfReservation(long pickupAddressId, long legacyShipperId,
+  public ReservationResponse updatePriorityLevelOfReservation(long pickupAddressId,
+      long legacyShipperId,
       long priorityLevel, long reservationId) {
     String url = "reservation/2.0/reservations/{reservation_id}";
 
@@ -127,5 +128,16 @@ public class ReservationClient extends SimpleApiClient {
         .queryParam("merchant_booking_ref", grabBookingId);
 
     return doDelete("Cancel Grab Booking - Internal API", spec, url);
+  }
+
+  public void cancelReservation(long reservationId) {
+    String url = "/reservation/2.0/reservations/{reservationId}/update-status";
+
+    RequestSpecification requestSpecification = createAuthenticatedRequest()
+        .pathParam("reservationId", reservationId)
+        .body("{\"status_value\": 4}");
+
+    Response response = doPost("Operator Portal - Update Reservation", requestSpecification, url);
+    response.then().assertThat().statusCode(HttpConstants.RESPONSE_200_SUCCESS);
   }
 }

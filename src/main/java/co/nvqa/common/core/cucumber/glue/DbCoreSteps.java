@@ -312,8 +312,8 @@ public class DbCoreSteps extends CoreStandardSteps {
     }, "check transactions");
   }
 
-  @When("DB Core - verify order_jaro_scores_v2 record:")
-  public void dbOperatorVerifyJaroScores(List<Map<String, String>> data) {
+  @When("DB Core - verify multiple order_jaro_scores_v2 record:")
+  public void dbOperatorVerifyMultipleJaroScores(List<Map<String, String>> data) {
     List<Map<String, String>> resolvedMap = resolveListOfMaps(data);
     List<OrderJaroScoresV2> expected = new ArrayList<>();
     resolvedMap.forEach(e -> {
@@ -332,12 +332,42 @@ public class DbCoreSteps extends CoreStandardSteps {
     }, "verify order_jaro_scores_v2 records", 10_000, 3);
   }
 
+  @When("DB Core - verify number of records in order_jaro_scores_v2:")
+  public void verifyOjsNumberOfRecords(Map<String, String> data) {
+    Map<String, String> resolvedData = resolveKeyValues(data);
+    final long waypointId = Long.parseLong(resolvedData.get("waypointId"));
+    final long numberOfRecords = Integer.parseInt(resolvedData.get("number"));
+    retryIfAssertionErrorOccurred(() -> {
+      List<OrderJaroScoresV2> actual = orderJaroScoresV2Dao
+          .getMultipleOjs(waypointId);
+      Assertions.assertThat(actual.size())
+          .as(f("Expected %s records in order_jaro_scores_v2 table", numberOfRecords))
+          .isEqualTo(numberOfRecords);
+      put(KEY_CORE_LIST_OF_CREATED_OJS, actual);
+    }, "verify records in order_jaro_scores_v2", 10_000, 3);
+  }
+
+  @When("DB Core - verify order_jaro_scores_v2 record:")
+  public void dbOperatorVerifySingleJaroScores(Map<String, String> data) {
+    final Map<String, String> resolvedData = resolveKeyValues(data);
+    OrderJaroScoresV2 expected = new OrderJaroScoresV2(resolvedData);
+    retryIfAssertionErrorOccurred(() -> {
+
+      OrderJaroScoresV2 actual = orderJaroScoresV2Dao
+          .getSingleOjs(expected.getWaypointId(), expected.getArchived());
+      Assertions.assertThat(actual)
+          .withFailMessage("order_jaro_scores_v2 record was not found: " + resolvedData)
+          .isNotNull();
+      expected.compareWithActual(actual, resolvedData);
+    }, "verify order_jaro_scores_v2 records", 10_000, 3);
+  }
+
   @When("DB Core - verify warehouse_sweeps record:")
   public void verifyWarehouseSweeps(Map<String, String> dataTableRaw) {
     Map<String, String> dataTable = resolveKeyValues(dataTableRaw);
     String trackingId = dataTable.get("trackingId");
-    Long hubId = Long.valueOf(dataTable.get("hubId"));
-    Long orderId = Long.valueOf(dataTable.get("orderId"));
+    Long hubId = Long.parseLong(dataTable.get("hubId"));
+    Long orderId = Long.parseLong(dataTable.get("orderId"));
 
     retryIfAssertionErrorOrRuntimeExceptionOccurred(() -> {
           List<WarehouseSweeps> warehouseSweepRecords = warehouseSweepsDao
@@ -364,9 +394,9 @@ public class DbCoreSteps extends CoreStandardSteps {
   @When("DB Core - verify outbound_scans record:")
   public void verifyOutboundScans(Map<String, String> dataTableRaw) {
     Map<String, String> dataTable = resolveKeyValues(dataTableRaw);
-    Long routeId = Long.valueOf(dataTable.get("routeId"));
-    Long hubId = Long.valueOf(dataTable.get("hubId"));
-    Long orderId = Long.valueOf(dataTable.get("orderId"));
+    Long routeId = Long.parseLong(dataTable.get("routeId"));
+    Long hubId = Long.parseLong(dataTable.get("hubId"));
+    Long orderId = Long.parseLong(dataTable.get("orderId"));
 
     retryIfAssertionErrorOrRuntimeExceptionOccurred(() -> {
           List<OutboundScans> outboundScansRecords = outboundScansDao

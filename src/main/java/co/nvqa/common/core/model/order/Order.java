@@ -4,6 +4,7 @@ import co.nvqa.common.model.DataEntity;
 import co.nvqa.common.utils.JsonUtils;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
@@ -197,7 +198,7 @@ public class Order extends DataEntity<Order> implements Serializable {
   }
 
   public void setId(String id) {
-    this.id = (Long.valueOf(id));
+    this.id = (Long.parseLong(id));
   }
 
   public void setDeliveryTimeslot(String deliveryTimeslot) {
@@ -370,9 +371,6 @@ public class Order extends DataEntity<Order> implements Serializable {
   public static class ShipperRefMetadata extends DataEntity<ShipperRefMetadata> implements
       Serializable {
 
-    public String delivery_verification_mode;
-    public Boolean allow_doorstep_dropoff;
-    public Boolean enforce_delivery_verification;
     private String deliveryVerificationIdentity;
     private Boolean allowDoorstepDropoff;
     private Boolean enforceDeliveryVerification;
@@ -504,12 +502,18 @@ public class Order extends DataEntity<Order> implements Serializable {
     //to be used in orders.data
     private Double originalWeight;
     private Dimension originalDimensions;
+    @JsonProperty("manual_dimensions")
+    private Dimension manualDimensions;
 
     public Dimension() {
     }
 
     public Dimension(String rawJson) {
       fromJson(rawJson);
+    }
+
+    public Dimension(Map<String, ?> data) {
+      super(data);
     }
   }
 
@@ -627,6 +631,11 @@ public class Order extends DataEntity<Order> implements Serializable {
       if (node.get("delivery_verification_mode") != null) {
         result.setDeliveryVerificationMode(node.get("delivery_verification_mode").asText());
       }
+
+      if (node.get("delivery_verification_identity") != null) {
+        result.setDeliveryVerificationMode(node.get("delivery_verification_identity").asText());
+      }
+
       if (node.get("collection_point") != null) {
         result.setCollectionPoint(node.get("collection_point").asText());
       }

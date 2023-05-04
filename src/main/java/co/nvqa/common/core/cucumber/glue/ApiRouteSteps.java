@@ -198,7 +198,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
   @When("API Core - Operator unarchives invalid route with data below:")
   public void operatorUnArchiveRouteInvalidState(Map<String, String> mapOfData) {
     Map<String, String> expectedData = resolveKeyValues(mapOfData);
-    final long routeId = Long.valueOf(expectedData.get("routeId"));
+    final long routeId = Long.parseLong(expectedData.get("routeId"));
     retryIfAssertionErrorOrRuntimeExceptionOccurred(
         () -> {
           Response response = getRouteClient().unarchiveRouteAndGetRawResponse(routeId);
