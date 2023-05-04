@@ -343,16 +343,18 @@ public class DbCoreSteps extends CoreStandardSteps {
       Assertions.assertThat(actual.size())
           .as(f("Expected %s records in order_jaro_scores_v2 table", numberOfRecords))
           .isEqualTo(numberOfRecords);
+      put(KEY_CORE_LIST_OF_CREATED_OJS, actual);
     }, "verify records in order_jaro_scores_v2", 10_000, 3);
   }
 
   @When("DB Core - verify order_jaro_scores_v2 record:")
   public void dbOperatorVerifySingleJaroScores(Map<String, String> data) {
     final Map<String, String> resolvedData = resolveKeyValues(data);
-    final long waypointId = Long.parseLong(resolvedData.get("waypointId"));
     OrderJaroScoresV2 expected = new OrderJaroScoresV2(resolvedData);
     retryIfAssertionErrorOccurred(() -> {
-      OrderJaroScoresV2 actual = orderJaroScoresV2Dao.getSingleOjs(waypointId);
+
+      OrderJaroScoresV2 actual = orderJaroScoresV2Dao
+          .getSingleOjs(expected.getWaypointId(), expected.getArchived());
       Assertions.assertThat(actual)
           .withFailMessage("order_jaro_scores_v2 record was not found: " + resolvedData)
           .isNotNull();

@@ -18,16 +18,17 @@ public class OrderJaroScoresV2Dao extends DbBase {
         StandardTestConstants.DB_PASS, "co.nvqa.common.core.model.persisted_class.core");
   }
 
-  public OrderJaroScoresV2 getSingleOjs(Long waypointId) {
-    String query = "FROM OrderJaroScoresV2 WHERE waypointId = :waypointId";
+  public OrderJaroScoresV2 getSingleOjs(Long waypointId, Integer archived) {
+    String query = "FROM OrderJaroScoresV2 WHERE waypointId = :waypointId AND archived = :archived";
     var result = findAll(session ->
         session.createQuery(query, OrderJaroScoresV2.class)
-            .setParameter("waypointId", waypointId));
+            .setParameter("waypointId", waypointId)
+            .setParameter("archived", archived));
     return CollectionUtils.isEmpty(result) ? null : result.get(0);
   }
 
   public List<OrderJaroScoresV2> getMultipleOjs(Long waypointId) {
-    String query = "FROM OrderJaroScoresV2 WHERE waypointId = :waypointId";
+    String query = "FROM OrderJaroScoresV2 WHERE waypointId = :waypointId ORDER BY id DESC";
     return findAll(session ->
         session.createQuery(query, OrderJaroScoresV2.class)
             .setParameter("waypointId", waypointId));
