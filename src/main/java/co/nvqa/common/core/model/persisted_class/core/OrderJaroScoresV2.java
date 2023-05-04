@@ -29,11 +29,6 @@ public class OrderJaroScoresV2 extends DataEntity<OrderJaroScoresV2> {
   @Column(name = "source_id")
   private Integer sourceId;
 
-  public Long getId() {
-    this.id = null;
-    return id;
-  }
-
   public OrderJaroScoresV2(Map<String, ?> data) {
     fromMap(data);
   }
