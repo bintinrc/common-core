@@ -312,8 +312,8 @@ public class DbCoreSteps extends CoreStandardSteps {
     }, "check transactions");
   }
 
-  @When("DB Core - verify order_jaro_scores_v2 record:")
-  public void dbOperatorVerifyJaroScores(List<Map<String, String>> data) {
+  @When("DB Core - verify multiple order_jaro_scores_v2 record:")
+  public void dbOperatorVerifyMultipleJaroScores(List<Map<String, String>> data) {
     List<Map<String, String>> resolvedMap = resolveListOfMaps(data);
     List<OrderJaroScoresV2> expected = new ArrayList<>();
     resolvedMap.forEach(e -> {
@@ -329,6 +329,34 @@ public class DbCoreSteps extends CoreStandardSteps {
           .isNotEmpty();
       actual
           .forEach(o -> DataEntity.assertListContains(expected, o, "ojs list"));
+    }, "verify order_jaro_scores_v2 records", 10_000, 3);
+  }
+
+  @When("DB Core - verify number of records in order_jaro_scores_v2:")
+  public void verifyOjsNumberOfRecords(Map<String, String> data) {
+    Map<String, String> resolvedData = resolveKeyValues(data);
+    final long waypointId = Long.parseLong(resolvedData.get("waypointId"));
+    final long numberOfRecords = Integer.parseInt(resolvedData.get("number"));
+    retryIfAssertionErrorOccurred(() -> {
+      List<OrderJaroScoresV2> actual = orderJaroScoresV2Dao
+          .getMultipleOjs(waypointId);
+      Assertions.assertThat(actual.size())
+          .as(f("Expected %s records in order_jaro_scores_v2 table", numberOfRecords))
+          .isEqualTo(numberOfRecords);
+    }, "verify records in order_jaro_scores_v2", 10_000, 3);
+  }
+
+  @When("DB Core - verify order_jaro_scores_v2 record:")
+  public void dbOperatorVerifySingleJaroScores(Map<String, String> data) {
+    final Map<String, String> resolvedData = resolveKeyValues(data);
+    final long waypointId = Long.parseLong(resolvedData.get("waypointId"));
+    OrderJaroScoresV2 expected = new OrderJaroScoresV2(resolvedData);
+    retryIfAssertionErrorOccurred(() -> {
+      OrderJaroScoresV2 actual = orderJaroScoresV2Dao.getSingleOjs(waypointId);
+      Assertions.assertThat(actual)
+          .withFailMessage("order_jaro_scores_v2 record was not found: " + resolvedData)
+          .isNotNull();
+      expected.compareWithActual(actual, resolvedData);
     }, "verify order_jaro_scores_v2 records", 10_000, 3);
   }
 
