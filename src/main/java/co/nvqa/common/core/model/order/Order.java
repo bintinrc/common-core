@@ -4,6 +4,7 @@ import co.nvqa.common.model.DataEntity;
 import co.nvqa.common.utils.JsonUtils;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
@@ -504,12 +505,18 @@ public class Order extends DataEntity<Order> implements Serializable {
     //to be used in orders.data
     private Double originalWeight;
     private Dimension originalDimensions;
+    @JsonProperty("manual_dimensions")
+    private Dimension manualDimensions;
 
     public Dimension() {
     }
 
     public Dimension(String rawJson) {
       fromJson(rawJson);
+    }
+
+    public Dimension(Map<String, ?> data) {
+      super(data);
     }
   }
 

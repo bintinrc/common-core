@@ -3,6 +3,7 @@ package co.nvqa.common.core.cucumber.glue;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.hibernate.OrderDao;
 import co.nvqa.common.core.model.order.Order.Data;
+import co.nvqa.common.core.model.order.Order.Dimension;
 import co.nvqa.common.core.model.order.Order.PreviousAddressDetails;
 import co.nvqa.common.core.model.persisted_class.core.Orders;
 import io.cucumber.java.en.Given;
@@ -101,7 +102,8 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
     final Double width = Double.parseDouble(resolvedMap.get("width"));
     final Double height = Double.parseDouble(resolvedMap.get("height"));
     final Double measuredWeight = Double.parseDouble(resolvedMap.get("weight"));
-    final Double shipperSubmittedWeight = Double.parseDouble(resolvedMap.get("shipperSubmittedWeight"));
+    final Double shipperSubmittedWeight = Double
+        .parseDouble(resolvedMap.get("shipperSubmittedWeight"));
     retryIfAssertionErrorOccurred(() -> {
       Double actualWeight = orderDao.getOrderWeight(orderId);
       Assertions.assertThat(actualWeight).as("order weight is not null").isNotNull();
@@ -115,6 +117,34 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
       Assertions.assertThat(actualWeight).as("orders.weight equal highest weight")
           .isEqualTo(expectedWeight);
     }, f("Get orders.weight of id %s ", orderId), 10_000, 3);
+  }
+
+  @When("DB Core - verify order id {string} orders.dimensions record:")
+  public void verifyOrderDimensionsRecords(String id, Map<String, String> data) {
+    final Map<String, String> resolvedData = resolveKeyValues(data);
+    final long orderId = Long.parseLong(resolveValue(id));
+    Dimension expected = new Dimension(resolvedData);
+    retryIfAssertionErrorOccurred(() -> {
+      Dimension actual = orderDao.getOrderDimensions(orderId);
+      Assertions.assertThat(actual)
+          .withFailMessage("orders record was not found: " + resolvedData)
+          .isNotNull();
+      expected.compareWithActual(actual, resolvedData);
+    }, "verify orders.dimensions records", 10_000, 3);
+  }
+
+  @When("DB Core - verify order id {string} orders.data.manual_dimensions record:")
+  public void verifyOrderDataManualDimensionsRecords(String id, Map<String, String> data) {
+    final Map<String, String> resolvedData = resolveKeyValues(data);
+    final long orderId = Long.parseLong(resolveValue(id));
+    Dimension expected = new Dimension(resolvedData);
+    retryIfAssertionErrorOccurred(() -> {
+      Dimension actual = orderDao.getOrderManualDimensions(orderId);
+      Assertions.assertThat(actual)
+          .withFailMessage("orders record was not found: " + resolvedData)
+          .isNotNull();
+      expected.compareWithActual(actual, resolvedData);
+    }, "verify orders.data.manual_dimensions records", 10_000, 3);
   }
 
   @When("DB Core - operator verify orders.data.previousDeliveryDetails is updated correctly:")
