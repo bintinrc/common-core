@@ -73,7 +73,7 @@ public class ApiOrderSteps extends CoreStandardSteps {
     final Order order = retryIfAssertionErrorOrRuntimeExceptionOccurred(
         () -> getOrderClient().searchOrderByTrackingId(trackingId),
         "Order client search order by tracking id");
-    
+
     putInList(KEY_LIST_OF_CREATED_ORDERS, order);
   }
 
@@ -190,10 +190,13 @@ public class ApiOrderSteps extends CoreStandardSteps {
         () -> getOrderClient().setReturnedToSender(orderId, rtsRequest), "set RTS order");
   }
 
-  @Then("API Operator update order pricing_weight to {double} using order-weight-update")
-  public void apiOperatorUpdateOrderPricing_weightToUsingOrderWeightUpdate(double weight) {
-    final long orderId = Long.valueOf()
-    put(KEY_EXPECTED_NEW_WEIGHT, weight);
+  @Then("API Core - Operator update order pricing_weight using order-weight-update with data below:")
+  public void apiOperatorUpdateOrderPricing_weightToUsingOrderWeightUpdate(
+      Map<String, String> data) {
+    Map<String, String> resolvedMap = resolveKeyValues(data);
+    final long orderId = Long.parseLong(resolvedMap.get("orderId"));
+    final double weight = Double.parseDouble(resolvedMap.get("weight"));
+    put(KEY_SAVED_ORDER_WEIGHT, weight);
     retryIfAssertionErrorOrRuntimeExceptionOccurred(
         () -> getOrderClient().updateOrderPricingWeight(orderId, weight),
         "update order pricing weight using Order Weight Update ");
