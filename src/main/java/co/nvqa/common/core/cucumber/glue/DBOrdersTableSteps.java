@@ -5,8 +5,12 @@ import co.nvqa.common.core.hibernate.OrderDao;
 import co.nvqa.common.core.model.order.Order.Data;
 import co.nvqa.common.core.model.order.Order.PreviousAddressDetails;
 import co.nvqa.common.core.model.persisted_class.core.Orders;
+import co.nvqa.common.utils.NvTestRuntimeException;
+import co.nvqa.common.utils.StandardTestUtils;
 import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import javax.inject.Inject;
@@ -56,6 +60,24 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
           .as("Order weight should be lover than " + expectedWeight + " - 0").isTrue();
       put(KEY_SAVED_ORDER_WEIGHT, actualWeight);
     }, f("get orders weight of order id %s", orderId), 10_000, 3);
+  }
+
+  @Then("DB Core - Operator generate stamp id for {string} orders")
+  public void generateStampId(String totalOrder) {
+    long totalOrderRequest = Long.parseLong(totalOrder);
+    for (int i = 0; i < totalOrderRequest; i++) {
+      retryIfNvTestRuntimeExceptionOccurred(() -> {
+        try {
+          String stampId = StandardTestUtils.generateStampId();
+          if (orderDao.getSingleOrderDetailsByStampId(stampId) != null) {
+            throw new AssertionError();
+          }
+          putInList(KEY_LIST_OF_CREATED_STAMP_ID, stampId);
+        } catch (AssertionError ae) {
+          throw new NvTestRuntimeException(ae);
+        }
+      }, "Generate Stamp ID");
+    }
   }
 
   @When("DB Core - operator verify orders.data.previousDeliveryDetails is updated correctly:")
