@@ -26,7 +26,7 @@ public class DbOrderPickupsSteps extends CoreStandardSteps {
   @When("DB Core - get reservation id from order id {string}")
   public void getReservationIdFromOrderId(String orderIdString) {
     final long orderId = Long.parseLong(resolveValue(orderIdString));
-    final List<OrderPickup> orderPickups = retryIfAssertionErrorOrRuntimeExceptionOccurred(() -> {
+    final List<OrderPickup> orderPickups = doWithRetry(() -> {
       final List<OrderPickup> result = orderPickupsDao.getOrderPickupByOrderId(orderId);
       if (result.isEmpty()) {
         throw new NvTestRuntimeException("pickup is not found for order " + orderId);

@@ -15,7 +15,6 @@ import lombok.Getter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
-import org.hamcrest.Matchers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,7 +84,7 @@ public class OrderVerificationSteps extends CoreStandardSteps {
 
   private Order apiOperatorGetOrderDetails(Long orderId) {
     String methodInfo = f("%s - [Order ID = %d]", getCurrentMethodName(), orderId);
-    return retryIfAssertionErrorOrRuntimeExceptionOccurred(() -> getOrderClient().getOrder(orderId),
+    return doWithRetry(() -> getOrderClient().getOrder(orderId),
         methodInfo);
   }
 

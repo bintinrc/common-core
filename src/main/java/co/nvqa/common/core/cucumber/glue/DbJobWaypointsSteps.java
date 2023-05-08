@@ -5,7 +5,6 @@ import co.nvqa.common.core.hibernate.JobWaypointDao;
 import co.nvqa.common.core.model.persisted_class.core.JobWaypoint;
 import co.nvqa.common.utils.NvTestRuntimeException;
 import io.cucumber.java.en.When;
-
 import javax.inject.Inject;
 
 public class DbJobWaypointsSteps extends CoreStandardSteps {
@@ -25,7 +24,7 @@ public class DbJobWaypointsSteps extends CoreStandardSteps {
   @When("DB Core - get waypoint id for job id {string}")
   public void getWaypointIdByJobId(String StringJobId) {
     final long jobId = Long.parseLong(resolveValue(StringJobId));
-    final JobWaypoint jobWaypoint = retryIfAssertionErrorOrRuntimeExceptionOccurred(() -> {
+    final JobWaypoint jobWaypoint = doWithRetry(() -> {
       final JobWaypoint result = jobWaypointDao.getWaypointIdByJobId(jobId);
       if (result == null) {
         throw new NvTestRuntimeException("waypoint is not found for job id " + jobId);
