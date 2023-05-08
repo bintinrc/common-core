@@ -1,4 +1,4 @@
-package co.nvqa.common.core.model.persisted_class.core;
+package co.nvqa.common.core.model.persisted_class.route;
 
 import co.nvqa.common.model.DataEntity;
 import java.util.Map;
@@ -11,13 +11,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * @author Sergey Mishanin
- */
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Setter
-@Getter
 @Entity
 @Table(name = "route_logs")
 public class RouteLogs extends DataEntity<RouteLogs> {
@@ -36,8 +33,12 @@ public class RouteLogs extends DataEntity<RouteLogs> {
   private Long hubId;
   @Column(name = "zone_id")
   private Long zoneId;
-  @Column(name = "driverId")
+  @Column(name = "driver_id")
   private Long driverId;
+  @Column(name = "legacy_id")
+  private Long legacyId;
+  @Column(name = "system_id")
+  private String systemId;
 
   public RouteLogs(Map<String, ?> data) {
     super(data);

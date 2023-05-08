@@ -16,7 +16,7 @@ import co.nvqa.common.core.model.persisted_class.core.OrderDetails;
 import co.nvqa.common.core.model.persisted_class.core.OrderJaroScoresV2;
 import co.nvqa.common.core.model.persisted_class.core.OutboundScans;
 import co.nvqa.common.core.model.persisted_class.core.Reservations;
-import co.nvqa.common.core.model.persisted_class.core.RouteLogs;
+import co.nvqa.common.core.model.persisted_class.core.CoreRouteLogs;
 import co.nvqa.common.core.model.persisted_class.core.RouteMonitoringData;
 import co.nvqa.common.core.model.persisted_class.core.ShipperPickupSearch;
 import co.nvqa.common.core.model.persisted_class.core.Transactions;
@@ -110,10 +110,10 @@ public class DbCoreSteps extends CoreStandardSteps {
   @When("DB Core - verify route_logs record:")
   public void verifyRouteLogs(Map<String, String> data) {
     Map<String, String> resolvedData = resolveKeyValues(data);
-    RouteLogs expected = new RouteLogs(resolvedData);
+    CoreRouteLogs expected = new CoreRouteLogs(resolvedData);
 
     retryIfAssertionErrorOccurred(() -> {
-      RouteLogs actual = routeLogsDao.getRouteLogs(expected.getId());
+      CoreRouteLogs actual = routeLogsDao.getRouteLogs(expected.getId());
       Assertions.assertThat(actual)
           .withFailMessage("Roure logs was not found: " + resolvedData)
           .isNotNull();
