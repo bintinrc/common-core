@@ -1,6 +1,7 @@
 package co.nvqa.common.core.model.persisted_class.core;
 
 import co.nvqa.common.model.DataEntity;
+import java.util.Map;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -30,4 +31,7 @@ public class CodInbounds extends DataEntity<CodInbounds> {
   @Column(name = "deleted_at")
   private String deletedAt;
 
+  public CodInbounds(Map<String, ?> data) {
+    fromMap(data);
+  }
 }
