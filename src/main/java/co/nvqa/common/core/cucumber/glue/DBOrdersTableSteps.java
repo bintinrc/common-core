@@ -13,6 +13,7 @@ import io.cucumber.java.en.When;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import javax.inject.Inject;
 import org.assertj.core.api.Assertions;
 
@@ -78,6 +79,15 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
         }
       }, "Generate Stamp ID");
     }
+  }
+
+  @Then("DB Core - Operator get order by stamp id {string}")
+  public void getOrderByStampId(String stampId) {
+    String stampIdCheck = resolveValue(stampId);
+    doWithRetry(() -> {
+      Orders order = orderDao.getSingleOrderDetailsByStampId(stampIdCheck);
+      putInList(KEY_LIST_OF_CREATED_ORDERS_CORE_DB,order,(o1, o2) -> Objects.equals(o1.getId(),o2.getId()));
+    }, "fetch order detail by Stamp Id", 10_000, 3);
   }
 
   @When("DB Core - operator verify orders.data.previousDeliveryDetails is updated correctly:")
