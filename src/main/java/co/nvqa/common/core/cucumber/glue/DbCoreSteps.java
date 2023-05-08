@@ -116,7 +116,7 @@ public class DbCoreSteps extends CoreStandardSteps {
     Map<String, String> resolvedData = resolveKeyValues(data);
     RouteLogs expected = new RouteLogs(resolvedData);
 
-    retryIfAssertionErrorOccurred(() -> {
+    doWithRetry(() -> {
       RouteLogs actual = routeLogsDao.getRouteLogs(expected.getId());
       Assertions.assertThat(actual).withFailMessage("Roure logs was not found: " + resolvedData)
           .isNotNull();
@@ -129,7 +129,7 @@ public class DbCoreSteps extends CoreStandardSteps {
     Map<String, String> resolvedData = resolveKeyValues(data);
     Waypoints expected = new Waypoints(resolvedData);
 
-    retryIfAssertionErrorOccurred(() -> {
+    doWithRetry(() -> {
       Waypoints actual = waypointsDao.getWaypointsDetails(expected.getId());
       Assertions.assertThat(actual)
           .withFailMessage("waypoints record was not found: " + resolvedData).isNotNull();
@@ -149,7 +149,7 @@ public class DbCoreSteps extends CoreStandardSteps {
     Map<String, String> resolvedData = resolveKeyValues(data);
     ShipperPickupSearch expected = new ShipperPickupSearch(resolvedData);
 
-    retryIfAssertionErrorOccurred(() -> {
+    doWithRetry(() -> {
       ShipperPickupSearch actual = null;
       if (expected.getReservationId() != null) {
         actual = shipperPickupSearchDao.getShipperPickupSearchByReservationId(
@@ -166,7 +166,7 @@ public class DbCoreSteps extends CoreStandardSteps {
     Map<String, String> resolvedData = resolveKeyValues(data);
     RouteMonitoringData expected = new RouteMonitoringData(resolvedData);
 
-    retryIfAssertionErrorOccurred(() -> {
+    doWithRetry(() -> {
       RouteMonitoringData actual = null;
       if (expected.getWaypointId() != null) {
         actual = routeMonitoringDataDao.getRouteMonitoringDataByWaypointId(
@@ -181,7 +181,7 @@ public class DbCoreSteps extends CoreStandardSteps {
   @When("DB Core - verify route_monitoring_data is hard-deleted:")
   public void verifyRouteMonitoringData(List<String> data) {
     List<String> resolvedData = resolveValues(data);
-    retryIfAssertionErrorOccurred(() -> {
+    doWithRetry(() -> {
       resolvedData.forEach(e -> {
         RouteMonitoringData actual = routeMonitoringDataDao.getRouteMonitoringDataByWaypointId(
             Long.parseLong(e));
@@ -202,7 +202,7 @@ public class DbCoreSteps extends CoreStandardSteps {
   public void verifyTransaction(Map<String, String> data) {
     Map<String, String> resolvedData = resolveKeyValues(data);
     Transactions expected = new Transactions(resolvedData);
-    retryIfAssertionErrorOccurred(() -> {
+    doWithRetry(() -> {
       Transactions actual = transactionsDao.getSingleTransaction(expected.getId());
       Assertions.assertThat(actual)
           .withFailMessage("transactions record was not found: " + resolvedData).isNotNull();
@@ -223,7 +223,7 @@ public class DbCoreSteps extends CoreStandardSteps {
     Map<String, String> resolvedData = resolveKeyValues(data);
     final Long orderId = Long.parseLong(resolvedData.get("orderId"));
     final Long routeId = Long.parseLong(resolvedData.get("routeId"));
-    retryIfAssertionErrorOccurred(() -> {
+    doWithRetry(() -> {
       List<Transactions> result = transactionsDao.getMultipleTransactionsByOrderId(orderId);
       Assertions.assertThat(result.size()).as("number of transactions")
           .isEqualTo(Integer.parseInt(data.get("number_of_txn")));
@@ -255,7 +255,7 @@ public class DbCoreSteps extends CoreStandardSteps {
   @Given("DB Core - verify number of transactions is correct after new transactions created")
   public void dbOperatorVerifiesCreatedTransactions(Map<String, String> mapOfData) {
 
-    retryIfAssertionErrorOccurred(() -> {
+    doWithRetry(() -> {
       Map<String, String> expectedData = resolveKeyValues(mapOfData);
       List<Transactions> result = transactionsDao.getMultipleTransactionsByOrderId(
           Long.parseLong((expectedData.get("order_id"))));
@@ -307,7 +307,7 @@ public class DbCoreSteps extends CoreStandardSteps {
       OrderJaroScoresV2 jaroScore = new OrderJaroScoresV2(e);
       expected.add(jaroScore);
     });
-    retryIfAssertionErrorOccurred(() -> {
+    doWithRetry(() -> {
       OrderJaroScoresV2 actualJaroScores = expected.get(0);
       List<OrderJaroScoresV2> actual = orderJaroScoresV2Dao.getMultipleOjs(
           actualJaroScores.getWaypointId());
