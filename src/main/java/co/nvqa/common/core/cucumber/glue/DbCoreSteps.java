@@ -411,7 +411,7 @@ public class DbCoreSteps extends CoreStandardSteps {
     doWithRetry(() -> {
       CodInbounds actual = null;
       if (expected.getRouteId() != null) {
-        actual = codInboundsDao.getCodInboundsByRouteId(expected.getRouteId());
+        actual = codInboundsDao.getDeletedCodInboundsByRouteId(expected.getRouteId());
       }
       Assertions.assertThat(actual.getDeletedAt())
           .withFailMessage("cod_inbounds record was not deleted: " + dataTableRaw)

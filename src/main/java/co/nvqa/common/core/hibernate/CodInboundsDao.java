@@ -24,4 +24,12 @@ public class CodInboundsDao extends DbBase {
     return CollectionUtils.isEmpty(result) ? null : result.get(0);
   }
 
+  public CodInbounds getDeletedCodInboundsByRouteId(Long routeId) {
+    String query = "FROM CodInbounds WHERE routeId =:routeId";
+    var result = findAll(session ->
+        session.createQuery(query, CodInbounds.class)
+            .setParameter("routeId", routeId));
+    return CollectionUtils.isEmpty(result) ? null : result.get(0);
+  }
+
 }
