@@ -23,7 +23,7 @@ public class CodInbounds extends DataEntity<CodInbounds> {
   private Long id;
   @Column(name = "route_id")
   private Long routeId;
-  @Column(name = "amount_collected")
+  @Column(name = "amt_collected")
   private Double amountCollected;
   @Column(name = "receipt_no")
   private String receiptNo;
