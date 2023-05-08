@@ -25,7 +25,7 @@ public class CodInboundsDao extends DbBase {
   }
 
   public CodInbounds getDeletedCodInboundsByRouteId(Long routeId) {
-    String query = "FROM CodInbounds WHERE routeId =:routeId";
+    String query = "FROM CodInbounds WHERE routeId =:routeId AND deletedAt is NOT NULL";
     var result = findAll(session ->
         session.createQuery(query, CodInbounds.class)
             .setParameter("routeId", routeId));
