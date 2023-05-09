@@ -6,11 +6,15 @@ import co.nvqa.common.core.model.order.Order.Data;
 import co.nvqa.common.core.model.order.Order.Dimension;
 import co.nvqa.common.core.model.order.Order.PreviousAddressDetails;
 import co.nvqa.common.core.model.persisted_class.core.Orders;
+import co.nvqa.common.utils.NvTestRuntimeException;
+import co.nvqa.common.utils.StandardTestUtils;
 import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.DoubleStream;
+import java.util.Objects;
 import javax.inject.Inject;
 import org.assertj.core.api.Assertions;
 
@@ -32,7 +36,7 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
     if (Boolean.parseBoolean(expectedData.get("use_weight_range"))) {
       dbOperatorVerifiesOrderWeightRangeUpdated(expectedData);
     } else {
-      retryIfAssertionErrorOccurred(() -> {
+      doWithRetry(() -> {
         double actualWeight = orderDao.getOrderWeight(orderId);
         Assertions.assertThat(actualWeight).as("orders.weight equals highest weight")
             .isEqualTo(expectedWeight);
@@ -50,7 +54,7 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
     final Double higherBound = expectedWeight;
     final Double lowerBound = expectedWeight - 0.5;
 
-    retryIfAssertionErrorOccurred(() -> {
+    doWithRetry(() -> {
       double actualWeight = orderDao.getOrderWeight(orderId);
       Assertions.assertThat(actualWeight >= lowerBound)
           .as("Order weight should be greater than " + expectedWeight + " - 0.5").isTrue();
@@ -63,7 +67,7 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
   @Given("DB Core - verify orders.weight and dimensions updated correctly for order id {string}")
   public void dbOperatorVerifiesOrdersWeightDims(String id, Map<String, String> source) {
     Long orderId = Long.parseLong(resolveValue(id));
-    retryIfAssertionErrorOccurred(() -> {
+    doWithRetry(() -> {
       if (source.containsKey("orders.weight")) {
         final Double actualOrdersWeight = orderDao.getOrderWeight(orderId);
         Assertions.assertThat(actualOrdersWeight).as("orders.weight equal")
@@ -104,7 +108,7 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
     final Double measuredWeight = Double.parseDouble(resolvedMap.get("weight"));
     final Double shipperSubmittedWeight = Double
         .parseDouble(resolvedMap.get("shipperSubmittedWeight"));
-    retryIfAssertionErrorOccurred(() -> {
+    doWithRetry(() -> {
       Double actualWeight = orderDao.getOrderWeight(orderId);
       Assertions.assertThat(actualWeight).as("order weight is not null").isNotNull();
       double volumetricWeight =
@@ -119,12 +123,39 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
     }, f("Get orders.weight of id %s ", orderId), 10_000, 3);
   }
 
+  @Then("DB Core - Operator generate stamp id for {string} orders")
+  public void generateStampId(String totalOrder) {
+    long totalOrderRequest = Long.parseLong(totalOrder);
+    for (int i = 0; i < totalOrderRequest; i++) {
+      doWithRetry(() -> {
+        try {
+          String stampId = StandardTestUtils.generateStampId();
+          if (orderDao.getSingleOrderDetailsByStampId(stampId) != null) {
+            throw new AssertionError();
+          }
+          putInList(KEY_CORE_LIST_OF_CREATED_STAMP_ID, stampId);
+        } catch (AssertionError ae) {
+          throw new NvTestRuntimeException(ae);
+        }
+      }, "Generate Stamp ID");
+    }
+  }
+
+  @Then("DB Core - Operator get order by stamp id {string}")
+  public void getOrderByStampId(String stampId) {
+    String stampIdCheck = resolveValue(stampId);
+    doWithRetry(() -> {
+      Orders order = orderDao.getSingleOrderDetailsByStampId(stampIdCheck);
+      putInList(KEY_CORE_LIST_OF_CREATED_ORDERS_CORE_DB,order,(o1, o2) -> Objects.equals(o1.getId(),o2.getId()));
+    }, "fetch order detail by Stamp Id", 10_000, 3);
+  }
+
   @When("DB Core - verify order id {string} orders.dimensions record:")
   public void verifyOrderDimensionsRecords(String id, Map<String, String> data) {
     final Map<String, String> resolvedData = resolveKeyValues(data);
     final long orderId = Long.parseLong(resolveValue(id));
     Dimension expected = new Dimension(resolvedData);
-    retryIfAssertionErrorOccurred(() -> {
+    doWithRetry(() -> {
       Dimension actual = orderDao.getOrderDimensions(orderId);
       Assertions.assertThat(actual)
           .withFailMessage("orders record was not found: " + resolvedData)
@@ -138,7 +169,7 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
     final Map<String, String> resolvedData = resolveKeyValues(data);
     final long orderId = Long.parseLong(resolveValue(id));
     Dimension expected = new Dimension(resolvedData);
-    retryIfAssertionErrorOccurred(() -> {
+    doWithRetry(() -> {
       Dimension actual = orderDao.getOrderManualDimensions(orderId);
       Assertions.assertThat(actual)
           .withFailMessage("orders record was not found: " + resolvedData)
@@ -151,7 +182,7 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
   public void verifyOrdersDataPreviousDelivery(Map<String, String> source) {
     Long resolvedOrderId = Long.parseLong(resolveValue(source.get("orderId")));
     Map<String, String> resolvedMap = resolveKeyValues(source);
-    retryIfAssertionErrorOccurred(() -> {
+    doWithRetry(() -> {
       String orderData = orderDao.getSingleOrderDetailsById(resolvedOrderId).getData();
       List<PreviousAddressDetails> previousAddressDetails = fromJsonCamelCase(orderData, Data.class)
           .getPreviousDeliveryDetails();
@@ -168,7 +199,7 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
   public void verifyOrdersDataPreviousPickup(Map<String, String> source) {
     Long resolvedOrderId = Long.parseLong(resolveValue(source.get("orderId")));
     Map<String, String> resolvedMap = resolveKeyValues(source);
-    retryIfAssertionErrorOccurred(() -> {
+    doWithRetry(() -> {
       String orderData = orderDao.getSingleOrderDetailsById(resolvedOrderId).getData();
       List<PreviousAddressDetails> previousAddressDetails = fromJsonCamelCase(orderData, Data.class)
           .getPreviousPickupDetails();
@@ -185,7 +216,7 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
   public void verifyOrderRecords(Map<String, String> data) {
     Map<String, String> resolvedData = resolveKeyValues(data);
     Orders expected = new Orders(resolvedData);
-    retryIfAssertionErrorOccurred(() -> {
+    doWithRetry(() -> {
       Orders actual = orderDao.getSingleOrderDetailsById(expected.getId());
       Assertions.assertThat(actual)
           .withFailMessage("orders record was not found: " + resolvedData)

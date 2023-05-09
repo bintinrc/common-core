@@ -40,14 +40,15 @@ public class ApiOrderSteps extends CoreStandardSteps {
    * order with the same tracking id. <br/><br/><b>Note</b>: becareful that you may face unintended
    * order status due to event propagation delay to Core service
    *
-   * @param tracking key that contains order's tracking id, example: KEY_LIST_OF_CREATED_TRACKING_IDS
+   * @param tracking key that contains order's tracking id, example:
+   *                 KEY_LIST_OF_CREATED_TRACKING_IDS
    */
   @When("API Core - Operator get order details for tracking order {string}")
   public void apiOperatorGetOrderDetailsForTrackingOrder(String tracking) {
     final String trackingId = resolveValue(tracking);
-    final Order order = retryIfAssertionErrorOrRuntimeExceptionOccurred(
+    final Order order = doWithRetry(
         () -> getOrderClient().searchOrderByTrackingId(trackingId),
-        "Order client search order by tracking id");
+        "Order client search order by tracking id", 20_000, 3);
 
     putInList(KEY_LIST_OF_CREATED_ORDERS, order,
         (o1, o2) -> StringUtils.equalsAnyIgnoreCase(o1.getTrackingId(), o2.getTrackingId()));
@@ -65,14 +66,14 @@ public class ApiOrderSteps extends CoreStandardSteps {
    * previous order with the same tracking id. this is intended to check if you have done certain
    * action to same order and you need previous data prior to the action being done
    *
-   * @param tracking key that contains order's tracking id, example: KEY_LIST_OF_CREATED_TRACKING_IDS
+   * @param tracking key that contains order's tracking id, example:
+   *                 KEY_LIST_OF_CREATED_TRACKING_IDS
    */
   @When("API Core - Operator get order details for previous order {string}")
   public void apiOperatorGetOrderDetailsForPreviousOrder(String tracking) {
     final String trackingId = resolveValue(tracking);
-    final Order order = retryIfAssertionErrorOrRuntimeExceptionOccurred(
-        () -> getOrderClient().searchOrderByTrackingId(trackingId),
-        "Order client search order by tracking id");
+    final Order order = doWithRetry(() -> getOrderClient().searchOrderByTrackingId(trackingId),
+        "Order client search order by tracking id", 20_000, 3);
 
     putInList(KEY_LIST_OF_CREATED_ORDERS, order);
   }
@@ -96,19 +97,17 @@ public class ApiOrderSteps extends CoreStandardSteps {
     final String trackingId = resolveValue(tracking);
 
     try {
-      final Order order = retryIfAssertionErrorOrRuntimeExceptionOccurred(
-          () -> {
-            final Order tempOrder = getOrderClient().searchOrderByTrackingId(trackingId);
-            final String actualGranularStatus = tempOrder.getGranularStatus();
-            if (!StringUtils.equalsIgnoreCase(actualGranularStatus, expectedGranularStatus)) {
-              final String message = f("Order actual status is not match, expected: %s but was: %s",
-                  expectedGranularStatus, actualGranularStatus);
-              LOGGER.debug(message);
-              throw new NvTestRuntimeException(message);
-            }
-            return tempOrder;
-          },
-          "Order client search order by tracking id");
+      final Order order = doWithRetry(() -> {
+        final Order tempOrder = getOrderClient().searchOrderByTrackingId(trackingId);
+        final String actualGranularStatus = tempOrder.getGranularStatus();
+        if (!StringUtils.equalsIgnoreCase(actualGranularStatus, expectedGranularStatus)) {
+          final String message = f("Order actual status is not match, expected: %s but was: %s",
+              expectedGranularStatus, actualGranularStatus);
+          LOGGER.debug(message);
+          throw new NvTestRuntimeException(message);
+        }
+        return tempOrder;
+      }, "Order client search order by tracking id", 20_000, 3);
 
       putInList(KEY_LIST_OF_CREATED_ORDERS, order,
           (o1, o2) -> StringUtils.equalsAnyIgnoreCase(o1.getTrackingId(), o2.getTrackingId()));
@@ -139,7 +138,7 @@ public class ApiOrderSteps extends CoreStandardSteps {
   public void apiOperatorForceSuccessOrder(String orderIdString, String codCollectedString) {
     final long orderId = Long.parseLong(resolveValue(orderIdString));
     final boolean codCollected = Boolean.parseBoolean(codCollectedString);
-    retryIfAssertionErrorOrRuntimeExceptionOccurred(
+    doWithRetry(
         () -> getOrderClient().forceSuccess(orderId, codCollected), "Force success", 3000, 10);
   }
 
@@ -162,14 +161,13 @@ public class ApiOrderSteps extends CoreStandardSteps {
     final RescheduleOrderRequest request = JsonUtils.fromJsonSnakeCase(rescheduleRequest,
         RescheduleOrderRequest.class);
 
-    retryIfAssertionErrorOrRuntimeExceptionOccurred(
-        () -> {
-          final RescheduleOrderResponse response = getOrderClient().rescheduleOrder(orderId,
-              request);
-          if (reattempt && !response.getStatus().equalsIgnoreCase("Success")) {
-            throw new NvTestRuntimeException("reschedule fail: " + response.getMessage());
-          }
-        }, "Reschedule order", 3000, 10);
+    doWithRetry(() -> {
+      final RescheduleOrderResponse response = getOrderClient().rescheduleOrder(orderId,
+          request);
+      if (reattempt && !response.getStatus().equalsIgnoreCase("Success")) {
+        throw new NvTestRuntimeException("reschedule fail: " + response.getMessage());
+      }
+    }, "Reschedule order", 3000, 10);
 
   }
 
@@ -186,7 +184,7 @@ public class ApiOrderSteps extends CoreStandardSteps {
     final String rtsRequestString = dataTable.get("rtsRequest");
     final RtsOrderRequest rtsRequest = fromJsonSnakeCase(rtsRequestString, RtsOrderRequest.class);
 
-    retryIfAssertionErrorOrRuntimeExceptionOccurred(
+    doWithRetry(
         () -> getOrderClient().setReturnedToSender(orderId, rtsRequest), "set RTS order");
   }
 
@@ -197,8 +195,7 @@ public class ApiOrderSteps extends CoreStandardSteps {
     final long orderId = Long.parseLong(resolvedMap.get("orderId"));
     final double weight = Double.parseDouble(resolvedMap.get("weight"));
     put(KEY_SAVED_ORDER_WEIGHT, weight);
-    retryIfAssertionErrorOrRuntimeExceptionOccurred(
-        () -> getOrderClient().updateOrderPricingWeight(orderId, weight),
+    doWithRetry(() -> getOrderClient().updateOrderPricingWeight(orderId, weight),
         "update order pricing weight using Order Weight Update ");
   }
 }

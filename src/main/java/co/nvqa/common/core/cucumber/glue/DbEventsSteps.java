@@ -22,15 +22,18 @@ public class DbEventsSteps extends CoreStandardSteps {
   @When("DB Events - verify order_events record:")
   public void verifyOrderEvent(Map<String, String> data) {
     OrderEvents expected = new OrderEvents(resolveKeyValues(data));
-    List<OrderEvents> actual = eventsDao.getOrderEvents(expected.getOrderId());
-    DataEntity.assertListContains(actual, expected, "order_events record");
+    doWithRetry(() -> {
+      List<OrderEvents> actual = eventsDao.getOrderEvents(expected.getOrderId());
+      DataEntity.assertListContains(actual, expected, "order_events record");
+    }, "Get record from order_events table", 10_000, 5);
   }
 
   @When("DB Events - verify pickup_events record:")
   public void verifyPickupEvent(Map<String, String> data) {
     PickupEvents expected = new PickupEvents(resolveKeyValues(data));
-    List<PickupEvents> actual = eventsDao.getPickupEvents(expected.getPickupId());
-    DataEntity.assertListContains(actual, expected, "pickup_events record");
+    doWithRetry(() -> {
+      List<PickupEvents> actual = eventsDao.getPickupEvents(expected.getPickupId());
+      DataEntity.assertListContains(actual, expected, "pickup_events record");
+    }, "Get record from pickup_events table", 10_000, 5);
   }
-
 }

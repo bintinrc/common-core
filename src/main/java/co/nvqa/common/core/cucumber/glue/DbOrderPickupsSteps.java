@@ -26,7 +26,7 @@ public class DbOrderPickupsSteps extends CoreStandardSteps {
   @When("DB Core - get reservation id from order id {string}")
   public void getReservationIdFromOrderId(String orderIdString) {
     final long orderId = Long.parseLong(resolveValue(orderIdString));
-    final List<OrderPickup> orderPickups = retryIfAssertionErrorOrRuntimeExceptionOccurred(() -> {
+    final List<OrderPickup> orderPickups = doWithRetry(() -> {
       final List<OrderPickup> result = orderPickupsDao.getOrderPickupByOrderId(orderId);
       if (result.isEmpty()) {
         throw new NvTestRuntimeException("pickup is not found for order " + orderId);
@@ -38,5 +38,18 @@ public class DbOrderPickupsSteps extends CoreStandardSteps {
         orderPickups.stream()
             .map(OrderPickup::getReservationId)
             .collect(Collectors.toList()));
+  }
+
+  @When("DB Core - get Order Pickup Data from order id {string}")
+  public void getOrderPickupDataFromOrderId(String orderIdString) {
+    final long orderId = Long.parseLong(resolveValue(orderIdString));
+    final List<OrderPickup> orderPickups = retryIfAssertionErrorOrRuntimeExceptionOccurred(() -> {
+      final List<OrderPickup> result = orderPickupsDao.getOrderPickupByOrderId(orderId);
+      if (result.isEmpty()) {
+        throw new NvTestRuntimeException("pickup is not found for order " + orderId);
+      }
+      return result;
+    }, "reading pickup from order id: " + orderId, 3000, 30);
+    putAllInList(KEY_CORE_LIST_OF_ORDER_PICKUPS, orderPickups);
   }
 }

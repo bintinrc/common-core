@@ -1,6 +1,8 @@
 package co.nvqa.common.core.cucumber.glue;
 
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
+import co.nvqa.common.core.hibernate.CodInboundsDao;
+import co.nvqa.common.core.hibernate.OrderDao;
 import co.nvqa.common.core.hibernate.OrderDetailsDao;
 import co.nvqa.common.core.hibernate.OrderJaroScoresV2Dao;
 import co.nvqa.common.core.hibernate.OutboundScansDao;
@@ -11,6 +13,7 @@ import co.nvqa.common.core.hibernate.ShipperPickupSearchDao;
 import co.nvqa.common.core.hibernate.TransactionsDao;
 import co.nvqa.common.core.hibernate.WarehouseSweepsDao;
 import co.nvqa.common.core.hibernate.WaypointsDao;
+import co.nvqa.common.core.model.persisted_class.core.CodInbounds;
 import co.nvqa.common.core.model.persisted_class.core.OrderDetails;
 import co.nvqa.common.core.model.persisted_class.core.OrderJaroScoresV2;
 import co.nvqa.common.core.model.persisted_class.core.OutboundScans;
@@ -56,9 +59,21 @@ public class DbCoreSteps extends CoreStandardSteps {
   private WarehouseSweepsDao warehouseSweepsDao;
   @Inject
   private OutboundScansDao outboundScansDao;
+  @Inject
+  private CodInboundsDao codInboundsDao;
 
   @Override
   public void init() {
+  }
+
+  @And("DB Core - get Reservation data from reservation id {string}")
+  public void coreGetReservationDataFromReservationId(String reservationId) {
+    Long resolvedReservationIdKey = Long.parseLong(resolveValue(reservationId));
+    doWithRetry(() -> {
+      Reservations result = reservationDao.getReservationsDetailsByReservationId(
+          resolvedReservationIdKey);
+      putInList(KEY_CORE_LIST_OF_RESERVATIONS_DB, result);
+    }, "Fetch ReservationData", 2000, 3);
   }
 
   @And("DB Core - get waypoint Id from reservation id {string}")
@@ -112,7 +127,8 @@ public class DbCoreSteps extends CoreStandardSteps {
     doWithRetry(() -> {
       CoreRouteLogs actual = routeLogsDao.getRouteLogs(expected.getId());
       Assertions.assertThat(actual)
-          .withFailMessage("Roure logs was not found: " + resolvedData)
+          .withFailMessage("Roure logs was not found: " + resolvedData);
+      Assertions.assertThat(actual).withFailMessage("Roure logs was not found: " + resolvedData)
           .isNotNull();
       expected.compareWithActual(actual, resolvedData);
     }, f("verify route_logs records"), 10_000, 3);
@@ -126,8 +142,7 @@ public class DbCoreSteps extends CoreStandardSteps {
     doWithRetry(() -> {
       Waypoints actual = waypointsDao.getWaypointsDetails(expected.getId());
       Assertions.assertThat(actual)
-          .withFailMessage("waypoints record was not found: " + resolvedData)
-          .isNotNull();
+          .withFailMessage("waypoints record was not found: " + resolvedData).isNotNull();
       expected.compareWithActual(actual, resolvedData);
 
       if (resolvedData.containsKey("seqNo")) {
@@ -143,9 +158,7 @@ public class DbCoreSteps extends CoreStandardSteps {
       }
       if (resolvedData.containsKey("routeId") && resolvedData.get("routeId")
           .equalsIgnoreCase("null")) {
-        Assertions.assertThat(actual.getSeqNo())
-            .as("route_id is null")
-            .isNull();
+        Assertions.assertThat(actual.getSeqNo()).as("route_id is null").isNull();
       }
     }, "verify waypoints records", 10_000, 3);
   }
@@ -162,8 +175,7 @@ public class DbCoreSteps extends CoreStandardSteps {
             expected.getReservationId());
       }
       Assertions.assertThat(actual)
-          .withFailMessage("shipper_pickup_search record was not found: " + data)
-          .isNotNull();
+          .withFailMessage("shipper_pickup_search record was not found: " + data).isNotNull();
       expected.compareWithActual(actual, resolvedData);
     }, "verify shipper_pickup_search records", 10_000, 3);
   }
@@ -180,8 +192,7 @@ public class DbCoreSteps extends CoreStandardSteps {
             expected.getWaypointId());
       }
       Assertions.assertThat(actual)
-          .withFailMessage("route_monitoring_data record was not found: " + data)
-          .isNotNull();
+          .withFailMessage("route_monitoring_data record was not found: " + data).isNotNull();
       expected.compareWithActual(actual, resolvedData);
     }, "verify route_monitoring_data records", 10_000, 3);
   }
@@ -189,15 +200,13 @@ public class DbCoreSteps extends CoreStandardSteps {
   @When("DB Core - verify route_monitoring_data is hard-deleted:")
   public void verifyRouteMonitoringData(List<String> data) {
     List<String> resolvedData = resolveValues(data);
-    doWithRetry(() -> {
-      resolvedData.forEach(e -> {
-        RouteMonitoringData actual = routeMonitoringDataDao
-            .getRouteMonitoringDataByWaypointId(Long.parseLong(e));
-        Assertions.assertThat(actual)
-            .as("route_monitoring_data is hard-deleted").isNull();
-      });
-    }, "verify route_monitoring_data records", 10_000, 3);
-
+    doWithRetry(() ->
+            resolvedData.forEach(e -> {
+              RouteMonitoringData actual = routeMonitoringDataDao.getRouteMonitoringDataByWaypointId(
+                  Long.parseLong(e));
+              Assertions.assertThat(actual).as("route_monitoring_data is hard-deleted").isNull();
+            })
+        , "verify route_monitoring_data records", 10_000, 3);
   }
 
   @When("DB Core - operator get order details of order id {string}")
@@ -214,19 +223,15 @@ public class DbCoreSteps extends CoreStandardSteps {
     doWithRetry(() -> {
       Transactions actual = transactionsDao.getSingleTransaction(expected.getId());
       Assertions.assertThat(actual)
-          .withFailMessage("transactions record was not found: " + resolvedData)
-          .isNotNull();
+          .withFailMessage("transactions record was not found: " + resolvedData).isNotNull();
       expected.compareWithActual(actual, resolvedData);
       if (data.containsKey("distributionPointId") && data.get("distributionPointId")
           .equalsIgnoreCase("null")) {
-        Assertions.assertThat(actual.getDistributionPointId())
-            .as("distributionPointId is null")
+        Assertions.assertThat(actual.getDistributionPointId()).as("distributionPointId is null")
             .isNull();
       }
       if (data.containsKey("routeId") && data.get("routeId").equalsIgnoreCase("null")) {
-        Assertions.assertThat(actual.getRouteId())
-            .as("route_id is null")
-            .isNull();
+        Assertions.assertThat(actual.getRouteId()).as("route_id is null").isNull();
       }
     }, "verify transactions records", 10_000, 3);
   }
@@ -257,11 +262,9 @@ public class DbCoreSteps extends CoreStandardSteps {
         Assertions.assertThat(result.get(2).getType()).as("new delivery type")
             .isEqualTo(data.get("new_delivery_type"));
         if (result.get(1).getStatus().equalsIgnoreCase("Fail")) {
-          Assertions.assertThat(result.get(2).getRouteId()).as("new route id is null")
-              .isNull();
+          Assertions.assertThat(result.get(2).getRouteId()).as("new route id is null").isNull();
         } else {
-          Assertions.assertThat(result.get(2).getRouteId()).as("old route id")
-              .isEqualTo(routeId);
+          Assertions.assertThat(result.get(2).getRouteId()).as("old route id").isEqualTo(routeId);
         }
       }
     }, "check transactions");
@@ -272,16 +275,15 @@ public class DbCoreSteps extends CoreStandardSteps {
 
     doWithRetry(() -> {
       Map<String, String> expectedData = resolveKeyValues(mapOfData);
-      List<Transactions> result = transactionsDao
-          .getMultipleTransactionsByOrderId(Long.parseLong((expectedData.get("order_id"))));
+      List<Transactions> result = transactionsDao.getMultipleTransactionsByOrderId(
+          Long.parseLong((expectedData.get("order_id"))));
       if (mapOfData.containsKey("number_of_transactions")) {
         Assertions.assertThat(result.size()).as("number of transactions")
             .isEqualTo(Integer.parseInt(expectedData.get("number_of_transactions")));
       }
       if (mapOfData.containsKey("number_of_pickup_txn")) {
         List<Transactions> pickupTxns = result.stream()
-            .filter(e -> e.getType().equalsIgnoreCase("PP")).collect(
-                Collectors.toList());
+            .filter(e -> e.getType().equalsIgnoreCase("PP")).collect(Collectors.toList());
         Assertions.assertThat(pickupTxns.size()).as("number of pickup transactions")
             .isEqualTo(Integer.parseInt(expectedData.get("number_of_pickup_txn")));
         //to check newly created pickup transaction address details
@@ -298,8 +300,7 @@ public class DbCoreSteps extends CoreStandardSteps {
 
       if (mapOfData.containsKey("number_of_delivery_txn")) {
         List<Transactions> deliveryTxns = result.stream()
-            .filter(e -> e.getType().equalsIgnoreCase("DD")).collect(
-                Collectors.toList());
+            .filter(e -> e.getType().equalsIgnoreCase("DD")).collect(Collectors.toList());
         Assertions.assertThat(deliveryTxns.size()).as("number of delivery transactions")
             .isEqualTo(Integer.parseInt(expectedData.get("number_of_delivery_txn")));
         //to check newly created delivery transaction address details
@@ -326,13 +327,12 @@ public class DbCoreSteps extends CoreStandardSteps {
     });
     doWithRetry(() -> {
       OrderJaroScoresV2 actualJaroScores = expected.get(0);
-      List<OrderJaroScoresV2> actual = orderJaroScoresV2Dao
-          .getMultipleOjs(actualJaroScores.getWaypointId());
+      List<OrderJaroScoresV2> actual = orderJaroScoresV2Dao.getMultipleOjs(
+          actualJaroScores.getWaypointId());
       Assertions.assertThat(actual)
           .as("List of Jaro Scores for waypoint id" + actualJaroScores.getWaypointId())
           .isNotEmpty();
-      actual
-          .forEach(o -> DataEntity.assertListContains(expected, o, "ojs list"));
+      actual.forEach(o -> DataEntity.assertListContains(expected, o, "ojs list"));
     }, "verify order_jaro_scores_v2 records", 10_000, 3);
   }
 
@@ -342,8 +342,7 @@ public class DbCoreSteps extends CoreStandardSteps {
     final long waypointId = Long.parseLong(resolvedData.get("waypointId"));
     final long numberOfRecords = Integer.parseInt(resolvedData.get("number"));
     doWithRetry(() -> {
-      List<OrderJaroScoresV2> actual = orderJaroScoresV2Dao
-          .getMultipleOjs(waypointId);
+      List<OrderJaroScoresV2> actual = orderJaroScoresV2Dao.getMultipleOjs(waypointId);
       Assertions.assertThat(actual.size())
           .as(f("Expected %s records in order_jaro_scores_v2 table", numberOfRecords))
           .isEqualTo(numberOfRecords);
@@ -356,9 +355,8 @@ public class DbCoreSteps extends CoreStandardSteps {
     final Map<String, String> resolvedData = resolveKeyValues(data);
     OrderJaroScoresV2 expected = new OrderJaroScoresV2(resolvedData);
     doWithRetry(() -> {
-
-      OrderJaroScoresV2 actual = orderJaroScoresV2Dao
-          .getSingleOjs(expected.getWaypointId(), expected.getArchived());
+      OrderJaroScoresV2 actual = orderJaroScoresV2Dao.getSingleOjs(expected.getWaypointId(),
+          expected.getArchived());
       Assertions.assertThat(actual)
           .withFailMessage("order_jaro_scores_v2 record was not found: " + resolvedData)
           .isNotNull();
@@ -374,49 +372,67 @@ public class DbCoreSteps extends CoreStandardSteps {
     Long orderId = Long.parseLong(dataTable.get("orderId"));
 
     doWithRetry(() -> {
-          List<WarehouseSweeps> warehouseSweepRecords = warehouseSweepsDao
-              .findWarehouseSweepRecord(trackingId);
+      List<WarehouseSweeps> warehouseSweepRecords = warehouseSweepsDao
+          .findWarehouseSweepRecord(trackingId);
+      Assertions.assertThat(warehouseSweepRecords.size())
+          .as("Expected 1 record in warehouse_sweeps table").isEqualTo(1);
 
-          Assertions.assertThat(warehouseSweepRecords.size())
-              .as("Expected 1 record in warehouse_sweeps table").isEqualTo(1);
+      WarehouseSweeps theRecord = warehouseSweepRecords.get(0);
 
-          WarehouseSweeps theRecord = warehouseSweepRecords.get(0);
+      Assertions.assertThat(theRecord.getScan()).as("Expected scan in warehouse_sweeps table")
+          .isEqualTo(trackingId);
+      Assertions.assertThat(theRecord.getHubId()).as("Expected hub_id in warehouse_sweeps table")
+          .isEqualTo(hubId);
+      Assertions.assertThat(theRecord.getOrderId())
+          .as("Expected order_id in warehouse_sweeps table").isEqualTo(orderId);
 
-          Assertions.assertThat(theRecord.getScan())
-              .as("Expected scan in warehouse_sweeps table").isEqualTo(trackingId);
-          Assertions.assertThat(theRecord.getHubId())
-              .as("Expected hub_id in warehouse_sweeps table").isEqualTo(hubId);
-          Assertions.assertThat(theRecord.getOrderId())
-              .as("Expected order_id in warehouse_sweeps table").isEqualTo(orderId);
+      putInList(KEY_CORE_WAREHOUSE_SWEEPS, theRecord);
 
-          putInList(KEY_CORE_WAREHOUSE_SWEEPS, theRecord);
-
-        }, "Verify record in warehouse_sweeps table", 2000, 10
-    );
+    }, "Verify record in warehouse_sweeps table", 2000, 10);
   }
 
   @When("DB Core - verify outbound_scans record:")
   public void verifyOutboundScans(Map<String, String> dataTableRaw) {
-    Map<String, String> dataTable = resolveKeyValues(dataTableRaw);
-    Long routeId = Long.parseLong(dataTable.get("routeId"));
-    Long hubId = Long.parseLong(dataTable.get("hubId"));
-    Long orderId = Long.parseLong(dataTable.get("orderId"));
-
+    Map<String, String> resolvedData = resolveKeyValues(dataTableRaw);
+    OutboundScans expected = new OutboundScans(resolvedData);
     doWithRetry(() -> {
-          List<OutboundScans> outboundScansRecords = outboundScansDao
-              .getOutboundScansByOrderId(orderId);
+      OutboundScans actual = null;
+      if (expected.getOrderId() != null) {
+        actual = outboundScansDao.getOutboundScansByOrderId(expected.getOrderId());
+      }
+      Assertions.assertThat(actual)
+          .withFailMessage("outbound_scans record was not found: " + dataTableRaw).isNotNull();
+      expected.compareWithActual(actual, resolvedData);
+    }, "Verify record in outbound_scans table", 2000, 10);
+  }
 
-          Assertions.assertThat(outboundScansRecords.size())
-              .as("Expected 1 record in outbound_scans table").isEqualTo(1);
+  @Then("DB Core - verify cod_inbounds record:")
+  public void verifyCodInboundsData(Map<String, String> dataTableRaw) {
+    Map<String, String> resolvedData = resolveKeyValues(dataTableRaw);
+    CodInbounds expected = new CodInbounds(resolvedData);
+    doWithRetry(() -> {
+      CodInbounds actual = null;
+      if (expected.getRouteId() != null) {
+        actual = codInboundsDao.getCodInboundsByRouteId(expected.getRouteId());
+      }
+      Assertions.assertThat(actual)
+          .withFailMessage("cod_inbounds record was not found: " + dataTableRaw).isNotNull();
+      expected.compareWithActual(actual, resolvedData);
+    }, "Verify records in cod_inbounds table");
+  }
 
-          OutboundScans theRecord = outboundScansRecords.get(0);
-
-          Assertions.assertThat(theRecord.getHubId())
-              .as("Expected hub_id in outbound_scans table").isEqualTo(hubId);
-          Assertions.assertThat(theRecord.getRouteId())
-              .as("Expected route_id in outbound_scans table").isEqualTo(routeId);
-
-        }, "Verify record in outbound_scans table", 2000, 10
-    );
+  @Then("DB Core - verify cod_inbounds record is deleted:")
+  public void dbOperatorVerifyTheNewCodSoftDeleted(Map<String, String> dataTableRaw) {
+    Map<String, String> resolvedData = resolveKeyValues(dataTableRaw);
+    CodInbounds expected = new CodInbounds(resolvedData);
+    doWithRetry(() -> {
+      CodInbounds actual = null;
+      if (expected.getRouteId() != null) {
+        actual = codInboundsDao.getDeletedCodInboundsByRouteId(expected.getRouteId());
+      }
+      Assertions.assertThat(actual.getDeletedAt())
+          .withFailMessage("cod_inbounds record was not deleted: " + dataTableRaw)
+          .isNotNull();
+    }, "Operator verify the COD for created route is soft deleted");
   }
 }
