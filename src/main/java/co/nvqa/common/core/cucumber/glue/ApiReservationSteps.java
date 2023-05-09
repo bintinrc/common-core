@@ -2,6 +2,7 @@ package co.nvqa.common.core.cucumber.glue;
 
 import co.nvqa.common.core.client.ReservationClient;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
+import co.nvqa.common.core.model.reservation.BulkRouteReservationResponse;
 import co.nvqa.common.core.model.reservation.ReservationFilter;
 import co.nvqa.common.core.model.reservation.ReservationRequest;
 import co.nvqa.common.core.model.reservation.ReservationResponse;
@@ -21,7 +22,8 @@ import lombok.Getter;
 public class ApiReservationSteps extends CoreStandardSteps {
 
   public static final int MAX_COMMENTS_LENGTH_ON_SHIPPER_PICKUP_PAGE = 255;
-  @Inject @Getter
+  @Inject
+  @Getter
   private ReservationClient reservationClient;
 
   @Override
@@ -33,7 +35,8 @@ public class ApiReservationSteps extends CoreStandardSteps {
    * Sample:
    * <p>
    * Given API Operator create V2 reservation using data below: <br/>| reservationRequest | {
-   * "legacy_shipper_id":{shipper-v4-legacy-id}, "pickup_address_id":"{KEY_CREATED_ADDRESS.id}", "pickup_start_time":"{gradle-current-date-yyyy-MM-dd}T15:00:00{gradle-timezone-XXX}",
+   * "legacy_shipper_id":{shipper-v4-legacy-id}, "pickup_address_id":"{KEY_CREATED_ADDRESS.id}",
+   * "pickup_start_time":"{gradle-current-date-yyyy-MM-dd}T15:00:00{gradle-timezone-XXX}",
    * "pickup_end_time":"{gradle-current-date-yyyy-MM-dd}T18:00:00{gradle-timezone-XXX}" } |
    *
    * @param dataTableAsMap Map of data from feature file.
@@ -41,8 +44,9 @@ public class ApiReservationSteps extends CoreStandardSteps {
   @Given("API Core - Operator create reservation using data below:")
   public void apiOperatorCreateV2ReservationUsingDataBelow(Map<String, String> dataTableAsMap) {
     Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
-    String reservationRequestReplaced = StandardTestUtils.replaceTokens(resolvedDataTable.get("reservationRequest"),
-        StandardTestUtils.createDefaultTokens());
+    String reservationRequestReplaced = StandardTestUtils
+        .replaceTokens(resolvedDataTable.get("reservationRequest"),
+            StandardTestUtils.createDefaultTokens());
     ReservationRequest reservationRequest = fromJson(getDefaultSnakeCaseMapper(),
         reservationRequestReplaced, ReservationRequest.class);
     ReservationResponse reservationResult = apiOperatorCreateV2Reservation(reservationRequest);
@@ -61,9 +65,9 @@ public class ApiReservationSteps extends CoreStandardSteps {
     put(KEY_LIST_OF_RESERVATIONS, responses);
   }
 
-  private ReservationResponse apiOperatorCreateV2Reservation(ReservationRequest reservationRequest) {
+  private ReservationResponse apiOperatorCreateV2Reservation(
+      ReservationRequest reservationRequest) {
     String scenarioName = getScenarioManager().getCurrentScenario().getName();
-
 
     if (reservationRequest.getPickupInstruction() == null) {
       String generatedComments = f(
@@ -98,11 +102,10 @@ public class ApiReservationSteps extends CoreStandardSteps {
   /**
    * Sample:<p>
    * <p>
-   * When API Core - Operator update priority level for the reservation using data below:<p>
-   * | pickupAddressId | {KEY_LIST_OF_RESERVATIONS[1].addressId} |<p>
-   * | legacyShipperId | {shipper-v4-legacy-id}                  |<p>
-   * | priorityLevel   | 1                                       |<p>
-   * | reservationId   | {KEY_CREATED_RESERVATION_ID}            |<p>
+   * When API Core - Operator update priority level for the reservation using data below:<p> |
+   * pickupAddressId | {KEY_LIST_OF_RESERVATIONS[1].addressId} |<p> | legacyShipperId |
+   * {shipper-v4-legacy-id}                  |<p> | priorityLevel   | 1 |<p> | reservationId   |
+   * {KEY_CREATED_RESERVATION_ID}            |<p>
    * <p>
    *
    * @param dataTableAsMap Map of data from feature file.
@@ -115,7 +118,22 @@ public class ApiReservationSteps extends CoreStandardSteps {
     long priorityLevel = Long.parseLong(resolveValue(dataTableAsMap.get("priorityLevel")));
     long reservationId = Long.parseLong(resolveValue(dataTableAsMap.get("reservationId")));
     getReservationClient()
-        .updatePriorityLevelOfReservation(pickupAddressId,legacyShipperId,priorityLevel, reservationId);
+        .updatePriorityLevelOfReservation(pickupAddressId, legacyShipperId, priorityLevel,
+            reservationId);
+  }
+
+  /**
+   * Sample:
+   * <p>
+   * API Core - Operator cancel reservation for id "{KEY_LIST_OF_CREATED_RESERVATIONS[1].id}"
+   * </p>
+   */
+  @Given("API Core - Operator cancel reservation for id {string}")
+  public void apiOperatorCreateV2ReservationUsingDataBelow(String id) {
+    final long reservationId = Long.parseLong(resolveValue(id));
+    doWithRetry(
+        () -> getReservationClient().cancelReservation(reservationId),
+        "cancel reservation");
   }
 
 }

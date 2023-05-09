@@ -1,7 +1,10 @@
 package co.nvqa.common.core.cucumber.glue;
 
+import co.nvqa.common.constants.HttpConstants;
 import co.nvqa.common.core.client.RouteClient;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
+import co.nvqa.common.core.model.other.CoreExceptionResponse.Error;
+import co.nvqa.common.core.model.reservation.BulkRouteReservationResponse;
 import co.nvqa.common.core.model.route.AddParcelToRouteRequest;
 import co.nvqa.common.core.model.route.AddPickupJobToRouteRequest;
 import co.nvqa.common.core.model.route.MergeWaypointsResponse;
@@ -95,7 +98,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
       putInList(KEY_LIST_OF_CREATED_ROUTES, createRouteResponse);
       putInList(KEY_LIST_OF_CREATED_ROUTE_ID, createRouteResponse.getId());
       put(KEY_CREATED_ROUTE_ID, createRouteResponse.getId());
-    }, "Operator create route.", 2000, 3);
+    }, "create route");
   }
 
   @Given("API Core - Operator create new route from zonal routing using data below:")
@@ -123,7 +126,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
         addParcelToRouteRequestTemplate, AddParcelToRouteRequest.class);
     doWithRetry(
         () -> getRouteClient().addParcelToRoute(orderId, addParcelToRouteRequest),
-        "Operator add parcel to route", 2000, 5);
+        "add order to route");
   }
 
   /**
@@ -145,8 +148,8 @@ public class ApiRouteSteps extends CoreStandardSteps {
     final AddPickupJobToRouteRequest addPickupJobToRouteRequest = fromJsonSnakeCase(
         addPickupJobToRouteRequestTemplate, AddPickupJobToRouteRequest.class);
     doWithRetry(
-        () -> getRouteClient().addPickupJobToRoute(jobId, addPickupJobToRouteRequest),
-        "Operator add Pickup Job to route", 2000, 3);
+        () -> getRouteClient().addPickupJobToRoute(jobId, addPickupJobToRouteRequest)
+        , "add pa job to route");
   }
 
   @Given("API Core - Operator remove pickup job id {string} from route")
@@ -154,7 +157,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
     final Long jobId = Long.parseLong(resolveValue(paJobId));
     doWithRetry(
         () -> getRouteClient().removePAJobFromRoute(jobId),
-        "Operator remove pickup job id from route", 2000, 5);
+        "remove pa job from route");
   }
 
   @Given("API Core - Operator update routed waypoint to pending")
@@ -273,6 +276,56 @@ public class ApiRouteSteps extends CoreStandardSteps {
         "add reservation to route ");
   }
 
+  /**
+   * Sample:<p>
+   * <p>
+   * When API Core - Operator bulk add reservation to route using data below: | request | {"ids":
+   * [{KEY_LIST_OF_CREATED_RESERVATIONS[1].id}, {KEY_LIST_OF_CREATED_RESERVATIONS[2].id}],"new_route_id":{KEY_LIST_OF_CREATED_ROUTES[1].id},"overwrite":true}
+   * |
+   * <p>
+   *
+   * @param dataTableAsMap Map of data from feature file.
+   */
+  @When("API Core - Operator bulk add reservation to route using data below:")
+  public void apiOperatorBulkAddReservationToRoute(Map<String, String> dataTableAsMap) {
+    Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
+
+    final String request = resolvedDataTable.get("request");
+    doWithRetry(
+        () -> {
+          BulkRouteReservationResponse response = getRouteClient()
+              .bulkAddToRouteReservation(request);
+          put(KEY_ROUTE_RESPONSE, response);
+        },
+        "bulk add reservation to route ");
+  }
+
+  /**
+   * Sample:<p>
+   * <p>
+   * When API Core - Operator bulk add reservation to route with partial success: | request |
+   * {"ids": [{KEY_LIST_OF_CREATED_RESERVATIONS[1].id}, {KEY_LIST_OF_CREATED_RESERVATIONS[2].id}],"new_route_id":{KEY_LIST_OF_CREATED_ROUTES[1].id},"overwrite":true}
+   * |
+   * <p>
+   *
+   * @param dataTableAsMap Map of data from feature file.
+   */
+  @When("API Core - Operator bulk add reservation to route with partial success:")
+  public void apiOperatorBulkAddReservationToRoutePartial(Map<String, String> dataTableAsMap) {
+    Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
+    final String request = resolvedDataTable.get("request");
+    doWithRetry(
+        () -> {
+          Response r = getRouteClient().bulkAddToRouteReservationAndGetRawResponse(request);
+          Assertions.assertThat(r.getStatusCode()).as("status code Message")
+              .isEqualTo(HttpConstants.RESPONSE_400_BAD_REQUEST);
+          Error actual = fromJsonSnakeCase(r.getBody().asString(), Error.class);
+          Error expected = fromJsonSnakeCase(resolvedDataTable.get("failedJobs"), Error.class);
+          expected.compareWithActual(actual, resolvedDataTable);
+        },
+        "bulk add reservation to route ");
+  }
+
   @Given("API Core - Operator merge waypoints on Zonal Routing:")
   public void apiOperatorMergeWaypoints(List<String> waypointIds) {
     waypointIds = resolveValues(waypointIds);
@@ -367,5 +420,24 @@ public class ApiRouteSteps extends CoreStandardSteps {
 
     doWithRetry(
         () -> getRouteClient().editRouteDetails(editRouteRequest), "Edit Route Details");
+  }
+
+  /**
+   * Sample:<p>
+   * <p>
+   * When API Operator add parcel to the route using data below:<p> | orderId | 111111 |<p> |
+   * addParcelToRouteRequest | {"route_id":95139463,"type":"DELIVERY"} |<p>
+   * <p>
+   *
+   * @param dataTableAsMap Map of data from feature file.
+   */
+  @Given("API Core - Operator force success waypoint via route manifest:")
+  public void apiOperatorForceSuccessRouteManifest(Map<String, String> dataTableAsMap) {
+    final Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
+    final long routeId = Long.parseLong(resolvedDataTable.get("routeId"));
+    final long waypointId = Long.parseLong(resolvedDataTable.get("waypointId"));
+    doWithRetry(
+        () -> getRouteClient().forceSuccessWaypoint(routeId, waypointId),
+        "force success route manifest");
   }
 }

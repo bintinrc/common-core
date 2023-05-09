@@ -1,6 +1,6 @@
 package co.nvqa.common.core.hibernate;
 
-import co.nvqa.common.core.model.persisted_class.core.RouteLogs;
+import co.nvqa.common.core.model.persisted_class.core.CoreRouteLogs;
 import co.nvqa.common.core.utils.CoreTestConstants;
 import co.nvqa.common.database.DbBase;
 import co.nvqa.common.utils.StandardTestConstants;
@@ -16,18 +16,18 @@ public class RouteLogsDao extends DbBase {
         StandardTestConstants.DB_PASS, "co.nvqa.common.core.model.persisted_class.core");
   }
 
-  public RouteLogs getRouteLogs(Long id) {
-    String query = "FROM RouteLogs WHERE id = :id";
-    List<RouteLogs> result = findAll(session ->
-        session.createQuery(query, RouteLogs.class)
+  public CoreRouteLogs getRouteLogs(Long id) {
+    String query = "FROM CoreRouteLogs WHERE id = :id";
+    List<CoreRouteLogs> result = findAll(session ->
+        session.createQuery(query, CoreRouteLogs.class)
             .setParameter("id", id));
     return CollectionUtils.isEmpty(result) ? null : result.get(0);
   }
 
-  public List<RouteLogs> getMultipleRouteLogsbyDriverId(Long driverId) {
-    String query = "FROM RouteLogs WHERE driverId = :driverId AND archived = 0 AND deletedAt IS NULL";
+  public List<CoreRouteLogs> getMultipleRouteLogsbyDriverId(Long driverId) {
+    String query = "FROM CoreRouteLogs WHERE driverId = :driverId AND archived = 0 AND deletedAt IS NULL";
     return findAll(session ->
-        session.createQuery(query, RouteLogs.class)
+        session.createQuery(query, CoreRouteLogs.class)
             .setParameter("driverId", driverId));
   }
 
