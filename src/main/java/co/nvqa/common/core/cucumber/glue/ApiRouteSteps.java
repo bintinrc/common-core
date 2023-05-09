@@ -18,9 +18,7 @@ import io.cucumber.java.en.When;
 import io.restassured.response.Response;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -92,12 +90,12 @@ public class ApiRouteSteps extends CoreStandardSteps {
       createRouteRequest.setHubId(get(KEY_DESTINATION_HUB_ID));
     }
 
-    retryIfAssertionErrorOrRuntimeExceptionOccurred(() -> {
+    doWithRetry(() -> {
       final RouteResponse createRouteResponse = getRouteClient().createRoute(createRouteRequest);
       putInList(KEY_LIST_OF_CREATED_ROUTES, createRouteResponse);
       putInList(KEY_LIST_OF_CREATED_ROUTE_ID, createRouteResponse.getId());
       put(KEY_CREATED_ROUTE_ID, createRouteResponse.getId());
-    }, 2000, 3);
+    }, "Operator create route.", 2000, 3);
   }
 
   @Given("API Core - Operator create new route from zonal routing using data below:")
@@ -123,9 +121,9 @@ public class ApiRouteSteps extends CoreStandardSteps {
     final long orderId = Long.parseLong(resolvedDataTable.get("orderId"));
     final AddParcelToRouteRequest addParcelToRouteRequest = fromJsonSnakeCase(
         addParcelToRouteRequestTemplate, AddParcelToRouteRequest.class);
-    retryIfAssertionErrorOrRuntimeExceptionOccurred(
+    doWithRetry(
         () -> getRouteClient().addParcelToRoute(orderId, addParcelToRouteRequest),
-        2000, 5);
+        "Operator add parcel to route", 2000, 5);
   }
 
   /**
@@ -146,17 +144,17 @@ public class ApiRouteSteps extends CoreStandardSteps {
     final long jobId = Long.parseLong(resolvedDataTable.get("jobId"));
     final AddPickupJobToRouteRequest addPickupJobToRouteRequest = fromJsonSnakeCase(
         addPickupJobToRouteRequestTemplate, AddPickupJobToRouteRequest.class);
-    retryIfAssertionErrorOrRuntimeExceptionOccurred(
-        () -> getRouteClient().addPickupJobToRoute(jobId, addPickupJobToRouteRequest)
-        , 2000, 3);
+    doWithRetry(
+        () -> getRouteClient().addPickupJobToRoute(jobId, addPickupJobToRouteRequest),
+        "Operator add Pickup Job to route", 2000, 3);
   }
 
   @Given("API Core - Operator remove pickup job id {string} from route")
   public void apiOperatorRemovePickupJobFromRouteUsingDataBelow(String paJobId) {
     final Long jobId = Long.parseLong(resolveValue(paJobId));
-    retryIfAssertionErrorOrRuntimeExceptionOccurred(
+    doWithRetry(
         () -> getRouteClient().removePAJobFromRoute(jobId),
-        2000, 5);
+        "Operator remove pickup job id from route", 2000, 5);
   }
 
   @Given("API Core - Operator update routed waypoint to pending")
@@ -164,7 +162,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
     final String json = toJsonCamelCase(resolveKeyValues(dataTableAsMap));
     final Waypoint waypoint = fromJsonCamelCase(json, Waypoint.class);
     final List<Waypoint> request = Collections.singletonList(waypoint);
-    retryIfAssertionErrorOccurred(
+    doWithRetry(
         () -> getRouteClient().updateWaypointToPending(request),
         "set routed waypoint to pending");
   }
@@ -181,7 +179,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
   public void operatorArchivesRoutes(List<String> routeIds) {
     routeIds = resolveValues(routeIds);
     List<Long> ids = routeIds.stream().map(Long::parseLong).collect(Collectors.toList());
-    retryIfAssertionErrorOrRuntimeExceptionOccurred(
+    doWithRetry(
         () -> getRouteClient().archiveRoutes(ids),
         "Archive route", 1000, 5);
   }
@@ -190,7 +188,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
   public void operatorUnarchivesRoutes(List<String> routeIds) {
     routeIds = resolveValues(routeIds);
     List<Long> ids = routeIds.stream().map(Long::parseLong).collect(Collectors.toList());
-    retryIfAssertionErrorOrRuntimeExceptionOccurred(
+    doWithRetry(
         () -> getRouteClient().unarchiveRoutes(ids),
         "Unarchive route", 1000, 5);
   }
@@ -199,7 +197,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
   public void operatorUnArchiveRouteInvalidState(Map<String, String> mapOfData) {
     Map<String, String> expectedData = resolveKeyValues(mapOfData);
     final long routeId = Long.parseLong(expectedData.get("routeId"));
-    retryIfAssertionErrorOrRuntimeExceptionOccurred(
+    doWithRetry(
         () -> {
           Response response = getRouteClient().unarchiveRouteAndGetRawResponse(routeId);
           Assertions.assertThat(response.getStatusCode()).as("status code")
@@ -213,7 +211,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
   public void operatorArchiveRouteInvalidState(Map<String, String> mapOfData) {
     Map<String, String> expectedData = resolveKeyValues(mapOfData);
     final long routeId = Long.parseLong(expectedData.get("routeId"));
-    retryIfAssertionErrorOrRuntimeExceptionOccurred(
+    doWithRetry(
         () -> {
           Response response = getRouteClient().archiveRouteAndGetRawResponse(routeId);
           Assertions.assertThat(response.getStatusCode()).as("status code")
@@ -234,7 +232,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
     final Map<String, String> map = resolveKeyValues(dataTableAsMap);
     final long orderId = Long.parseLong(map.get("orderId"));
     final String type = map.get("type");
-    retryIfAssertionErrorOrRuntimeExceptionOccurred(
+    doWithRetry(
         () -> getRouteClient().pullFromRoute(orderId, type),
         "Operator pull order from route");
   }
@@ -246,7 +244,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
         .replaceTokens(resolvedDataTable.get("editRouteRequest"),
             StandardTestUtils.createDefaultTokens());
     List<RouteRequest> request = fromJsonToList(createRouteRequestJson, RouteRequest.class);
-    retryIfAssertionErrorOrRuntimeExceptionOccurred(
+    doWithRetry(
         () -> {
           final List<RouteResponse> route = getRouteClient()
               .zonalRoutingEditRoute(request);
@@ -270,7 +268,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
 
     final long reservationResultId = Long.parseLong(resolvedDataTable.get("reservationId"));
     final long routeId = Long.parseLong(resolvedDataTable.get("routeId"));
-    retryIfAssertionErrorOrRuntimeExceptionOccurred(
+    doWithRetry(
         () -> getRouteClient().addReservationToRoute(routeId, reservationResultId),
         "add reservation to route ");
   }
@@ -279,7 +277,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
   public void apiOperatorMergeWaypoints(List<String> waypointIds) {
     waypointIds = resolveValues(waypointIds);
     List<Long> wpIds = waypointIds.stream().map(Long::parseLong).collect(Collectors.toList());
-    retryIfAssertionErrorOrRuntimeExceptionOccurred(
+    doWithRetry(
         () -> {
           final MergeWaypointsResponse result = getRouteClient().mergeWaypointsZonalRouting(wpIds);
           put(KEY_CORE_MERGE_WAYPOINT_RESPONSE, toJsonSnakeCase(result));
@@ -299,7 +297,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
     routeIds = resolveValues(routeIds);
     List<Long> resolvedRouteIds = routeIds.stream().map(Long::parseLong)
         .collect(Collectors.toList());
-    retryIfAssertionErrorOrRuntimeExceptionOccurred(
+    doWithRetry(
         () -> getRouteClient().mergeWaypointsRouteLogs(resolvedRouteIds),
         "merge waypoints on route logs");
   }
@@ -331,7 +329,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
     data = resolveKeyValues(data);
     final Long routeId = Long.parseLong(data.get("routeId"));
     final Long orderId = Long.parseLong(data.get("orderId"));
-    retryIfAssertionErrorOrRuntimeExceptionOccurred(
+    doWithRetry(
         () -> getRouteClient().addToRouteDp(orderId, routeId),
         "Add to route dp order");
   }
@@ -344,7 +342,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
    */
   @Given("API Core - Operator pull out dp order from DP holding route for order")
   public void operatorPullOutDpOrder(List<String> data) {
-    retryIfAssertionErrorOrRuntimeExceptionOccurred(
+    doWithRetry(
         () -> data.forEach(
             e -> getRouteClient().pullOutDpOrderFromRoute(Long.parseLong(resolveValue(e)))),
         "pull out dp order from route");
@@ -367,7 +365,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
             StandardTestUtils.createDefaultTokens());
     List<RouteRequest> editRouteRequest = fromJsonToList(editRouteRequestJson, RouteRequest.class);
 
-    retryIfAssertionErrorOrRuntimeExceptionOccurred(
+    doWithRetry(
         () -> getRouteClient().editRouteDetails(editRouteRequest), "Edit Route Details");
   }
 }

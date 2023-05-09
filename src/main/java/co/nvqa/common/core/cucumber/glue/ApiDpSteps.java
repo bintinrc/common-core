@@ -30,7 +30,7 @@ public class ApiDpSteps extends CoreStandardSteps {
   public void operatorPerformDpDropOff(String orderIdString) {
     Long orderId = Long.parseLong(resolveValue(orderIdString));
 
-    retryIfAssertionErrorOrRuntimeExceptionOccurred(
+    doWithRetry(
         () -> getCoreDpClient().driverDropOffToDp(orderId), "core drop off dp");
   }
 
@@ -42,7 +42,7 @@ public class ApiDpSteps extends CoreStandardSteps {
     final String trackingId = resolvedDataTable.get("trackingId");
     final DpTagging request = fromJsonSnakeCase(
         jsonRequest, DpTagging.class);
-    retryIfAssertionErrorOccurred(
+    doWithRetry(
         () -> {
           DpTagging result = getCoreDpClient().tagToDpAndAddToRoute(orderId, request);
           if (request.getDpTag() != null) {
@@ -80,7 +80,7 @@ public class ApiDpSteps extends CoreStandardSteps {
     final long orderId = Long.parseLong(resolvedDataTable.get("orderId"));
     final DpUntagging request = fromJsonSnakeCase(
         jsonRequest, DpUntagging.class);
-    retryIfAssertionErrorOccurred(
+    doWithRetry(
         () -> getCoreDpClient().removeFromDpHoldingRouteAndUntagFromDp(orderId, request),
         "untag from dp");
   }
@@ -90,7 +90,7 @@ public class ApiDpSteps extends CoreStandardSteps {
     final Map<String, String> resolvedDataTable = resolveKeyValues(source);
     final long orderId = Long.parseLong(resolvedDataTable.get("orderId"));
     final String version = resolvedDataTable.get("version");
-    retryIfAssertionErrorOccurred(
+    doWithRetry(
         () -> getCoreDpClient().untagOrderFromDp(orderId, version),
         "untag from dp");
   }
@@ -100,7 +100,7 @@ public class ApiDpSteps extends CoreStandardSteps {
     final Map<String, String> resolvedDataTable = resolveKeyValues(source);
     final long orderId = Long.parseLong(resolvedDataTable.get("orderId"));
     final long dpId = Long.parseLong(resolvedDataTable.get("dpId"));
-    retryIfAssertionErrorOccurred(
+    doWithRetry(
         () -> getCoreDpClient().overstayFromDp(orderId, dpId),
         "overstay from dp");
   }
@@ -111,7 +111,7 @@ public class ApiDpSteps extends CoreStandardSteps {
     final long orderId = Long.parseLong(resolvedDataTable.get("orderId"));
     final String json = resolvedDataTable.get("request");
     final Boolean isReverify = Boolean.parseBoolean(resolvedDataTable.get("isReverify"));
-    retryIfAssertionErrorOccurred(
+    doWithRetry(
         () -> getCoreDpClient().lodgeInAtDp(orderId, json, isReverify),
         "lodge in at dp");
   }
