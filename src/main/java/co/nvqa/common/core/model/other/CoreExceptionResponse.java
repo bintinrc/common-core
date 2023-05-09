@@ -1,5 +1,7 @@
 package co.nvqa.common.core.model.other;
 
+import co.nvqa.common.model.DataEntity;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -11,17 +13,18 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CoreExceptionResponse {
+public class CoreExceptionResponse extends DataEntity<CoreExceptionResponse> {
 
   private Long id;
-  private Error data;
+  private Error error;
   private String status;
 
   @Getter
   @Setter
-  public static class Error {
+  public static class Error extends DataEntity<Error> {
 
-    private Integer code;
+    private Long code;
+    @JsonProperty("nvErrorCode")
     private String nvErrorCode;
     private List<String> messages = new ArrayList<>();
     private String application;
@@ -31,7 +34,8 @@ public class CoreExceptionResponse {
 
     @Getter
     @Setter
-    public static class Data {
+    public static class Data extends DataEntity<Data>{
+
       private String message;
     }
   }

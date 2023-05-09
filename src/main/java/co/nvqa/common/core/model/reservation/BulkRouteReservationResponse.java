@@ -10,6 +10,6 @@ import lombok.Setter;
 public class BulkRouteReservationResponse {
 
   private List<CoreExceptionResponse> successfulJobs;
-  private List<CoreExceptionResponse> failed_jobs;
+  private List<CoreExceptionResponse> failedJobs;
 
 }

@@ -7,6 +7,7 @@ import co.nvqa.common.core.model.RouteGroup;
 import co.nvqa.common.core.model.coverage.CreateCoverageRequest;
 import co.nvqa.common.core.model.coverage.CreateCoverageResponse;
 import co.nvqa.common.core.model.pickup.MilkRunGroup;
+import co.nvqa.common.core.model.reservation.BulkRouteReservationResponse;
 import co.nvqa.common.core.model.route.AddParcelToRouteRequest;
 import co.nvqa.common.core.model.route.AddPickupJobToRouteRequest;
 import co.nvqa.common.core.model.route.MergeWaypointsResponse;
@@ -206,12 +207,13 @@ public class RouteClient extends SimpleApiClient {
     }
   }
 
-  public void bulkAddToRouteReservation(String request) {
+  public BulkRouteReservationResponse bulkAddToRouteReservation(String request) {
     Response r = bulkAddToRouteReservationAndGetRawResponse(request);
     r.then().contentType(ContentType.JSON);
     if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
       throw new NvTestHttpException("unexpected http status: " + r.statusCode());
     }
+    return fromJsonSnakeCase(r.getBody().asString(), BulkRouteReservationResponse.class);
   }
 
   public Response bulkAddToRouteReservationAndGetRawResponse(String request) {
@@ -589,5 +591,49 @@ public class RouteClient extends SimpleApiClient {
       throw new NvTestHttpException("unexpected http status: " + r.statusCode());
     }
     r.then().contentType(ContentType.JSON);
+  }
+
+  public void forceFailWaypoint(long routeId, long waypointId, long failureReasonId) {
+    String url = "core/admin/routes/{routeId}/waypoints/{waypointId}/pods";
+
+    RequestSpecification spec = createAuthenticatedRequest()
+        .pathParam("routeId", routeId)
+        .pathParam("waypointId", waypointId)
+        .body(f("{ \"action\": \"fail\", \"failure_reason_id\":%d}", failureReasonId));
+
+    Response r = doPut("Core - Admin Force Fail", spec, url);
+    if (r.statusCode() != HttpConstants.RESPONSE_204_NO_CONTENT) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+  }
+
+  public void forceSuccessWaypoint(long routeId, long waypointId) {
+    String url = "core/admin/routes/{routeId}/waypoints/{waypointId}/pods";
+
+    RequestSpecification spec = createAuthenticatedRequest()
+        .pathParam("routeId", routeId)
+        .pathParam("waypointId", waypointId)
+        .body("{ \"action\": \"success\"}");
+
+    Response r = doPut("Core - Admin Force Success", spec, url);
+    if (r.statusCode() != HttpConstants.RESPONSE_204_NO_CONTENT) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+  }
+
+  public void forceSuccessWaypointWithCodCollected(long routeId, long waypointId,
+      List<Long> orderIds) {
+    String url = "core/admin/routes/{routeId}/waypoints/{waypointId}/pods";
+    String json = f("{ \"action\": \"success\", \"cod_collected_order_ids\": %s}", orderIds);
+
+    RequestSpecification spec = createAuthenticatedRequest()
+        .pathParam("routeId", routeId)
+        .pathParam("waypointId", waypointId)
+        .body(json);
+
+    Response r = doPut("Core - Admin Force Success with COD collected", spec, url);
+    if (r.statusCode() != HttpConstants.RESPONSE_204_NO_CONTENT) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
   }
 }

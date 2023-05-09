@@ -1,7 +1,6 @@
 package co.nvqa.common.core.cucumber.glue;
 
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
-import co.nvqa.common.core.hibernate.OrderDao;
 import co.nvqa.common.core.hibernate.OrderDetailsDao;
 import co.nvqa.common.core.hibernate.OrderJaroScoresV2Dao;
 import co.nvqa.common.core.hibernate.OutboundScansDao;
@@ -38,8 +37,6 @@ import org.assertj.core.api.Assertions;
 public class DbCoreSteps extends CoreStandardSteps {
 
   @Inject
-  private OrderDao orderDao;
-  @Inject
   private OrderDetailsDao orderDetailsDao;
   @Inject
   private RouteLogsDao routeLogsDao;
@@ -67,7 +64,7 @@ public class DbCoreSteps extends CoreStandardSteps {
   @And("DB Core - get waypoint Id from reservation id {string}")
   public void coreGetWaypointFromReservationId(String reservationId) {
     Long resolvedReservationIdKey = Long.parseLong(resolveValue(reservationId));
-    retryIfAssertionErrorOrRuntimeExceptionOccurred(() -> {
+    doWithRetry(() -> {
       Reservations result = reservationDao.getReservationsDetailsByReservationId(
           resolvedReservationIdKey);
       put(KEY_WAYPOINT_ID, result.getWaypointId());
@@ -77,7 +74,7 @@ public class DbCoreSteps extends CoreStandardSteps {
   @Then("DB Core - verifies that zone type is equal to {string} and zone id is not null for waypointId {string}")
   public void dbCoreVerifiesThatZoneIdEqualTo(String expectedZoneType, String waypointId) {
     Long resolvedWayPointIdKey = Long.parseLong(resolveValue(waypointId));
-    retryIfAssertionErrorOrRuntimeExceptionOccurred(() -> {
+    doWithRetry(() -> {
       Waypoints result = waypointsDao.getWaypointsDetails(resolvedWayPointIdKey);
       Assertions.assertThat(result.getZoneType())
           .as("Assertion for Zone Type column value is as expected").isEqualTo(expectedZoneType);
@@ -89,7 +86,7 @@ public class DbCoreSteps extends CoreStandardSteps {
   @Then("DB Core - verifies that zone type is equal to {string} and zone id is null for waypointId {string}")
   public void dbCoreVerifiesThatZoneIdEqualToNull(String expectedZoneType, String waypointId) {
     Long resolvedWayPointIdKey = Long.parseLong(resolveValue(waypointId));
-    retryIfAssertionErrorOrRuntimeExceptionOccurred(() -> {
+    doWithRetry(() -> {
       Waypoints result = waypointsDao.getWaypointsDetails(resolvedWayPointIdKey);
       Assertions.assertThat(result.getZoneType())
           .as("Assertion for Zone Type column value is as expected").isEqualTo(expectedZoneType);
@@ -101,7 +98,7 @@ public class DbCoreSteps extends CoreStandardSteps {
   @Then("DB Core - operator get waypoints details for {string}")
   public void dbCoreGetWaypointDetails(String waypointId) {
     Long resolvedWayPointIdKey = Long.parseLong(resolveValue(waypointId));
-    retryIfAssertionErrorOrRuntimeExceptionOccurred(() -> {
+    doWithRetry(() -> {
       Waypoints result = waypointsDao.getWaypointsDetails(resolvedWayPointIdKey);
       put(KEY_CORE_WAYPOINT_DETAILS, result);
     }, "get core waypoint details", 2000, 3);
@@ -112,7 +109,7 @@ public class DbCoreSteps extends CoreStandardSteps {
     Map<String, String> resolvedData = resolveKeyValues(data);
     CoreRouteLogs expected = new CoreRouteLogs(resolvedData);
 
-    retryIfAssertionErrorOccurred(() -> {
+    doWithRetry(() -> {
       CoreRouteLogs actual = routeLogsDao.getRouteLogs(expected.getId());
       Assertions.assertThat(actual)
           .withFailMessage("Roure logs was not found: " + resolvedData)
@@ -126,16 +123,23 @@ public class DbCoreSteps extends CoreStandardSteps {
     Map<String, String> resolvedData = resolveKeyValues(data);
     Waypoints expected = new Waypoints(resolvedData);
 
-    retryIfAssertionErrorOccurred(() -> {
+    doWithRetry(() -> {
       Waypoints actual = waypointsDao.getWaypointsDetails(expected.getId());
       Assertions.assertThat(actual)
           .withFailMessage("waypoints record was not found: " + resolvedData)
           .isNotNull();
       expected.compareWithActual(actual, resolvedData);
-      if (resolvedData.containsKey("seqNo") && resolvedData.get("seqNo").equalsIgnoreCase("null")) {
-        Assertions.assertThat(actual.getSeqNo())
-            .as("seq_no is null")
-            .isNull();
+
+      if (resolvedData.containsKey("seqNo")) {
+        if (resolvedData.get("seqNo").equalsIgnoreCase("null")) {
+          Assertions.assertThat(actual.getSeqNo())
+              .as("seq_no is null")
+              .isNull();
+        } else {
+          Assertions.assertThat(actual.getSeqNo())
+              .as("seq_no is not null")
+              .isNotNull();
+        }
       }
       if (resolvedData.containsKey("routeId") && resolvedData.get("routeId")
           .equalsIgnoreCase("null")) {
@@ -151,7 +155,7 @@ public class DbCoreSteps extends CoreStandardSteps {
     Map<String, String> resolvedData = resolveKeyValues(data);
     ShipperPickupSearch expected = new ShipperPickupSearch(resolvedData);
 
-    retryIfAssertionErrorOccurred(() -> {
+    doWithRetry(() -> {
       ShipperPickupSearch actual = null;
       if (expected.getReservationId() != null) {
         actual = shipperPickupSearchDao.getShipperPickupSearchByReservationId(
@@ -169,7 +173,7 @@ public class DbCoreSteps extends CoreStandardSteps {
     Map<String, String> resolvedData = resolveKeyValues(data);
     RouteMonitoringData expected = new RouteMonitoringData(resolvedData);
 
-    retryIfAssertionErrorOccurred(() -> {
+    doWithRetry(() -> {
       RouteMonitoringData actual = null;
       if (expected.getWaypointId() != null) {
         actual = routeMonitoringDataDao.getRouteMonitoringDataByWaypointId(
@@ -185,7 +189,7 @@ public class DbCoreSteps extends CoreStandardSteps {
   @When("DB Core - verify route_monitoring_data is hard-deleted:")
   public void verifyRouteMonitoringData(List<String> data) {
     List<String> resolvedData = resolveValues(data);
-    retryIfAssertionErrorOccurred(() -> {
+    doWithRetry(() -> {
       resolvedData.forEach(e -> {
         RouteMonitoringData actual = routeMonitoringDataDao
             .getRouteMonitoringDataByWaypointId(Long.parseLong(e));
@@ -207,7 +211,7 @@ public class DbCoreSteps extends CoreStandardSteps {
   public void verifyTransaction(Map<String, String> data) {
     Map<String, String> resolvedData = resolveKeyValues(data);
     Transactions expected = new Transactions(resolvedData);
-    retryIfAssertionErrorOccurred(() -> {
+    doWithRetry(() -> {
       Transactions actual = transactionsDao.getSingleTransaction(expected.getId());
       Assertions.assertThat(actual)
           .withFailMessage("transactions record was not found: " + resolvedData)
@@ -232,7 +236,7 @@ public class DbCoreSteps extends CoreStandardSteps {
     Map<String, String> resolvedData = resolveKeyValues(data);
     final Long orderId = Long.parseLong(resolvedData.get("orderId"));
     final Long routeId = Long.parseLong(resolvedData.get("routeId"));
-    retryIfAssertionErrorOccurred(() -> {
+    doWithRetry(() -> {
       List<Transactions> result = transactionsDao.getMultipleTransactionsByOrderId(orderId);
       Assertions.assertThat(result.size()).as("number of transactions")
           .isEqualTo(Integer.parseInt(data.get("number_of_txn")));
@@ -266,7 +270,7 @@ public class DbCoreSteps extends CoreStandardSteps {
   @Given("DB Core - verify number of transactions is correct after new transactions created")
   public void dbOperatorVerifiesCreatedTransactions(Map<String, String> mapOfData) {
 
-    retryIfAssertionErrorOccurred(() -> {
+    doWithRetry(() -> {
       Map<String, String> expectedData = resolveKeyValues(mapOfData);
       List<Transactions> result = transactionsDao
           .getMultipleTransactionsByOrderId(Long.parseLong((expectedData.get("order_id"))));
@@ -320,7 +324,7 @@ public class DbCoreSteps extends CoreStandardSteps {
       OrderJaroScoresV2 jaroScore = new OrderJaroScoresV2(e);
       expected.add(jaroScore);
     });
-    retryIfAssertionErrorOccurred(() -> {
+    doWithRetry(() -> {
       OrderJaroScoresV2 actualJaroScores = expected.get(0);
       List<OrderJaroScoresV2> actual = orderJaroScoresV2Dao
           .getMultipleOjs(actualJaroScores.getWaypointId());
@@ -337,7 +341,7 @@ public class DbCoreSteps extends CoreStandardSteps {
     Map<String, String> resolvedData = resolveKeyValues(data);
     final long waypointId = Long.parseLong(resolvedData.get("waypointId"));
     final long numberOfRecords = Integer.parseInt(resolvedData.get("number"));
-    retryIfAssertionErrorOccurred(() -> {
+    doWithRetry(() -> {
       List<OrderJaroScoresV2> actual = orderJaroScoresV2Dao
           .getMultipleOjs(waypointId);
       Assertions.assertThat(actual.size())
@@ -351,7 +355,7 @@ public class DbCoreSteps extends CoreStandardSteps {
   public void dbOperatorVerifySingleJaroScores(Map<String, String> data) {
     final Map<String, String> resolvedData = resolveKeyValues(data);
     OrderJaroScoresV2 expected = new OrderJaroScoresV2(resolvedData);
-    retryIfAssertionErrorOccurred(() -> {
+    doWithRetry(() -> {
 
       OrderJaroScoresV2 actual = orderJaroScoresV2Dao
           .getSingleOjs(expected.getWaypointId(), expected.getArchived());
@@ -369,7 +373,7 @@ public class DbCoreSteps extends CoreStandardSteps {
     Long hubId = Long.parseLong(dataTable.get("hubId"));
     Long orderId = Long.parseLong(dataTable.get("orderId"));
 
-    retryIfAssertionErrorOrRuntimeExceptionOccurred(() -> {
+    doWithRetry(() -> {
           List<WarehouseSweeps> warehouseSweepRecords = warehouseSweepsDao
               .findWarehouseSweepRecord(trackingId);
 
@@ -398,7 +402,7 @@ public class DbCoreSteps extends CoreStandardSteps {
     Long hubId = Long.parseLong(dataTable.get("hubId"));
     Long orderId = Long.parseLong(dataTable.get("orderId"));
 
-    retryIfAssertionErrorOrRuntimeExceptionOccurred(() -> {
+    doWithRetry(() -> {
           List<OutboundScans> outboundScansRecords = outboundScansDao
               .getOutboundScansByOrderId(orderId);
 
