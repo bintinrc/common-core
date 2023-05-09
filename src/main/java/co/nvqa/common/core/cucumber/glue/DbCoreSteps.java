@@ -67,10 +67,10 @@ public class DbCoreSteps extends CoreStandardSteps {
   @And("DB Core - get Reservation data from reservation id {string}")
   public void coreGetReservationDataFromReservationId(String reservationId) {
     Long resolvedReservationIdKey = Long.parseLong(resolveValue(reservationId));
-    retryIfAssertionErrorOrRuntimeExceptionOccurred(() -> {
+    doWithRetry(() -> {
       Reservations result = reservationDao.getReservationsDetailsByReservationId(
           resolvedReservationIdKey);
-      putInList(KEY_LIST_OF_RESERVATIONS_DB, result);
+      putInList(KEY_CORE_LIST_OF_RESERVATIONS_DB, result);
     }, "Fetch ReservationData", 2000, 3);
   }
 

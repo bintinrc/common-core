@@ -50,6 +50,6 @@ public class DbOrderPickupsSteps extends CoreStandardSteps {
       }
       return result;
     }, "reading pickup from order id: " + orderId, 3000, 30);
-    putAllInList(KEY_LIST_OF_ORDER_PICKUPS, orderPickups);
+    putAllInList(KEY_CORE_LIST_OF_ORDER_PICKUPS, orderPickups);
   }
 }

@@ -127,13 +127,13 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
   public void generateStampId(String totalOrder) {
     long totalOrderRequest = Long.parseLong(totalOrder);
     for (int i = 0; i < totalOrderRequest; i++) {
-      retryIfNvTestRuntimeExceptionOccurred(() -> {
+      doWithRetry(() -> {
         try {
           String stampId = StandardTestUtils.generateStampId();
           if (orderDao.getSingleOrderDetailsByStampId(stampId) != null) {
             throw new AssertionError();
           }
-          putInList(KEY_LIST_OF_CREATED_STAMP_ID, stampId);
+          putInList(KEY_CORE_LIST_OF_CREATED_STAMP_ID, stampId);
         } catch (AssertionError ae) {
           throw new NvTestRuntimeException(ae);
         }
@@ -146,7 +146,7 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
     String stampIdCheck = resolveValue(stampId);
     doWithRetry(() -> {
       Orders order = orderDao.getSingleOrderDetailsByStampId(stampIdCheck);
-      putInList(KEY_LIST_OF_CREATED_ORDERS_CORE_DB,order,(o1, o2) -> Objects.equals(o1.getId(),o2.getId()));
+      putInList(KEY_CORE_LIST_OF_CREATED_ORDERS_CORE_DB,order,(o1, o2) -> Objects.equals(o1.getId(),o2.getId()));
     }, "fetch order detail by Stamp Id", 10_000, 3);
   }
 
