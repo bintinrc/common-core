@@ -68,6 +68,16 @@ public class DbCoreSteps extends CoreStandardSteps {
   public void init() {
   }
 
+  @And("DB Core - get Reservation data from reservation id {string}")
+  public void coreGetReservationDataFromReservationId(String reservationId) {
+    Long resolvedReservationIdKey = Long.parseLong(resolveValue(reservationId));
+    doWithRetry(() -> {
+      Reservations result = reservationDao.getReservationsDetailsByReservationId(
+          resolvedReservationIdKey);
+      putInList(KEY_CORE_LIST_OF_RESERVATIONS_DB, result);
+    }, "Fetch ReservationData", 2000, 3);
+  }
+
   @And("DB Core - get waypoint Id from reservation id {string}")
   public void coreGetWaypointFromReservationId(String reservationId) {
     Long resolvedReservationIdKey = Long.parseLong(resolveValue(reservationId));
