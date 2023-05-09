@@ -6,11 +6,15 @@ import co.nvqa.common.core.model.order.Order.Data;
 import co.nvqa.common.core.model.order.Order.Dimension;
 import co.nvqa.common.core.model.order.Order.PreviousAddressDetails;
 import co.nvqa.common.core.model.persisted_class.core.Orders;
+import co.nvqa.common.utils.NvTestRuntimeException;
+import co.nvqa.common.utils.StandardTestUtils;
 import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.DoubleStream;
+import java.util.Objects;
 import javax.inject.Inject;
 import org.assertj.core.api.Assertions;
 
@@ -117,6 +121,33 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
       Assertions.assertThat(actualWeight).as("orders.weight equal highest weight")
           .isEqualTo(expectedWeight);
     }, f("Get orders.weight of id %s ", orderId), 10_000, 3);
+  }
+
+  @Then("DB Core - Operator generate stamp id for {string} orders")
+  public void generateStampId(String totalOrder) {
+    long totalOrderRequest = Long.parseLong(totalOrder);
+    for (int i = 0; i < totalOrderRequest; i++) {
+      doWithRetry(() -> {
+        try {
+          String stampId = StandardTestUtils.generateStampId();
+          if (orderDao.getSingleOrderDetailsByStampId(stampId) != null) {
+            throw new AssertionError();
+          }
+          putInList(KEY_CORE_LIST_OF_CREATED_STAMP_ID, stampId);
+        } catch (AssertionError ae) {
+          throw new NvTestRuntimeException(ae);
+        }
+      }, "Generate Stamp ID");
+    }
+  }
+
+  @Then("DB Core - Operator get order by stamp id {string}")
+  public void getOrderByStampId(String stampId) {
+    String stampIdCheck = resolveValue(stampId);
+    doWithRetry(() -> {
+      Orders order = orderDao.getSingleOrderDetailsByStampId(stampIdCheck);
+      putInList(KEY_CORE_LIST_OF_CREATED_ORDERS_CORE_DB,order,(o1, o2) -> Objects.equals(o1.getId(),o2.getId()));
+    }, "fetch order detail by Stamp Id", 10_000, 3);
   }
 
   @When("DB Core - verify order id {string} orders.dimensions record:")
