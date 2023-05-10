@@ -656,50 +656,6 @@ public class OrderClient extends SimpleApiClient {
     return fromJson(DEFAULT_SNAKE_CASE_MAPPER, r.body().asString(), BatchOrderInfo.class);
   }
 
-  public void forceFailWaypoint(long routeId, long waypointId, long failureReasonId) {
-    String url = "core/admin/routes/{routeId}/waypoints/{waypointId}/pods";
-
-    RequestSpecification spec = createAuthenticatedRequest()
-        .pathParam("routeId", routeId)
-        .pathParam("waypointId", waypointId)
-        .body(f("{ \"action\": \"fail\", \"failure_reason_id\":%d}", failureReasonId));
-
-    Response r = doPut("Core - Admin Force Fail", spec, url);
-    if (r.statusCode() != HttpConstants.RESPONSE_204_NO_CONTENT) {
-      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
-    }
-  }
-
-  public void forceSuccessWaypoint(long routeId, long waypointId) {
-    String url = "core/admin/routes/{routeId}/waypoints/{waypointId}/pods";
-
-    RequestSpecification spec = createAuthenticatedRequest()
-        .pathParam("routeId", routeId)
-        .pathParam("waypointId", waypointId)
-        .body("{ \"action\": \"success\"}");
-
-    Response r = doPut("Core - Admin Force Success", spec, url);
-    if (r.statusCode() != HttpConstants.RESPONSE_204_NO_CONTENT) {
-      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
-    }
-  }
-
-  public void forceSuccessWaypointWithCodCollected(long routeId, long waypointId,
-      List<Long> orderIds) {
-    String url = "core/admin/routes/{routeId}/waypoints/{waypointId}/pods";
-    String json = f("{ \"action\": \"success\", \"cod_collected_order_ids\": %s}", orderIds);
-
-    RequestSpecification spec = createAuthenticatedRequest()
-        .pathParam("routeId", routeId)
-        .pathParam("waypointId", waypointId)
-        .body(json);
-
-    Response r = doPut("Core - Admin Force Success with COD collected", spec, url);
-    if (r.statusCode() != HttpConstants.RESPONSE_204_NO_CONTENT) {
-      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
-    }
-  }
-
   public void editDeliveryDetails(Long orderId, DeliveryDetails deliveryDetails) {
     String url = "core/2.0/orders/{orderId}";
 

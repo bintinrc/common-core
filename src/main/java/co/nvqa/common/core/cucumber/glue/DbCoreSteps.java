@@ -18,7 +18,7 @@ import co.nvqa.common.core.model.persisted_class.core.OrderDetails;
 import co.nvqa.common.core.model.persisted_class.core.OrderJaroScoresV2;
 import co.nvqa.common.core.model.persisted_class.core.OutboundScans;
 import co.nvqa.common.core.model.persisted_class.core.Reservations;
-import co.nvqa.common.core.model.persisted_class.core.RouteLogs;
+import co.nvqa.common.core.model.persisted_class.core.CoreRouteLogs;
 import co.nvqa.common.core.model.persisted_class.core.RouteMonitoringData;
 import co.nvqa.common.core.model.persisted_class.core.ShipperPickupSearch;
 import co.nvqa.common.core.model.persisted_class.core.Transactions;
@@ -39,8 +39,6 @@ import org.assertj.core.api.Assertions;
 
 public class DbCoreSteps extends CoreStandardSteps {
 
-  @Inject
-  private OrderDao orderDao;
   @Inject
   private OrderDetailsDao orderDetailsDao;
   @Inject
@@ -124,10 +122,12 @@ public class DbCoreSteps extends CoreStandardSteps {
   @When("DB Core - verify route_logs record:")
   public void verifyRouteLogs(Map<String, String> data) {
     Map<String, String> resolvedData = resolveKeyValues(data);
-    RouteLogs expected = new RouteLogs(resolvedData);
+    CoreRouteLogs expected = new CoreRouteLogs(resolvedData);
 
     doWithRetry(() -> {
-      RouteLogs actual = routeLogsDao.getRouteLogs(expected.getId());
+      CoreRouteLogs actual = routeLogsDao.getRouteLogs(expected.getId());
+      Assertions.assertThat(actual)
+          .withFailMessage("Roure logs was not found: " + resolvedData);
       Assertions.assertThat(actual).withFailMessage("Roure logs was not found: " + resolvedData)
           .isNotNull();
       expected.compareWithActual(actual, resolvedData);
@@ -144,8 +144,17 @@ public class DbCoreSteps extends CoreStandardSteps {
       Assertions.assertThat(actual)
           .withFailMessage("waypoints record was not found: " + resolvedData).isNotNull();
       expected.compareWithActual(actual, resolvedData);
-      if (resolvedData.containsKey("seqNo") && resolvedData.get("seqNo").equalsIgnoreCase("null")) {
-        Assertions.assertThat(actual.getSeqNo()).as("seq_no is null").isNull();
+
+      if (resolvedData.containsKey("seqNo")) {
+        if (resolvedData.get("seqNo").equalsIgnoreCase("null")) {
+          Assertions.assertThat(actual.getSeqNo())
+              .as("seq_no is null")
+              .isNull();
+        } else {
+          Assertions.assertThat(actual.getSeqNo())
+              .as("seq_no is not null")
+              .isNotNull();
+        }
       }
       if (resolvedData.containsKey("routeId") && resolvedData.get("routeId")
           .equalsIgnoreCase("null")) {
@@ -191,14 +200,13 @@ public class DbCoreSteps extends CoreStandardSteps {
   @When("DB Core - verify route_monitoring_data is hard-deleted:")
   public void verifyRouteMonitoringData(List<String> data) {
     List<String> resolvedData = resolveValues(data);
-    doWithRetry(() -> {
-      resolvedData.forEach(e -> {
-        RouteMonitoringData actual = routeMonitoringDataDao.getRouteMonitoringDataByWaypointId(
-            Long.parseLong(e));
-        Assertions.assertThat(actual).as("route_monitoring_data is hard-deleted").isNull();
-      });
-    }, "verify route_monitoring_data records", 10_000, 3);
-
+    doWithRetry(() ->
+            resolvedData.forEach(e -> {
+              RouteMonitoringData actual = routeMonitoringDataDao.getRouteMonitoringDataByWaypointId(
+                  Long.parseLong(e));
+              Assertions.assertThat(actual).as("route_monitoring_data is hard-deleted").isNull();
+            })
+        , "verify route_monitoring_data records", 10_000, 3);
   }
 
   @When("DB Core - operator get order details of order id {string}")
@@ -364,9 +372,8 @@ public class DbCoreSteps extends CoreStandardSteps {
     Long orderId = Long.parseLong(dataTable.get("orderId"));
 
     doWithRetry(() -> {
-      List<WarehouseSweeps> warehouseSweepRecords = warehouseSweepsDao.findWarehouseSweepRecord(
-          trackingId);
-
+      List<WarehouseSweeps> warehouseSweepRecords = warehouseSweepsDao
+          .findWarehouseSweepRecord(trackingId);
       Assertions.assertThat(warehouseSweepRecords.size())
           .as("Expected 1 record in warehouse_sweeps table").isEqualTo(1);
 
