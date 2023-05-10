@@ -9,6 +9,7 @@ import io.cucumber.guice.ScenarioScoped;
 import io.cucumber.java.en.Given;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import lombok.Getter;
@@ -22,6 +23,8 @@ import org.slf4j.LoggerFactory;
 public class OrderVerificationSteps extends CoreStandardSteps {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ApiOrderSteps.class);
+  public static final String TRANSACTION_TYPE_PICKUP = "PICKUP";
+  public static final String TRANSACTION_TYPE_DELIVERY = "DELIVERY";
 
   @Inject
   @Getter
@@ -97,7 +100,7 @@ public class OrderVerificationSteps extends CoreStandardSteps {
     }
 
     List<Transaction> result = transactions.stream().filter(
-        transaction -> StringUtils.equalsIgnoreCase(type, transaction.getType()))
+            transaction -> StringUtils.equalsIgnoreCase(type, transaction.getType()))
         .collect(Collectors.toList());
 
     if (CollectionUtils.isEmpty(result)) {
@@ -105,6 +108,71 @@ public class OrderVerificationSteps extends CoreStandardSteps {
     }
 
     return Iterables.getLast(result);
+  }
+
+  @Given("API Core - verify {word} transaction of the order:")
+  public void apiOperatorVerifyTransaction(String transactionType, Map<String, String> data) {
+    data = resolveKeyValues(data);
+    List<Order> orders = get(KEY_LIST_OF_CREATED_ORDERS);
+    if (CollectionUtils.isEmpty(orders)) {
+      throw new IllegalArgumentException("KEY_LIST_OF_CREATED_ORDERS is empty");
+    }
+    String orderIdStr = data.get("orderId");
+    long orderId =
+        StringUtils.isNotBlank(orderIdStr) ? Long.parseLong(orderIdStr)
+            : orders.get(orders.size() - 1).getId();
+    Order order = orders.stream()
+        .filter(o -> o.getId() != null && o.getId() == orderId)
+        .findFirst()
+        .orElseThrow(() -> new IllegalArgumentException(
+            "Data for order [" + orderId + "] was not found in KEY_LIST_OF_CREATED_ORDERS"));
+    Transaction transaction;
+    switch (transactionType.toUpperCase()) {
+      case TRANSACTION_TYPE_PICKUP:
+        transaction = order.getLastPickupTransaction();
+        break;
+      case TRANSACTION_TYPE_DELIVERY:
+        transaction = order.getLastDeliveryTransaction();
+        break;
+      default:
+        throw new IllegalArgumentException(f("Unknown transaction type [%s]", transactionType));
+    }
+    put(KEY_TRANSACTION_ID, transaction.getId());
+    put(KEY_WAYPOINT_ID, transaction.getWaypointId());
+    if (data.containsKey("status")) {
+      Assertions.assertThat(transaction.getStatus())
+          .as(f("%s transaction: status", transactionType)).isEqualTo(data.get("status"));
+    }
+    if (data.containsKey("comments")) {
+      Assertions.assertThat(transaction.getComments())
+          .as(f("%s transaction: comments", transactionType)).isEqualTo(data.get("comments"));
+    }
+  }
+
+  @Given("API Core - save the last {word} transaction of {value} order as {string}")
+  public void saveTransaction(String transactionType, String orderId, String key) {
+    List<Order> orders = get(KEY_LIST_OF_CREATED_ORDERS);
+    Order order = orders.stream()
+        .filter(o -> Objects.equals(o.getId(), Long.valueOf(orderId)))
+        .findFirst()
+        .orElseThrow(
+            () -> new IllegalArgumentException("Order with Id " + orderId + " was not found"));
+    saveTransaction(transactionType, key, order);
+  }
+
+  private void saveTransaction(String transactionType, String key, Order order) {
+    Transaction transaction;
+    switch (transactionType.toUpperCase()) {
+      case TRANSACTION_TYPE_PICKUP:
+        transaction = order.getLastPickupTransaction();
+        break;
+      case TRANSACTION_TYPE_DELIVERY:
+        transaction = order.getLastDeliveryTransaction();
+        break;
+      default:
+        throw new IllegalArgumentException(f("Unknown transaction type [%s]", transactionType));
+    }
+    put(key, transaction);
   }
 
 }

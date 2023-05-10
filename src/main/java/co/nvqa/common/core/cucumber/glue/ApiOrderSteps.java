@@ -9,13 +9,17 @@ import co.nvqa.common.core.model.order.RtsOrderRequest;
 import co.nvqa.common.utils.JsonUtils;
 import co.nvqa.common.utils.NvTestRuntimeException;
 import io.cucumber.guice.ScenarioScoped;
+import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import io.restassured.response.Response;
 import java.util.List;
 import java.util.Map;
 import javax.inject.Inject;
 import lombok.Getter;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.hamcrest.Matchers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -197,5 +201,36 @@ public class ApiOrderSteps extends CoreStandardSteps {
     put(KEY_SAVED_ORDER_WEIGHT, weight);
     doWithRetry(() -> getOrderClient().updateOrderPricingWeight(orderId, weight),
         "update order pricing weight using Order Weight Update ");
+  }
+
+  @Given("API Core - cancel order and check error:")
+  public void apiOperatorCancelCreatedOrderAndGetError(Map<String, String> data) {
+    data = resolveKeyValues(data);
+    int statusCode = Integer.parseInt(data.getOrDefault("statusCode", "500"));
+    String orderIdStr = data.get("orderId");
+    long orderId;
+    if (StringUtils.isNotBlank(orderIdStr)) {
+      orderId = Long.parseLong(orderIdStr);
+    } else {
+      List<Order> orders = get(KEY_LIST_OF_CREATED_ORDERS);
+      if (CollectionUtils.isEmpty(orders)) {
+        throw new IllegalArgumentException("KEY_LIST_OF_CREATED_ORDERS is empty");
+      }
+      orderId = orders.get(orders.size() - 1).getId();
+    }
+    String message = data.get("message");
+    doWithRetry(() -> {
+      Response response = getOrderClient().cancelOrder(orderId);
+      response.then()
+          .statusCode(statusCode)
+          .body("messages", Matchers.hasItem(message),
+              "data.message", Matchers.equalTo(message));
+    }, "try to cancel order and check error", 1000, 5);
+  }
+
+  @Given("API Core - cancel order {value}")
+  public void apiOperatorCancelCreatedOrder(String orderIdStr) {
+    long orderId = Long.parseLong(orderIdStr);
+    getOrderClient().cancelOrder(orderId);
   }
 }
