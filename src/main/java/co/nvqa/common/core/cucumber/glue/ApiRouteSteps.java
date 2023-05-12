@@ -279,6 +279,20 @@ public class ApiRouteSteps extends CoreStandardSteps {
   /**
    * Sample:<p>
    * <p>
+   * API Core - Operator remove reservation id {KEY_LIST_OF_CREATED_RESERVATIONS[1].id} from route
+   * <p>
+   */
+  @When("API Core - Operator remove reservation id {string} from route")
+  public void apiOperatorAddReservationPickUpsToTheRoute(String id) {
+    final long reservationResultId = Long.parseLong(resolveValue(id));
+    doWithRetry(
+        () -> getRouteClient().pullReservationOutOfRoute(reservationResultId),
+        "remove reservation from route ");
+  }
+
+  /**
+   * Sample:<p>
+   * <p>
    * When API Core - Operator bulk add reservation to route using data below: | request | {"ids":
    * [{KEY_LIST_OF_CREATED_RESERVATIONS[1].id}, {KEY_LIST_OF_CREATED_RESERVATIONS[2].id}],"new_route_id":{KEY_LIST_OF_CREATED_ROUTES[1].id},"overwrite":true}
    * |

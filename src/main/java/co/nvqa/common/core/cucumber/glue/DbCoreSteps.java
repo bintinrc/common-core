@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
+import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
 
 public class DbCoreSteps extends CoreStandardSteps {
@@ -184,6 +185,16 @@ public class DbCoreSteps extends CoreStandardSteps {
       Assertions.assertThat(actual)
           .withFailMessage("shipper_pickup_search record was not found: " + data).isNotNull();
       expected.compareWithActual(actual, resolvedData);
+      if (resolvedData.containsKey("serviceTime")) {
+        Assertions.assertThat(actual.getServiceEndTime())
+            .as("shipper_pickup_search serviceEndTime is not null").isNotNull();
+      }
+      if (resolvedData.containsKey("failureReason")) {
+        Assertions
+            .assertThat(StringUtils
+                .containsIgnoreCase(actual.getComments(), (resolvedData.get("failureReason"))))
+            .as("shipper_pickup_search failureReason is correct").isTrue();
+      }
     }, "verify shipper_pickup_search records", 10_000, 3);
   }
 
