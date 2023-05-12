@@ -1,6 +1,7 @@
 package co.nvqa.common.core.model.persisted_class.core;
 
 import co.nvqa.common.model.DataEntity;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -31,8 +32,7 @@ public class OrderTagsSearch extends DataEntity<OrderTagsSearch> {
   @Column(name = "parcel_granular_status")
   private String parcelGranularStatus;
   @Column(name = "order_tag_ids")
-  @ElementCollection
-  private Set<Long> orderTagIds;
+  private String orderTagIds;
   @Column(name = "route_id")
   private Long routeId;
   @Column(name = "driver_id")
@@ -40,16 +40,5 @@ public class OrderTagsSearch extends DataEntity<OrderTagsSearch> {
 
   public OrderTagsSearch(Map<String, ?> data) {
     super(data);
-  }
-
-  public void setOrderTagIds(Set<Long> orderTagIds) {
-    this.orderTagIds = orderTagIds;
-  }
-
-  public void setOrderTagIds(String orderTagIds) {
-    setOrderTagIds(splitAndNormalize(orderTagIds).stream()
-        .map(Long::valueOf)
-        .collect(Collectors.toSet())
-    );
   }
 }
