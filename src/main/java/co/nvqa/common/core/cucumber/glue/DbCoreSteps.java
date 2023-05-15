@@ -4,6 +4,8 @@ import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.hibernate.CodInboundsDao;
 import co.nvqa.common.core.hibernate.OrderDetailsDao;
 import co.nvqa.common.core.hibernate.OrderJaroScoresV2Dao;
+import co.nvqa.common.core.hibernate.OrderTagsDao;
+import co.nvqa.common.core.hibernate.OrderTagsSearchDao;
 import co.nvqa.common.core.hibernate.OutboundScansDao;
 import co.nvqa.common.core.hibernate.ReservationsDao;
 import co.nvqa.common.core.hibernate.RouteLogsDao;
@@ -18,7 +20,8 @@ import co.nvqa.common.core.model.persisted_class.core.CodInbounds;
 import co.nvqa.common.core.model.persisted_class.core.CoreRouteLogs;
 import co.nvqa.common.core.model.persisted_class.core.OrderDetails;
 import co.nvqa.common.core.model.persisted_class.core.OrderJaroScoresV2;
-import co.nvqa.common.core.model.persisted_class.core.Orders;
+import co.nvqa.common.core.model.persisted_class.core.OrderTags;
+import co.nvqa.common.core.model.persisted_class.core.OrderTagsSearch;
 import co.nvqa.common.core.model.persisted_class.core.OutboundScans;
 import co.nvqa.common.core.model.persisted_class.core.Reservations;
 import co.nvqa.common.core.model.persisted_class.core.RouteMonitoringData;
@@ -66,6 +69,10 @@ public class DbCoreSteps extends CoreStandardSteps {
   private OutboundScansDao outboundScansDao;
   @Inject
   private CodInboundsDao codInboundsDao;
+  @Inject
+  private OrderTagsDao orderTagsDao;
+  @Inject
+  private OrderTagsSearchDao orderTagsSearchDao;
 
   @Override
   public void init() {
@@ -467,5 +474,27 @@ public class DbCoreSteps extends CoreStandardSteps {
           .isNull();
     });
     assertions.assertAll();
+  }
+
+  @And("DB Core - Operator verifies tags of {string} order:")
+  public void verifyOrderTags(String orderId, List<String> expected) {
+    expected = resolveValues(expected);
+    List<OrderTags> actual = orderTagsDao.getOrderTags(Long.parseLong(resolveValue(orderId)));
+    Assertions.assertThat(actual).as("List of order_tag records for order_id=%s", orderId)
+        .isNotEmpty();
+    Assertions.assertThat(actual).extracting(o -> String.valueOf(o.getTagId()))
+        .as("List of tag_id for order_id=%s", orderId)
+        .containsExactlyInAnyOrderElementsOf(expected);
+  }
+
+  @And("DB Core - Operator verifies order_tags_search record of {string} order:")
+  public void verifyOrderTagsSearch(String orderId, Map<String, String> data) {
+    OrderTagsSearch expected = new OrderTagsSearch(resolveKeyValues(data));
+    List<OrderTagsSearch> actual = orderTagsSearchDao
+        .getOrderTagsSearch(Long.parseLong(resolveValue(orderId)));
+    Assertions.assertThat(actual).as("List of order_tags_search records for order_id=%s", orderId)
+        .isNotEmpty();
+    Assertions.assertThat(actual).as("List of order_tags_search records for order_id=%s", orderId)
+        .anyMatch(expected::matchedTo);
   }
 }

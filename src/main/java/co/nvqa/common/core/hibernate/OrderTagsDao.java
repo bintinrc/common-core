@@ -15,7 +15,7 @@ public class OrderTagsDao extends DbBase {
         StandardTestConstants.DB_PASS, "co.nvqa.common.core.model.persisted_class.core");
   }
 
-  public List<OrderTags> getMultipleTransactions(Long orderId) {
+  public List<OrderTags> getOrderTags(Long orderId) {
     String query = "FROM OrderTags WHERE orderId = :orderId";
     return findAll(session ->
         session.createQuery(query, OrderTags.class)
