@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 import javax.inject.Inject;
 import lombok.Getter;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.Matchers;
 import org.slf4j.Logger;
@@ -208,16 +207,11 @@ public class ApiOrderSteps extends CoreStandardSteps {
     data = resolveKeyValues(data);
     int statusCode = Integer.parseInt(data.getOrDefault("statusCode", "500"));
     String orderIdStr = data.get("orderId");
-    long orderId;
-    if (StringUtils.isNotBlank(orderIdStr)) {
-      orderId = Long.parseLong(orderIdStr);
-    } else {
-      List<Order> orders = get(KEY_LIST_OF_CREATED_ORDERS);
-      if (CollectionUtils.isEmpty(orders)) {
-        throw new IllegalArgumentException("KEY_LIST_OF_CREATED_ORDERS is empty");
-      }
-      orderId = orders.get(orders.size() - 1).getId();
+    if (StringUtils.isBlank(orderIdStr)) {
+      throw new IllegalArgumentException("orderId was not defined");
     }
+    long orderId = Long.parseLong(orderIdStr);
+
     String message = data.get("message");
     doWithRetry(() -> {
       Response response = getOrderClient().cancelOrder(orderId);

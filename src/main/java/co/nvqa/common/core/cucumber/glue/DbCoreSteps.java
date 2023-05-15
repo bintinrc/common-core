@@ -42,6 +42,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
+import org.apache.commons.collections.CollectionUtils;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.SoftAssertions;
 
@@ -448,14 +449,17 @@ public class DbCoreSteps extends CoreStandardSteps {
     }, "Operator verify the COD for created route is soft deleted");
   }
 
-  @When("DB Core - verify orders records are hard-deleted in waypoints table:")
-  public void verifyOrdersWaypointsAreHardDeleted(List<String> orderIds) {
-    resolveValues(orderIds).forEach(this::verifyOrderWaypointsAreHardDeleted);
+  @When("DB Core - verify orders from {value} records are hard-deleted in waypoints table:")
+  public void verifyOrdersWaypointsAreHardDeleted(String listKey, List<String> orderIds) {
+    resolveValues(orderIds).forEach(id -> verifyOrderWaypointsAreHardDeleted(id, listKey));
   }
 
-  @When("DB Core - verify {value} order records are hard-deleted in waypoints table")
-  public void verifyOrderWaypointsAreHardDeleted(String orderId) {
-    List<Order> orders = get(KEY_LIST_OF_CREATED_ORDERS);
+  @When("DB Core - verify {value} order from {value} records are hard-deleted in waypoints table")
+  public void verifyOrderWaypointsAreHardDeleted(String orderId, String listKey) {
+    List<Order> orders = get(listKey);
+    if (CollectionUtils.isEmpty(orders)) {
+      throw new IllegalArgumentException("There are no orders stored under [" + listKey + "] list");
+    }
     Order order = orders.stream()
         .filter(o -> Objects.equals(o.getId(), Long.valueOf(orderId)))
         .findFirst()

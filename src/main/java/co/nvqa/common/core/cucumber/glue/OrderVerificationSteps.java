@@ -113,9 +113,14 @@ public class OrderVerificationSteps extends CoreStandardSteps {
   @Given("API Core - verify {word} transaction of the order:")
   public void apiOperatorVerifyTransaction(String transactionType, Map<String, String> data) {
     data = resolveKeyValues(data);
-    List<Order> orders = get(KEY_LIST_OF_CREATED_ORDERS);
+    String ordersListKey = data.get("ordersListKey");
+    if (StringUtils.isBlank(ordersListKey)) {
+      throw new IllegalArgumentException("ordersListKey was not defined");
+    }
+    List<Order> orders = get(ordersListKey);
     if (CollectionUtils.isEmpty(orders)) {
-      throw new IllegalArgumentException("KEY_LIST_OF_CREATED_ORDERS is empty");
+      throw new IllegalArgumentException(
+          "There are no orders stored under [" + ordersListKey + "] list");
     }
     String orderIdStr = data.get("orderId");
     long orderId =
@@ -137,8 +142,7 @@ public class OrderVerificationSteps extends CoreStandardSteps {
       default:
         throw new IllegalArgumentException(f("Unknown transaction type [%s]", transactionType));
     }
-    put(KEY_TRANSACTION_ID, transaction.getId());
-    put(KEY_WAYPOINT_ID, transaction.getWaypointId());
+    put(KEY_CORE_TRANSACTION, transaction);
     if (data.containsKey("status")) {
       Assertions.assertThat(transaction.getStatus())
           .as(f("%s transaction: status", transactionType)).isEqualTo(data.get("status"));
@@ -149,9 +153,12 @@ public class OrderVerificationSteps extends CoreStandardSteps {
     }
   }
 
-  @Given("API Core - save the last {word} transaction of {value} order as {string}")
-  public void saveTransaction(String transactionType, String orderId, String key) {
-    List<Order> orders = get(KEY_LIST_OF_CREATED_ORDERS);
+  @Given("API Core - save the last {word} transaction of {value} order from {value} as {string}")
+  public void saveTransaction(String transactionType, String orderId, String listKey, String key) {
+    List<Order> orders = get(listKey);
+    if (CollectionUtils.isEmpty(orders)) {
+      throw new IllegalArgumentException("There are no orders stored under [" + listKey + "] list");
+    }
     Order order = orders.stream()
         .filter(o -> Objects.equals(o.getId(), Long.valueOf(orderId)))
         .findFirst()
