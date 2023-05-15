@@ -449,12 +449,12 @@ public class DbCoreSteps extends CoreStandardSteps {
     }, "Operator verify the COD for created route is soft deleted");
   }
 
-  @When("DB Core - verify orders from {value} records are hard-deleted in waypoints table:")
+  @When("DB Core - verify orders from {string} records are hard-deleted in waypoints table:")
   public void verifyOrdersWaypointsAreHardDeleted(String listKey, List<String> orderIds) {
     resolveValues(orderIds).forEach(id -> verifyOrderWaypointsAreHardDeleted(id, listKey));
   }
 
-  @When("DB Core - verify {value} order from {value} records are hard-deleted in waypoints table")
+  @When("DB Core - verify {value} order from {string} records are hard-deleted in waypoints table")
   public void verifyOrderWaypointsAreHardDeleted(String orderId, String listKey) {
     List<Order> orders = get(listKey);
     if (CollectionUtils.isEmpty(orders)) {

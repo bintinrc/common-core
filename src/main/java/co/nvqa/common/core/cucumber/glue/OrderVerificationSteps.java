@@ -112,11 +112,11 @@ public class OrderVerificationSteps extends CoreStandardSteps {
 
   @Given("API Core - verify {word} transaction of the order:")
   public void apiOperatorVerifyTransaction(String transactionType, Map<String, String> data) {
-    data = resolveKeyValues(data);
     String ordersListKey = data.get("ordersListKey");
     if (StringUtils.isBlank(ordersListKey)) {
       throw new IllegalArgumentException("ordersListKey was not defined");
     }
+    data = resolveKeyValues(data);
     List<Order> orders = get(ordersListKey);
     if (CollectionUtils.isEmpty(orders)) {
       throw new IllegalArgumentException(
@@ -153,7 +153,7 @@ public class OrderVerificationSteps extends CoreStandardSteps {
     }
   }
 
-  @Given("API Core - save the last {word} transaction of {value} order from {value} as {string}")
+  @Given("API Core - save the last {word} transaction of {value} order from {string} as {string}")
   public void saveTransaction(String transactionType, String orderId, String listKey, String key) {
     List<Order> orders = get(listKey);
     if (CollectionUtils.isEmpty(orders)) {
