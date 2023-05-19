@@ -13,8 +13,8 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.DoubleStream;
 import java.util.Objects;
+import java.util.stream.DoubleStream;
 import javax.inject.Inject;
 import org.assertj.core.api.Assertions;
 
@@ -146,7 +146,8 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
     String stampIdCheck = resolveValue(stampId);
     doWithRetry(() -> {
       Orders order = orderDao.getSingleOrderDetailsByStampId(stampIdCheck);
-      putInList(KEY_CORE_LIST_OF_CREATED_ORDERS_CORE_DB,order,(o1, o2) -> Objects.equals(o1.getId(),o2.getId()));
+      putInList(KEY_CORE_LIST_OF_CREATED_ORDERS_CORE_DB, order,
+          (o1, o2) -> Objects.equals(o1.getId(), o2.getId()));
     }, "fetch order detail by Stamp Id", 10_000, 3);
   }
 

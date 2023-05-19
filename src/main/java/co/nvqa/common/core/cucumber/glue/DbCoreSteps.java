@@ -14,14 +14,16 @@ import co.nvqa.common.core.hibernate.ShipperPickupSearchDao;
 import co.nvqa.common.core.hibernate.TransactionsDao;
 import co.nvqa.common.core.hibernate.WarehouseSweepsDao;
 import co.nvqa.common.core.hibernate.WaypointsDao;
+import co.nvqa.common.core.model.order.Order;
+import co.nvqa.common.core.model.order.Order.Transaction;
 import co.nvqa.common.core.model.persisted_class.core.CodInbounds;
+import co.nvqa.common.core.model.persisted_class.core.CoreRouteLogs;
 import co.nvqa.common.core.model.persisted_class.core.OrderDetails;
 import co.nvqa.common.core.model.persisted_class.core.OrderJaroScoresV2;
 import co.nvqa.common.core.model.persisted_class.core.OrderTags;
 import co.nvqa.common.core.model.persisted_class.core.OrderTagsSearch;
 import co.nvqa.common.core.model.persisted_class.core.OutboundScans;
 import co.nvqa.common.core.model.persisted_class.core.Reservations;
-import co.nvqa.common.core.model.persisted_class.core.CoreRouteLogs;
 import co.nvqa.common.core.model.persisted_class.core.RouteMonitoringData;
 import co.nvqa.common.core.model.persisted_class.core.ShipperPickupSearch;
 import co.nvqa.common.core.model.persisted_class.core.Transactions;
@@ -36,9 +38,13 @@ import io.cucumber.java.en.When;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
+import org.apache.commons.collections.CollectionUtils;
 import org.assertj.core.api.Assertions;
+import org.assertj.core.api.SoftAssertions;
 
 public class DbCoreSteps extends CoreStandardSteps {
 
@@ -441,6 +447,37 @@ public class DbCoreSteps extends CoreStandardSteps {
           .withFailMessage("cod_inbounds record was not deleted: " + dataTableRaw)
           .isNotNull();
     }, "Operator verify the COD for created route is soft deleted");
+  }
+
+  @When("DB Core - verify orders from {string} records are hard-deleted in waypoints table:")
+  public void verifyOrdersWaypointsAreHardDeleted(String listKey, List<String> orderIds) {
+    resolveValues(orderIds).forEach(id -> verifyOrderWaypointsAreHardDeleted(id, listKey));
+  }
+
+  @When("DB Core - verify {value} order from {string} records are hard-deleted in waypoints table")
+  public void verifyOrderWaypointsAreHardDeleted(String orderId, String listKey) {
+    List<Order> orders = get(listKey);
+    if (CollectionUtils.isEmpty(orders)) {
+      throw new IllegalArgumentException("There are no orders stored under [" + listKey + "] list");
+    }
+    Order order = orders.stream()
+        .filter(o -> Objects.equals(o.getId(), Long.valueOf(orderId)))
+        .findFirst()
+        .orElseThrow(
+            () -> new IllegalArgumentException("Order with ID " + orderId + " was not found"));
+    Set<Long> waypointIds = order.getTransactions().stream()
+        .map(Transaction::getWaypointId)
+        .filter(Objects::nonNull)
+        .collect(Collectors.toSet());
+
+    SoftAssertions assertions = new SoftAssertions();
+    waypointIds.forEach(w -> {
+      Waypoints waypoint = waypointsDao.getWaypointsDetails(w);
+      assertions.assertThat(waypoint)
+          .as("waypoints record for id=%s", w)
+          .isNull();
+    });
+    assertions.assertAll();
   }
 
   @And("DB Core - Operator verifies tags of {string} order:")
