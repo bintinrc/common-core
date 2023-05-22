@@ -193,6 +193,10 @@ public class Order extends DataEntity<Order> implements Serializable {
   public Order() {
   }
 
+  public Order(Map<String, ?> data) {
+    fromMap(data);
+  }
+
   public void setId(Long id) {
     this.id = id;
   }

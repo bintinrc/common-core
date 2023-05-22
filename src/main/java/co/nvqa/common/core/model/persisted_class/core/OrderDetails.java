@@ -1,5 +1,7 @@
 package co.nvqa.common.core.model.persisted_class.core;
 
+import co.nvqa.common.model.DataEntity;
+import java.util.Map;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -15,7 +17,7 @@ import lombok.Setter;
 @Getter
 @Entity
 @Table(name = "order_details")
-public class OrderDetails {
+public class OrderDetails extends DataEntity<OrderDetails> {
   @Id
   private Long id;
 
@@ -40,4 +42,7 @@ public class OrderDetails {
   @Column(name = "parent_shipper_id")
   private Long parentShipperId;
 
+  public OrderDetails(Map<String, ?> data) {
+    fromMap(data);
+  }
 }
