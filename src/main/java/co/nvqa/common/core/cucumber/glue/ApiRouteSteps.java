@@ -439,11 +439,9 @@ public class ApiRouteSteps extends CoreStandardSteps {
   /**
    * Sample:<p>
    * <p>
-   * When API Operator add parcel to the route using data below:<p> | orderId | 111111 |<p> |
-   * addParcelToRouteRequest | {"route_id":95139463,"type":"DELIVERY"} |<p>
-   * <p>
-   *
-   * @param dataTableAsMap Map of data from feature file.
+   * API Core - Operator force success waypoint via route manifest:
+   *       | routeId    | {KEY_LIST_OF_CREATED_ROUTES[1].id}               |
+   *       | waypointId | {KEY_CORE_LIST_OF_RESERVATIONS_DB[1].waypointId} |
    */
   @Given("API Core - Operator force success waypoint via route manifest:")
   public void apiOperatorForceSuccessRouteManifest(Map<String, String> dataTableAsMap) {
@@ -453,5 +451,23 @@ public class ApiRouteSteps extends CoreStandardSteps {
     doWithRetry(
         () -> getRouteClient().forceSuccessWaypoint(routeId, waypointId),
         "force success route manifest");
+  }
+
+  /**
+   * Sample:<p>
+   * API Core - Operator force fail waypoint via route manifest:
+   *       | routeId         | {KEY_LIST_OF_CREATED_ROUTES[1].id}               |
+   *       | waypointId      | {KEY_CORE_LIST_OF_RESERVATIONS_DB[1].waypointId} |
+   *       | failureReasonId | 12345                                            |
+   */
+  @Given("API Core - Operator force fail waypoint via route manifest:")
+  public void apiOperatorForceFailRouteManifest(Map<String, String> dataTableAsMap) {
+    final Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
+    final long routeId = Long.parseLong(resolvedDataTable.get("routeId"));
+    final long waypointId = Long.parseLong(resolvedDataTable.get("waypointId"));
+    final long failureReasonId = Long.parseLong(resolvedDataTable.get("failureReasonId"));
+    doWithRetry(
+        () -> getRouteClient().forceFailWaypoint(routeId, waypointId, failureReasonId),
+        "force fail route manifest");
   }
 }
