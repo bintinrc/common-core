@@ -7,6 +7,7 @@ import co.nvqa.common.core.model.other.CoreExceptionResponse.Error;
 import co.nvqa.common.core.model.reservation.BulkRouteReservationResponse;
 import co.nvqa.common.core.model.route.AddParcelToRouteRequest;
 import co.nvqa.common.core.model.route.AddPickupJobToRouteRequest;
+import co.nvqa.common.core.model.route.BulkAddPickupJobToRouteRequest;
 import co.nvqa.common.core.model.route.MergeWaypointsResponse;
 import co.nvqa.common.core.model.route.MergeWaypointsResponse.Data;
 import co.nvqa.common.core.model.route.RouteRequest;
@@ -150,6 +151,40 @@ public class ApiRouteSteps extends CoreStandardSteps {
     doWithRetry(
         () -> getRouteClient().addPickupJobToRoute(jobId, addPickupJobToRouteRequest)
         , "add pa job to route");
+  }
+
+  @Given("API Core - Operator bulk add pickup jobs to the route using data below:")
+  public void apiOperatorBulkAddPickupJobToTheRouteUsingDataBelow(
+      Map<String, String> dataTableAsMap) {
+    final Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
+
+    final String bulkAddPickupJobToTheRouteRequestTemplate = resolvedDataTable
+        .get("bulkAddPickupJobToTheRouteRequest");
+
+    final BulkAddPickupJobToRouteRequest bulkAddPickupJobToRouteRequest = fromJsonSnakeCase(
+        bulkAddPickupJobToTheRouteRequestTemplate, BulkAddPickupJobToRouteRequest.class);
+
+    doWithRetry(
+        () -> getRouteClient().bulkAddPickupJobToRoute(bulkAddPickupJobToRouteRequest),
+        "Operator Bulk Add Pickup Jobs to Route", 2000, 3);
+  }
+
+  @Given("API Core - Operator bulk update routed pickup jobs to another route using data below:")
+  public void apiOperatorBulkUpdateRoutedPickupJobToTheRouteUsingDataBelow(
+      Map<String, String> dataTableAsMap) {
+    final Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
+
+    final String bulkAddPickupJobToTheRouteRequestTemplate = resolvedDataTable
+        .get("bulkAddPickupJobToTheRouteRequest");
+
+    final BulkAddPickupJobToRouteRequest bulkAddPickupJobToRouteRequest = fromJsonSnakeCase(
+        bulkAddPickupJobToTheRouteRequestTemplate, BulkAddPickupJobToRouteRequest.class);
+
+    bulkAddPickupJobToRouteRequest.setOverwrite(true);
+
+    doWithRetry(
+        () -> getRouteClient().bulkAddPickupJobToRoute(bulkAddPickupJobToRouteRequest),
+        "Operator Bulk Update Routed Pickup Jobs to another Route", 2000, 3);
   }
 
   @Given("API Core - Operator remove pickup job id {string} from route")

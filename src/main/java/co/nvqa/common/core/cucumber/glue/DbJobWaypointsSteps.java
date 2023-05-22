@@ -33,4 +33,17 @@ public class DbJobWaypointsSteps extends CoreStandardSteps {
     }, "reading job waypoint from job id: " + jobId);
     put(KEY_WAYPOINT_ID, jobWaypoint.getWaypointId());
   }
+
+  @When("DB Core - get all waypoint ids of jobs ")
+  public void getWaypointIdsByJobIds(String StringJobId) {
+    final long jobId = Long.parseLong(resolveValue(StringJobId));
+    final JobWaypoint jobWaypoint = doWithRetry(() -> {
+      final JobWaypoint result = jobWaypointDao.getWaypointIdByJobId(jobId);
+      if (result == null) {
+        throw new NvTestRuntimeException("waypoint is not found for job id " + jobId);
+      }
+      return result;
+    }, "reading job waypoint from job id: " + jobId);
+    put(KEY_WAYPOINT_ID, jobWaypoint.getWaypointId());
+  }
 }
