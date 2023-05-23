@@ -169,7 +169,6 @@ public class RouteClient extends SimpleApiClient {
     final String json = toJson(DEFAULT_SNAKE_CASE_MAPPER, bulkAddPickupJobToRouteRequest);
     final RequestSpecification spec = createAuthenticatedRequest().body(json);
     final Response response = doPut("Core - Bulk Add Pickup Job to Route", spec, url);
-    ;
     response.then().contentType(ContentType.JSON);
     if (response.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
       throw new NvTestHttpException("unexpected http status: " + response.statusCode());

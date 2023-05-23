@@ -1,6 +1,5 @@
 package co.nvqa.common.core.model.route;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,8 +12,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class BulkAddPickupJobToRouteRequest {
 
-  @JsonProperty("ids")
-  private List<Long> paJobIds;
+  private List<Long> ids;
   private String newRouteId;
   private Boolean overwrite;
 }
