@@ -227,4 +227,9 @@ public class ApiOrderSteps extends CoreStandardSteps {
     long orderId = Long.parseLong(orderIdStr);
     getOrderClient().cancelOrder(orderId);
   }
+
+  @Given("API Core - resume order {value}")
+  public void apiOperatorResumeTheCreatedOrder(String trackingId) {
+    getOrderClient().resumeOrder(trackingId);
+  }
 }

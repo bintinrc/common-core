@@ -99,6 +99,8 @@ public class Orders extends DataEntity<Orders> {
   private Long latestWarehouseSweepId;
   @Column(name = "shipper_ref_metadata")
   private String shipperRefMetadata;
+  @Column(name = "cod_id")
+  private String codId;
   private String dimensions;
 
   public Orders(Map<String, ?> data) {

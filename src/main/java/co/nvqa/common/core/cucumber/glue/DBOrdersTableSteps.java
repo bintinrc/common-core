@@ -1,10 +1,14 @@
 package co.nvqa.common.core.cucumber.glue;
 
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
+import co.nvqa.common.core.hibernate.CodsDao;
 import co.nvqa.common.core.hibernate.OrderDao;
+import co.nvqa.common.core.hibernate.OrderDeliveryVerificationsDao;
 import co.nvqa.common.core.model.order.Order.Data;
 import co.nvqa.common.core.model.order.Order.Dimension;
 import co.nvqa.common.core.model.order.Order.PreviousAddressDetails;
+import co.nvqa.common.core.model.persisted_class.core.Cods;
+import co.nvqa.common.core.model.persisted_class.core.OrderDeliveryVerifications;
 import co.nvqa.common.core.model.persisted_class.core.Orders;
 import co.nvqa.common.utils.NvTestRuntimeException;
 import co.nvqa.common.utils.StandardTestUtils;
@@ -23,6 +27,10 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
 
   @Inject
   private OrderDao orderDao;
+  @Inject
+  private OrderDeliveryVerificationsDao odvDao;
+  @Inject
+  private CodsDao codsDao;
 
   @Override
   public void init() {
@@ -224,6 +232,43 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
           .isNotNull();
       expected.compareWithActual(actual, resolvedData);
     }, "verify orders records", 10_000, 3);
+  }
+
+  @Given("DB Core - verify order by Stamp ID:")
+  public void dbCoreOperatorGetsOrderByStampId(Map<String, String> data) {
+    data = resolveKeyValues(data);
+    String stampId = data.get("stampId");
+    String trackingId = data.get("trackingId");
+    Orders orders = orderDao.getSingleOrderDetailsByStampId(stampId);
+    Assertions.assertThat(orders.getTrackingId())
+        .as(f("Order trackingId is not matched to trackingId with %s stampId", stampId))
+        .isEqualTo(trackingId);
+  }
+
+  @When("DB Core - verify order_delivery_verifications record:")
+  public void verifyOrderDeliveryVerificationsRecords(Map<String, String> data) {
+    Map<String, String> resolvedData = resolveKeyValues(data);
+    OrderDeliveryVerifications expected = new OrderDeliveryVerifications(resolvedData);
+    doWithRetry(() -> {
+      OrderDeliveryVerifications actual = odvDao.getTransactionBlob(expected.getOrderId());
+      Assertions.assertThat(actual)
+          .withFailMessage("order_delivery_verifications record was not found: " + resolvedData)
+          .isNotNull();
+      expected.compareWithActual(actual, resolvedData);
+    }, "verify order_delivery_verifications records", 10_000, 3);
+  }
+
+  @When("DB Core - verify cods record:")
+  public void verifyCodsRecords(Map<String, String> data) {
+    Map<String, String> resolvedData = resolveKeyValues(data);
+    Cods expected = new Cods(resolvedData);
+    doWithRetry(() -> {
+      Cods actual = codsDao.getCodsById(expected.getId());
+      Assertions.assertThat(actual)
+          .withFailMessage("cods record was not found: " + resolvedData)
+          .isNotNull();
+      expected.compareWithActual(actual, resolvedData);
+    }, "verify cods records", 10_000, 3);
   }
 
 }
