@@ -9,7 +9,6 @@
 New Steps:
 
 - API Core - Operator bulk add pickup jobs to the route using data below:
-- API Core - Operator bulk update routed pickup jobs to another route using data below:
 
 <hr>
 
