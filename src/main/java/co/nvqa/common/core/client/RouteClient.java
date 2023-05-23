@@ -165,23 +165,15 @@ public class RouteClient extends SimpleApiClient {
 
   public void bulkAddPickupJobToRoute(
       BulkAddPickupJobToRouteRequest bulkAddPickupJobToRouteRequest) {
-    final Response response = bulkAddPickupJobToRouteAndGetRawResponse(
-        bulkAddPickupJobToRouteRequest);
+    final String url = "core/pickup-appointment-jobs/route-bulk";
+    final String json = toJson(DEFAULT_SNAKE_CASE_MAPPER, bulkAddPickupJobToRouteRequest);
+    final RequestSpecification spec = createAuthenticatedRequest().body(json);
+    final Response response = doPut("Core - Bulk Add Pickup Job to Route", spec, url);
+    ;
     response.then().contentType(ContentType.JSON);
     if (response.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
       throw new NvTestHttpException("unexpected http status: " + response.statusCode());
     }
-  }
-
-  private Response bulkAddPickupJobToRouteAndGetRawResponse(
-      BulkAddPickupJobToRouteRequest bulkAddPickupJobToRouteRequest) {
-    final String url = "core/pickup-appointment-jobs/route-bulk";
-    final String json = toJson(DEFAULT_SNAKE_CASE_MAPPER, bulkAddPickupJobToRouteRequest);
-
-    final RequestSpecification spec = createAuthenticatedRequest()
-        .body(json);
-
-    return doPut("Core - Bulk Add Pickup Job to Route", spec, url);
   }
 
   public void removePAJobFromRoute(long paJobId) {
