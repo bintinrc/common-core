@@ -169,24 +169,6 @@ public class ApiRouteSteps extends CoreStandardSteps {
         "Operator Bulk Add Pickup Jobs to Route", 2000, 3);
   }
 
-  @Given("API Core - Operator bulk update routed pickup jobs to another route using data below:")
-  public void apiOperatorBulkUpdateRoutedPickupJobToTheRouteUsingDataBelow(
-      Map<String, String> dataTableAsMap) {
-    final Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
-
-    final String bulkAddPickupJobToTheRouteRequestTemplate = resolvedDataTable
-        .get("bulkAddPickupJobToTheRouteRequest");
-
-    final BulkAddPickupJobToRouteRequest bulkAddPickupJobToRouteRequest = fromJsonSnakeCase(
-        bulkAddPickupJobToTheRouteRequestTemplate, BulkAddPickupJobToRouteRequest.class);
-
-    bulkAddPickupJobToRouteRequest.setOverwrite(true);
-
-    doWithRetry(
-        () -> getRouteClient().bulkAddPickupJobToRoute(bulkAddPickupJobToRouteRequest),
-        "Operator Bulk Update Routed Pickup Jobs to another Route", 2000, 3);
-  }
-
   @Given("API Core - Operator remove pickup job id {string} from route")
   public void apiOperatorRemovePickupJobFromRouteUsingDataBelow(String paJobId) {
     final Long jobId = Long.parseLong(resolveValue(paJobId));
