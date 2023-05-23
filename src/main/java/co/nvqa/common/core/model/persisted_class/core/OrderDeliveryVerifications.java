@@ -1,6 +1,8 @@
 package co.nvqa.common.core.model.persisted_class.core;
 
 
+import co.nvqa.common.model.DataEntity;
+import java.util.Map;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -16,7 +18,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Entity
 @Table(name = "order_delivery_verifications")
-public class OrderDeliveryVerifications {
+public class OrderDeliveryVerifications extends DataEntity<OrderDeliveryVerifications> {
 
   @Id
   private Long id;
@@ -31,4 +33,7 @@ public class OrderDeliveryVerifications {
   @Column(name = "delivery_verification_identity")
   private String deliveryVerificationIdentity;
 
+  public OrderDeliveryVerifications(Map<String, ?> data) {
+    super(data);
+  }
 }
