@@ -2,13 +2,21 @@
 
 <hr>
 
-## [1.2.38] 2023-05-23
+## [1.2.40] 2023-05-24
+
+### Added
+
+- API Core - Operator bulk add pickup jobs to the route using data below:
+
+<hr>
+
+## [1.2.39] 2023-05-24
 
 ### Added
 
 New Steps:
 
-- API Core - Operator bulk add pickup jobs to the route using data below:
+- API Core - Operator revert rts order:
 
 <hr>
 
