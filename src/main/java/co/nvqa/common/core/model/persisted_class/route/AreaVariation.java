@@ -19,7 +19,7 @@ import lombok.Setter;
 @Setter
 @Getter
 @Entity
-@Table(name = "sr_area_variations")
+@Table(name = "sr_area_variations_v2")
 public class AreaVariation extends DataEntity<AreaVariation> {
 
   @Id
@@ -31,6 +31,8 @@ public class AreaVariation extends DataEntity<AreaVariation> {
   private String variationName;
   @Column(name = "system_id")
   private String systemId;
+  @Column(name = "hub_id")
+  private Long hubId;
 
   public AreaVariation(Map<String, ?> data) {
     super(data);
