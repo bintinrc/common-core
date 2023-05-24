@@ -241,7 +241,7 @@ public class ApiOrderSteps extends CoreStandardSteps {
     final Map<String, String> dataTable = resolveKeyValues(dataTableRaw);
     final Long orderId = Long.parseLong(dataTable.get("orderId"));
     doWithRetry(
-            () -> getOrderClient().revertRts(new RtsOrderRequest(), orderId), "Revert RTS order"
+        () -> getOrderClient().revertRts(new RtsOrderRequest(), orderId), "Revert RTS order"
     );
   }
 }
