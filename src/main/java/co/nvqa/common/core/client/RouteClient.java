@@ -256,9 +256,27 @@ public class RouteClient extends SimpleApiClient {
   }
 
   public List<RouteResponse> getUnarchivedRouteDetailsByDriverId(long driverId) {
-    String url = "route-v2/routes?page_size=1000&archived=false&driver_ids={driverId}";
+    String url = "route-v2/routes";
     RequestSpecification spec = createAuthenticatedRequest()
-        .pathParam("driverId", driverId);
+        .queryParam("driver_ids", driverId)
+        .queryParam("archived", false);
+    Response r = doGet("Route - Get Route Details", spec, url);
+    r.then().contentType(ContentType.JSON);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+    return fromJsonSnakeCase(r.body().asString(),
+        GetRouteDetailsResponse.class).getData();
+  }
+
+  public List<RouteResponse> getUnarchivedRouteDetailsByDriverId(long driverId, int pageSize,
+      long lastId, boolean archived) {
+    String url = "route-v2/routes";
+    RequestSpecification spec = createAuthenticatedRequest()
+        .queryParam("driver_ids", driverId)
+        .queryParam("archived", archived)
+        .queryParam("page_size", pageSize)
+        .queryParam("last_id", lastId);
     Response r = doGet("Route - Get Route Details", spec, url);
     r.then().contentType(ContentType.JSON);
     if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
