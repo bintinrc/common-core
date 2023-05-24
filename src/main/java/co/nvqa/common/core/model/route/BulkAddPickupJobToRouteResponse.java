@@ -12,25 +12,16 @@ import lombok.Setter;
 @NoArgsConstructor
 public class BulkAddPickupJobToRouteResponse {
 
-  private List<SuccessfulStatusJobs> successfulPaJobs;
-  private List<FailedStatusJobs> failedPaJobs;
+  private List<ResponseStatusJobs> successfulPaJobs;
+  private List<ResponseStatusJobs> failedPaJobs;
 
   @Setter
   @Getter
   @AllArgsConstructor
   @NoArgsConstructor
-  public static class SuccessfulStatusJobs {
+  public static class ResponseStatusJobs {
     private long id;
     private String status;
-  }
-
-  @Setter
-  @Getter
-  @AllArgsConstructor
-  @NoArgsConstructor
-  public static class FailedStatusJobs {
-
-    private long id;
     private String message;
   }
 }
