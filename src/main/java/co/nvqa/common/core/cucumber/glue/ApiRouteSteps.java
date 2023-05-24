@@ -439,9 +439,9 @@ public class ApiRouteSteps extends CoreStandardSteps {
   /**
    * Sample:<p>
    * <p>
-   * API Core - Operator force success waypoint via route manifest:
-   *       | routeId    | {KEY_LIST_OF_CREATED_ROUTES[1].id}               |
-   *       | waypointId | {KEY_CORE_LIST_OF_RESERVATIONS_DB[1].waypointId} |
+   * API Core - Operator force success waypoint via route manifest: | routeId    |
+   * {KEY_LIST_OF_CREATED_ROUTES[1].id}               | | waypointId |
+   * {KEY_CORE_LIST_OF_RESERVATIONS_DB[1].waypointId} |
    */
   @Given("API Core - Operator force success waypoint via route manifest:")
   public void apiOperatorForceSuccessRouteManifest(Map<String, String> dataTableAsMap) {
@@ -454,11 +454,9 @@ public class ApiRouteSteps extends CoreStandardSteps {
   }
 
   /**
-   * Sample:<p>
-   * API Core - Operator force fail waypoint via route manifest:
-   *       | routeId         | {KEY_LIST_OF_CREATED_ROUTES[1].id}               |
-   *       | waypointId      | {KEY_CORE_LIST_OF_RESERVATIONS_DB[1].waypointId} |
-   *       | failureReasonId | 12345                                            |
+   * Sample:<p> API Core - Operator force fail waypoint via route manifest: | routeId         |
+   * {KEY_LIST_OF_CREATED_ROUTES[1].id}               | | waypointId      |
+   * {KEY_CORE_LIST_OF_RESERVATIONS_DB[1].waypointId} | | failureReasonId | 12345 |
    */
   @Given("API Core - Operator force fail waypoint via route manifest:")
   public void apiOperatorForceFailRouteManifest(Map<String, String> dataTableAsMap) {
@@ -469,5 +467,25 @@ public class ApiRouteSteps extends CoreStandardSteps {
     doWithRetry(
         () -> getRouteClient().forceFailWaypoint(routeId, waypointId, failureReasonId),
         "force fail route manifest");
+  }
+
+  @Given("API Route - Operator archive all unarchived routes of driver id {string}")
+  public void archiveAllRoutesOfDriver(String driverId) {
+    doWithRetry(
+        () -> {
+          List<RouteResponse> routes = getRouteClient()
+              .getUnarchivedRouteDetailsByDriverId(Long.parseLong(driverId));
+          if (!routes.isEmpty()) {
+            routes.forEach(e -> getRouteClient().archiveRoute(e.getLegacyId()));
+          }
+        },
+        "archive all routes");
+  }
+
+  @Given("API Route - Operator run FM auto route cron job for date {string}")
+  public void runFmRoutingCronJob(String date) {
+    doWithRetry(
+        () -> getRouteClient().runFmAutoRouteCronJob(date),
+        "run fm routing cronjob");
   }
 }

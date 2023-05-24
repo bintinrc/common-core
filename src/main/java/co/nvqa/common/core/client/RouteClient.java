@@ -10,6 +10,7 @@ import co.nvqa.common.core.model.pickup.MilkRunGroup;
 import co.nvqa.common.core.model.reservation.BulkRouteReservationResponse;
 import co.nvqa.common.core.model.route.AddParcelToRouteRequest;
 import co.nvqa.common.core.model.route.AddPickupJobToRouteRequest;
+import co.nvqa.common.core.model.route.GetRouteDetailsResponse;
 import co.nvqa.common.core.model.route.MergeWaypointsResponse;
 import co.nvqa.common.core.model.route.ParcelRouteTransferRequest;
 import co.nvqa.common.core.model.route.ParcelRouteTransferResponse;
@@ -239,6 +240,19 @@ public class RouteClient extends SimpleApiClient {
     }
     return fromJsonToList(r.body().asString(),
         RouteResponse.class);
+  }
+
+  public List<RouteResponse> getUnarchivedRouteDetailsByDriverId(long driverId) {
+    String url = "route-v2/routes?page_size=1000&archived=false&driver_ids={driverId}";
+    RequestSpecification spec = createAuthenticatedRequest()
+        .pathParam("driverId", driverId);
+    Response r = doGet("Route - Get Route Details", spec, url);
+    r.then().contentType(ContentType.JSON);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+    return fromJsonSnakeCase(r.body().asString(),
+        GetRouteDetailsResponse.class).getData();
   }
 
   public void pullReservationOutOfRoute(long reservationId) {
@@ -633,6 +647,19 @@ public class RouteClient extends SimpleApiClient {
 
     Response r = doPut("Core - Admin Force Success with COD collected", spec, url);
     if (r.statusCode() != HttpConstants.RESPONSE_204_NO_CONTENT) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+  }
+
+  public void runFmAutoRouteCronJob(String date) {
+    String url = "route-v2/debug/reservations/auto-routing";
+    String json = f("{ \"date\": \"%s\", \"execute\": true}", date);
+
+    RequestSpecification spec = createAuthenticatedRequest()
+        .body(json);
+
+    Response r = doPost("Route - Run FM Routing Cron Job", spec, url);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
       throw new NvTestHttpException("unexpected http status: " + r.statusCode());
     }
   }
