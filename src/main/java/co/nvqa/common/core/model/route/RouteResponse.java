@@ -24,6 +24,7 @@ import lombok.Setter;
 public class RouteResponse {
 
   private Long id;
+  private Long legacyId;
   private String createdAt;
   private Driver driver;
   private List<Integer> tags = new ArrayList<>();
@@ -115,7 +116,8 @@ public class RouteResponse {
   @Setter
   @AllArgsConstructor
   @NoArgsConstructor
-  public static class Waypoint extends DataEntity<Waypoint>{
+  public static class Waypoint extends DataEntity<Waypoint> {
+
     public static final String STATUS_PENDING = "pending";
     public static final String STATUS_ROUTED = "routed";
     public static final String STATUS_SUCCESS = "success";

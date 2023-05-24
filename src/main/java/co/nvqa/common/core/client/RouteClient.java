@@ -9,6 +9,7 @@ import co.nvqa.common.core.model.pickup.MilkRunGroup;
 import co.nvqa.common.core.model.reservation.BulkRouteReservationResponse;
 import co.nvqa.common.core.model.route.AddParcelToRouteRequest;
 import co.nvqa.common.core.model.route.AddPickupJobToRouteRequest;
+import co.nvqa.common.core.model.route.GetRouteDetailsResponse;
 import co.nvqa.common.core.model.route.BulkAddPickupJobToRouteRequest;
 import co.nvqa.common.core.model.route.BulkAddPickupJobToRouteResponse;
 import co.nvqa.common.core.model.route.MergeWaypointsResponse;
@@ -252,6 +253,37 @@ public class RouteClient extends SimpleApiClient {
     }
     return fromJsonToList(r.body().asString(),
         RouteResponse.class);
+  }
+
+  public List<RouteResponse> getUnarchivedRouteDetailsByDriverId(long driverId) {
+    String url = "route-v2/routes";
+    RequestSpecification spec = createAuthenticatedRequest()
+        .queryParam("driver_ids", driverId)
+        .queryParam("archived", false);
+    Response r = doGet("Route - Get Route Details", spec, url);
+    r.then().contentType(ContentType.JSON);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+    return fromJsonSnakeCase(r.body().asString(),
+        GetRouteDetailsResponse.class).getData();
+  }
+
+  public List<RouteResponse> getUnarchivedRouteDetailsByDriverId(long driverId, int pageSize,
+      long lastId, boolean archived) {
+    String url = "route-v2/routes";
+    RequestSpecification spec = createAuthenticatedRequest()
+        .queryParam("driver_ids", driverId)
+        .queryParam("archived", archived)
+        .queryParam("page_size", pageSize)
+        .queryParam("last_id", lastId);
+    Response r = doGet("Route - Get Route Details", spec, url);
+    r.then().contentType(ContentType.JSON);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+    return fromJsonSnakeCase(r.body().asString(),
+        GetRouteDetailsResponse.class).getData();
   }
 
   public void pullReservationOutOfRoute(long reservationId) {
@@ -646,6 +678,19 @@ public class RouteClient extends SimpleApiClient {
 
     Response r = doPut("Core - Admin Force Success with COD collected", spec, url);
     if (r.statusCode() != HttpConstants.RESPONSE_204_NO_CONTENT) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+  }
+
+  public void runFmAutoRouteCronJob(String date) {
+    String url = "route-v2/debug/reservations/auto-routing";
+    String json = f("{ \"date\": \"%s\", \"execute\": true}", date);
+
+    RequestSpecification spec = createAuthenticatedRequest()
+        .body(json);
+
+    Response r = doPost("Route - Run FM Routing Cron Job", spec, url);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
       throw new NvTestHttpException("unexpected http status: " + r.statusCode());
     }
   }

@@ -49,29 +49,32 @@ public class DbRouteSteps extends CoreStandardSteps {
 
   @When("DB Route - verify waypoints record:")
   public void verifyWaypoints(Map<String, String> data) {
-    data = resolveKeyValues(data);
-    Waypoints expected = new Waypoints(data);
-    Waypoints actual = routeDbDao.getWaypointsDetails(expected.getLegacyId());
-    Assertions.assertThat(actual)
-        .withFailMessage("waypoints record was not found: " + data)
-        .isNotNull();
-    expected.compareWithActual(actual, data);
-    if (data.containsKey("seqNo")) {
-      if (data.get("seqNo").equalsIgnoreCase("null")) {
-        Assertions.assertThat(actual.getSeqNo())
-            .as("seq_no is null")
-            .isNull();
-      } else {
-        Assertions.assertThat(actual.getSeqNo())
-            .as("seq_no is not null")
-            .isNotNull();
+    Map<String, String> resolvedData = resolveKeyValues(data);
+    Waypoints expected = new Waypoints(resolvedData);
+    doWithRetry(() -> {
+      Waypoints actual = routeDbDao.getWaypointsDetails(expected.getLegacyId());
+      Assertions.assertThat(actual)
+          .withFailMessage("waypoints record was not found: " + resolvedData)
+          .isNotNull();
+      expected.compareWithActual(actual, resolvedData);
+      if (resolvedData.containsKey("seqNo")) {
+        if (resolvedData.get("seqNo").equalsIgnoreCase("null")) {
+          Assertions.assertThat(actual.getSeqNo())
+              .as("seq_no is null")
+              .isNull();
+        } else {
+          Assertions.assertThat(actual.getSeqNo())
+              .as("seq_no is not null")
+              .isNotNull();
+        }
       }
-    }
-    if (data.containsKey("routeId") && data.get("routeId").equalsIgnoreCase("null")) {
-      Assertions.assertThat(actual.getSeqNo())
-          .as("route_id is null")
-          .isNull();
-    }
+      if (resolvedData.containsKey("routeId") && resolvedData.get("routeId")
+          .equalsIgnoreCase("null")) {
+        Assertions.assertThat(actual.getSeqNo())
+            .as("route_id is null")
+            .isNull();
+      }
+    }, "verify waypoints records", 10_000, 3);
   }
 
   @Then("DB Route - verify that sr_keywords record is not created for {string} area")
@@ -143,5 +146,16 @@ public class DbRouteSteps extends CoreStandardSteps {
           .isNotNull();
       expected.compareWithActual(actual, resolvedData);
     }, f("verify route_logs records"), 10_000, 5);
+  }
+
+  @When("DB Route - get latest route_logs record for driver id {string}")
+  public void getRouteLogs(String driverId) {
+    doWithRetry(() -> {
+      RouteLogs actual = routeDbDao.getRouteLogsByDriverId(Long.valueOf(resolveValue(driverId)));
+      Assertions.assertThat(actual)
+          .withFailMessage("Route logs was not found")
+          .isNotNull();
+      putInList(KEY_LIST_OF_CREATED_ROUTES, actual);
+    }, f("get route_logs record"), 10_000, 5);
   }
 }

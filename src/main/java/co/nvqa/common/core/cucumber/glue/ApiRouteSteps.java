@@ -299,6 +299,20 @@ public class ApiRouteSteps extends CoreStandardSteps {
   /**
    * Sample:<p>
    * <p>
+   * API Core - Operator remove reservation id {KEY_LIST_OF_CREATED_RESERVATIONS[1].id} from route
+   * <p>
+   */
+  @When("API Core - Operator remove reservation id {string} from route")
+  public void apiOperatorAddReservationPickUpsToTheRoute(String id) {
+    final long reservationResultId = Long.parseLong(resolveValue(id));
+    doWithRetry(
+        () -> getRouteClient().pullReservationOutOfRoute(reservationResultId),
+        "remove reservation from route ");
+  }
+
+  /**
+   * Sample:<p>
+   * <p>
    * When API Core - Operator bulk add reservation to route using data below: | request | {"ids":
    * [{KEY_LIST_OF_CREATED_RESERVATIONS[1].id}, {KEY_LIST_OF_CREATED_RESERVATIONS[2].id}],"new_route_id":{KEY_LIST_OF_CREATED_ROUTES[1].id},"overwrite":true}
    * |
@@ -445,11 +459,9 @@ public class ApiRouteSteps extends CoreStandardSteps {
   /**
    * Sample:<p>
    * <p>
-   * When API Operator add parcel to the route using data below:<p> | orderId | 111111 |<p> |
-   * addParcelToRouteRequest | {"route_id":95139463,"type":"DELIVERY"} |<p>
-   * <p>
-   *
-   * @param dataTableAsMap Map of data from feature file.
+   * API Core - Operator force success waypoint via route manifest: | routeId    |
+   * {KEY_LIST_OF_CREATED_ROUTES[1].id}               | | waypointId |
+   * {KEY_CORE_LIST_OF_RESERVATIONS_DB[1].waypointId} |
    */
   @Given("API Core - Operator force success waypoint via route manifest:")
   public void apiOperatorForceSuccessRouteManifest(Map<String, String> dataTableAsMap) {
@@ -459,5 +471,41 @@ public class ApiRouteSteps extends CoreStandardSteps {
     doWithRetry(
         () -> getRouteClient().forceSuccessWaypoint(routeId, waypointId),
         "force success route manifest");
+  }
+
+  /**
+   * Sample:<p> API Core - Operator force fail waypoint via route manifest: | routeId         |
+   * {KEY_LIST_OF_CREATED_ROUTES[1].id}               | | waypointId      |
+   * {KEY_CORE_LIST_OF_RESERVATIONS_DB[1].waypointId} | | failureReasonId | 12345 |
+   */
+  @Given("API Core - Operator force fail waypoint via route manifest:")
+  public void apiOperatorForceFailRouteManifest(Map<String, String> dataTableAsMap) {
+    final Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
+    final long routeId = Long.parseLong(resolvedDataTable.get("routeId"));
+    final long waypointId = Long.parseLong(resolvedDataTable.get("waypointId"));
+    final long failureReasonId = Long.parseLong(resolvedDataTable.get("failureReasonId"));
+    doWithRetry(
+        () -> getRouteClient().forceFailWaypoint(routeId, waypointId, failureReasonId),
+        "force fail route manifest");
+  }
+
+  @Given("API Route - Operator archive all unarchived routes of driver id {string}")
+  public void archiveAllRoutesOfDriver(String driverId) {
+    doWithRetry(
+        () -> {
+          List<RouteResponse> routes = getRouteClient()
+              .getUnarchivedRouteDetailsByDriverId(Long.parseLong(driverId));
+          if (!routes.isEmpty()) {
+            routes.forEach(e -> getRouteClient().archiveRoute(e.getLegacyId()));
+          }
+        },
+        "archive all routes");
+  }
+
+  @Given("API Route - Operator run FM auto route cron job for date {string}")
+  public void runFmRoutingCronJob(String date) {
+    doWithRetry(
+        () -> getRouteClient().runFmAutoRouteCronJob(date),
+        "run fm routing cronjob");
   }
 }
