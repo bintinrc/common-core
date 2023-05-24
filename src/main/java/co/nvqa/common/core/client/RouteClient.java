@@ -2,7 +2,6 @@ package co.nvqa.common.core.client;
 
 import co.nvqa.common.client.SimpleApiClient;
 import co.nvqa.common.constants.HttpConstants;
-import co.nvqa.common.core.model.ResponseWrapper;
 import co.nvqa.common.core.model.RouteGroup;
 import co.nvqa.common.core.model.coverage.CreateCoverageRequest;
 import co.nvqa.common.core.model.coverage.CreateCoverageResponse;
@@ -11,6 +10,8 @@ import co.nvqa.common.core.model.reservation.BulkRouteReservationResponse;
 import co.nvqa.common.core.model.route.AddParcelToRouteRequest;
 import co.nvqa.common.core.model.route.AddPickupJobToRouteRequest;
 import co.nvqa.common.core.model.route.GetRouteDetailsResponse;
+import co.nvqa.common.core.model.route.BulkAddPickupJobToRouteRequest;
+import co.nvqa.common.core.model.route.BulkAddPickupJobToRouteResponse;
 import co.nvqa.common.core.model.route.MergeWaypointsResponse;
 import co.nvqa.common.core.model.route.ParcelRouteTransferRequest;
 import co.nvqa.common.core.model.route.ParcelRouteTransferResponse;
@@ -24,7 +25,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
-
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -163,6 +163,19 @@ public class RouteClient extends SimpleApiClient {
         .body(json);
 
     return doPut("Core - Add Pickup Job to Route", spec, url);
+  }
+
+  public BulkAddPickupJobToRouteResponse bulkAddPickupJobToRoute(
+      BulkAddPickupJobToRouteRequest bulkAddPickupJobToRouteRequest) {
+    final String url = "core/pickup-appointment-jobs/route-bulk";
+    final String json = toJson(DEFAULT_SNAKE_CASE_MAPPER, bulkAddPickupJobToRouteRequest);
+    final RequestSpecification spec = createAuthenticatedRequest().body(json);
+    final Response response = doPut("Core - Bulk Add Pickup Job to Route", spec, url);
+    response.then().contentType(ContentType.JSON);
+    if (response.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + response.statusCode());
+    }
+    return fromJsonSnakeCase(response.getBody().asString(), BulkAddPickupJobToRouteResponse.class);
   }
 
   public void removePAJobFromRoute(long paJobId) {
