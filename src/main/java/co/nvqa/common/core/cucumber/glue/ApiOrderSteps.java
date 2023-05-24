@@ -232,4 +232,16 @@ public class ApiOrderSteps extends CoreStandardSteps {
   public void apiOperatorResumeTheCreatedOrder(String trackingId) {
     getOrderClient().resumeOrder(trackingId);
   }
+
+  /**
+   * @param dataTableRaw <br/> <b>orderId</b>: {KEY_LIST_OF_CREATED_ORDERS[1].id}
+   */
+  @When("API Core - Operator revert rts order:")
+  public void apiOperatorRevertRtsOrder(Map<String, String> dataTableRaw) {
+    final Map<String, String> dataTable = resolveKeyValues(dataTableRaw);
+    final Long orderId = Long.parseLong(dataTable.get("orderId"));
+    doWithRetry(
+            () -> getOrderClient().revertRts(new RtsOrderRequest(), orderId), "Revert RTS order"
+    );
+  }
 }
