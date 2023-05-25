@@ -398,7 +398,6 @@ public class OrderClient extends SimpleApiClient {
     List<OrderTagsRequest> request = Collections.singletonList(tag);
     String json = toJsonSnakeCase(request);
     RequestSpecification spec = createAuthenticatedRequest()
-        .pathParam("orderId", orderId)
         .body(json);
 
     Response r = doPost("Core - Add Order Level Tags", spec, url);

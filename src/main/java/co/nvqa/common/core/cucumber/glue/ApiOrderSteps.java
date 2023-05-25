@@ -14,6 +14,7 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.response.Response;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import javax.inject.Inject;
@@ -255,5 +256,14 @@ public class ApiOrderSteps extends CoreStandardSteps {
     String dimensionsJson = data.get("dimensions");
     Assertions.assertThat(dimensionsJson).as("Dimensions").isNotNull();
     getOrderClient().updateParcelDimensions(Long.parseLong(orderId), new Dimension(dimensionsJson));
+  }
+
+  @When("API Core - tags parcel with the below tag")
+  public void apiCoreTagsParcelsWithBelowTag(Map<String, String> dataTableRaw) {
+    final Map<String, String> dataTable = resolveKeyValues(dataTableRaw);
+    final Long orderId = Long.valueOf(dataTable.get("orderId"));
+    Long tag = Long.valueOf(dataTable.get("orderTag"));
+    List<Long> tags = Collections.singletonList(tag);
+    getOrderClient().addOrderLevelTags(orderId, tags);
   }
 }
