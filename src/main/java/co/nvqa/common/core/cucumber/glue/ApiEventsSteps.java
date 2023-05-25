@@ -4,7 +4,6 @@ import co.nvqa.common.core.client.EventClient;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.model.event.Event;
 import co.nvqa.common.core.model.event.Events;
-import co.nvqa.common.utils.NvTestRuntimeException;
 import io.cucumber.guice.ScenarioScoped;
 import io.cucumber.java.en.Then;
 import java.util.List;
@@ -85,15 +84,15 @@ public class ApiEventsSteps extends CoreStandardSteps {
 
     doWithRetry(() -> {
       final Events actualOrderEvents = getEventClient().getOrderEventsByOrderId(orderId);
-      if (actualOrderEvents.getData().isEmpty()) {
-        throw new NvTestRuntimeException(
-            f("Order events should not empty, order id: %d, event: %s", orderId,
-                expectedOrderEvent));
-      }
-      Assertions.assertThat(actualOrderEvents.getData().get(0).getType().toLowerCase())
-          .withFailMessage(
-              f("%s event is NOT published for order id: %s", expectedOrderEvent, orderId))
-          .contains(expectedOrderEvent.getType().toLowerCase());
+
+      Assertions.assertThat(actualOrderEvents.getData())
+          .withFailMessage(f("Order events should not empty, order id: %d, event: %s", orderId,
+              expectedOrderEvent)).isNotEmpty();
+
+      Assertions.assertThat(actualOrderEvents.getData()).withFailMessage(
+          f("%s event is NOT published for order id: %s", expectedOrderEvent, orderId)).anySatisfy(
+          event -> Assertions.assertThat(event.getType()).isEqualTo(expectedOrderEvent.getType()));
+
     }, String.format("%s event is published for order id %d", expectedOrderEvent, orderId));
   }
 }
