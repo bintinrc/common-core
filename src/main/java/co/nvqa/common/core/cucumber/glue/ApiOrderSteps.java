@@ -258,8 +258,8 @@ public class ApiOrderSteps extends CoreStandardSteps {
     getOrderClient().updateParcelDimensions(Long.parseLong(orderId), new Dimension(dimensionsJson));
   }
 
-  @When("API Core - tags parcel with the below tag")
-  public void apiCoreTagsParcelsWithBelowTag(Map<String, String> dataTableRaw) {
+  @When("API Core - Operator bulk tags parcel with below tag:")
+  public void apiCoreBulkTagsParcelsWithBelowTag(Map<String, String> dataTableRaw) {
     final Map<String, String> dataTable = resolveKeyValues(dataTableRaw);
     final Long orderId = Long.valueOf(dataTable.get("orderId"));
     Long tag = Long.valueOf(dataTable.get("orderTag"));
