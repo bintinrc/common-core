@@ -10,6 +10,7 @@ import co.nvqa.common.core.hibernate.OutboundScansDao;
 import co.nvqa.common.core.hibernate.ReservationsDao;
 import co.nvqa.common.core.hibernate.RouteLogsDao;
 import co.nvqa.common.core.hibernate.RouteMonitoringDataDao;
+import co.nvqa.common.core.hibernate.RouteWaypointDao;
 import co.nvqa.common.core.hibernate.ShipperPickupSearchDao;
 import co.nvqa.common.core.hibernate.TransactionsDao;
 import co.nvqa.common.core.hibernate.WarehouseSweepsDao;
@@ -25,6 +26,7 @@ import co.nvqa.common.core.model.persisted_class.core.OrderTagsSearch;
 import co.nvqa.common.core.model.persisted_class.core.OutboundScans;
 import co.nvqa.common.core.model.persisted_class.core.Reservations;
 import co.nvqa.common.core.model.persisted_class.core.RouteMonitoringData;
+import co.nvqa.common.core.model.persisted_class.core.RouteWaypoint;
 import co.nvqa.common.core.model.persisted_class.core.ShipperPickupSearch;
 import co.nvqa.common.core.model.persisted_class.core.Transactions;
 import co.nvqa.common.core.model.persisted_class.core.WarehouseSweeps;
@@ -42,8 +44,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.SoftAssertions;
 
@@ -75,6 +77,8 @@ public class DbCoreSteps extends CoreStandardSteps {
   private OrderTagsDao orderTagsDao;
   @Inject
   private OrderTagsSearchDao orderTagsSearchDao;
+  @Inject
+  private RouteWaypointDao routeWaypointDao;
 
   @Override
   public void init() {
@@ -511,5 +515,19 @@ public class DbCoreSteps extends CoreStandardSteps {
         .isNotEmpty();
     Assertions.assertThat(actual).as("List of order_tags_search records for order_id=%s", orderId)
         .anyMatch(expected::matchedTo);
+  }
+
+  @When("DB Core - verify route_waypoint records are hard-deleted:")
+  public void verifyRouteWaypointIsHardDeleted(List<String> data) {
+    List<String> resolvedData = resolveValues(data);
+    doWithRetry(() ->
+            resolvedData.forEach(e -> {
+              List<RouteWaypoint> actual = routeWaypointDao.getRouteWaypointsByWaypointId(
+                  Long.parseLong(e));
+              Assertions.assertThat(actual)
+                  .withFailMessage("Unexpected route_waypoint records were found: %s", actual)
+                  .isNullOrEmpty();
+            })
+        , "verify route_waypoint records", 10_000, 3);
   }
 }
