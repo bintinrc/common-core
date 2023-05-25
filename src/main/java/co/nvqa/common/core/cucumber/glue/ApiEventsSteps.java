@@ -91,7 +91,6 @@ public class ApiEventsSteps extends CoreStandardSteps {
                 expectedOrderEvent));
       }
       Assertions.assertThat(actualOrderEvents.getData().get(0).getType().toLowerCase())
-          .as(f("%s event is published for order id: %s", expectedOrderEvent, orderId))
           .withFailMessage(
               f("%s event is NOT published for order id: %s", expectedOrderEvent, orderId))
           .contains(expectedOrderEvent.getType().toLowerCase());
