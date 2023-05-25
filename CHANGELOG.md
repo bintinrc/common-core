@@ -7,6 +7,7 @@
 ### Added
 
 - API Core - Operator verify that {string} event is published for order id {string}
+- API Core - update order dimensions:
 
 <hr>
 
