@@ -2,6 +2,14 @@
 
 <hr>
 
+## [1.2.44] 2023-05-25
+
+### Added
+ 
+- API Core - tags parcel with the below tag
+
+<hr>
+
 ## [1.2.43] 2023-05-25
 
 ### Added

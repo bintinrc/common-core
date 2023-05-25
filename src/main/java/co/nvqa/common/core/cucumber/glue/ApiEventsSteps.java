@@ -77,7 +77,7 @@ public class ApiEventsSteps extends CoreStandardSteps {
    * "{KEY_LIST_OF_CREATED_ORDERS[1].id}"
    */
   @Then("API Core - Operator verify that {string} event is published for order id {string}")
-  public void operatorVerifiesOrderEventDetails(String orderEvent, String createdOrderId) {
+  public void operatorVerifiesOrderEventPublished(String orderEvent, String createdOrderId) {
     final Event expectedOrderEvent = new Event();
     expectedOrderEvent.setType(resolveValue(orderEvent));
     final long orderId = Long.parseLong(resolveValue(createdOrderId));
