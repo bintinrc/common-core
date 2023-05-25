@@ -90,8 +90,10 @@ public class ApiEventsSteps extends CoreStandardSteps {
               expectedOrderEvent)).isNotEmpty();
 
       Assertions.assertThat(actualOrderEvents.getData()).withFailMessage(
-          f("%s event is NOT published for order id: %s", expectedOrderEvent, orderId)).anySatisfy(
-          event -> Assertions.assertThat(event.getType()).isEqualTo(expectedOrderEvent.getType()));
+              f("%s event is NOT published for order id: %s", expectedOrderEvent.getType(), orderId))
+          .anySatisfy(
+              event -> Assertions.assertThat(event.getType())
+                  .isEqualTo(expectedOrderEvent.getType()));
 
     }, String.format("%s event is published for order id %d", expectedOrderEvent, orderId));
   }
