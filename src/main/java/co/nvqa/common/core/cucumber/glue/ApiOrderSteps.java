@@ -43,8 +43,7 @@ public class ApiOrderSteps extends CoreStandardSteps {
    * order with the same tracking id. <br/><br/><b>Note</b>: becareful that you may face unintended
    * order status due to event propagation delay to Core service
    *
-   * @param tracking key that contains order's tracking id, example:
-   *                 KEY_LIST_OF_CREATED_TRACKING_IDS
+   * @param tracking key that contains order's tracking id, example: KEY_LIST_OF_CREATED_TRACKING_IDS
    */
   @When("API Core - Operator get order details for tracking order {string}")
   public void apiOperatorGetOrderDetailsForTrackingOrder(String tracking) {
@@ -69,8 +68,7 @@ public class ApiOrderSteps extends CoreStandardSteps {
    * previous order with the same tracking id. this is intended to check if you have done certain
    * action to same order and you need previous data prior to the action being done
    *
-   * @param tracking key that contains order's tracking id, example:
-   *                 KEY_LIST_OF_CREATED_TRACKING_IDS
+   * @param tracking key that contains order's tracking id, example: KEY_LIST_OF_CREATED_TRACKING_IDS
    */
   @When("API Core - Operator get order details for previous order {string}")
   public void apiOperatorGetOrderDetailsForPreviousOrder(String tracking) {
@@ -214,7 +212,8 @@ public class ApiOrderSteps extends CoreStandardSteps {
 
     String message = data.get("message");
     doWithRetry(() -> {
-      Response response = getOrderClient().cancelOrder(orderId);
+      Response response = getOrderClient()
+          .cancelOrderV1AndGetRawResponse(orderId, "cancelled for testing purposes");
       response.then()
           .statusCode(statusCode)
           .body("messages", Matchers.hasItem(message),
@@ -225,12 +224,33 @@ public class ApiOrderSteps extends CoreStandardSteps {
   @Given("API Core - cancel order {value}")
   public void apiOperatorCancelCreatedOrder(String orderIdStr) {
     long orderId = Long.parseLong(orderIdStr);
-    getOrderClient().cancelOrder(orderId);
+    doWithRetry(() ->
+            getOrderClient().cancelOrder(orderId),
+        "cancel order");
+  }
+
+  @Given("API Core - force cancel order {value}")
+  public void apiOperatorForceCancelCreatedOrder(String orderIdStr) {
+    long orderId = Long.parseLong(orderIdStr);
+    doWithRetry(() ->
+            getOrderClient().forceCancelOrder(orderId),
+        "force cancel order");
   }
 
   @Given("API Core - resume order {value}")
   public void apiOperatorResumeTheCreatedOrder(String trackingId) {
-    getOrderClient().resumeOrder(trackingId);
+    doWithRetry(() -> getOrderClient().resumeOrder(trackingId),
+        "resume cancelled order");
+  }
+
+  @Given("API Core - Operator update order granular status:")
+  public void apiOperatorUpdateGranularStatusOrder(Map<String, String> data) {
+    data = resolveKeyValues(data);
+    Long orderId = Long.parseLong(data.get("orderId"));
+    String granularStatus = data.get("granularStatus");
+    doWithRetry(
+        () -> getOrderClient().updateGranularStatusOrder(orderId, granularStatus),
+        "update order granular status");
   }
 
   /**
