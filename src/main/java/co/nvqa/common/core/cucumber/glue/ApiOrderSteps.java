@@ -261,16 +261,6 @@ public class ApiOrderSteps extends CoreStandardSteps {
         "resume cancelled order");
   }
 
-  @Given("API Core - Operator update order granular status:")
-  public void apiOperatorUpdateGranularStatusOrder(Map<String, String> data) {
-    data = resolveKeyValues(data);
-    Long orderId = Long.parseLong(data.get("orderId"));
-    String granularStatus = data.get("granularStatus");
-    doWithRetry(
-        () -> getOrderClient().updateGranularStatusOrder(orderId, granularStatus),
-        "update order granular status");
-  }
-
   /**
    * @param dataTableRaw <br/> <b>orderId</b>: {KEY_LIST_OF_CREATED_ORDERS[1].id}
    */
