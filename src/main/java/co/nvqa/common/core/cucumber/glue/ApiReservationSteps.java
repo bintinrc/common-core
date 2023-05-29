@@ -56,13 +56,13 @@ public class ApiReservationSteps extends CoreStandardSteps {
 
   @When("API Core - Operator get reservation from reservation id {string}")
   public void apiOperatorGetReservationForId(String reservationIdString) {
+
     final long reservationId = Long.parseLong(resolveValue(reservationIdString));
     final ReservationFilter filter = ReservationFilter.builder()
         .reservationId(reservationId)
         .build();
-
-    final List<ReservationResponse> responses = getReservationClient().getReservations(filter);
-    put(KEY_LIST_OF_RESERVATIONS, responses);
+    final ReservationResponse responses = getReservationClient().getReservations(filter);
+    putInList(KEY_LIST_OF_RESERVATIONS, responses);
   }
 
   private ReservationResponse apiOperatorCreateV2Reservation(
