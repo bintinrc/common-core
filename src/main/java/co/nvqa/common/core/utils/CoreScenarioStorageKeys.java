@@ -32,6 +32,7 @@ public interface CoreScenarioStorageKeys {
   //  archive & unarchive route response
   String KEY_ROUTE_RESPONSE = "KEY_ROUTE_RESPONSE";
 
+  String KEY_COVERAGE = "KEY_COVERAGE";
   String KEY_COVERAGE_ID = "KEY_COVERAGE_ID";
 
   String KEY_CORE_MERGE_WAYPOINT_RESPONSE = "KEY_CORE_MERGE_WAYPOINT_RESPONSE";
