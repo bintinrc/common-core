@@ -3,6 +3,8 @@ package co.nvqa.common.core.cucumber.glue;
 import co.nvqa.common.constants.HttpConstants;
 import co.nvqa.common.core.client.RouteClient;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
+import co.nvqa.common.core.model.coverage.CreateCoverageRequest;
+import co.nvqa.common.core.model.coverage.CreateCoverageResponse;
 import co.nvqa.common.core.model.other.CoreExceptionResponse.Error;
 import co.nvqa.common.core.model.reservation.BulkRouteReservationResponse;
 import co.nvqa.common.core.model.route.AddParcelToRouteRequest;
@@ -18,6 +20,7 @@ import co.nvqa.common.core.utils.CoreTestUtils;
 import co.nvqa.common.model.DataEntity;
 import co.nvqa.common.utils.StandardTestUtils;
 import io.cucumber.guice.ScenarioScoped;
+import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
 import io.restassured.response.Response;
@@ -507,5 +510,15 @@ public class ApiRouteSteps extends CoreStandardSteps {
     doWithRetry(
         () -> getRouteClient().runFmAutoRouteCronJob(date),
         "run fm routing cronjob");
+  }
+
+  @And("API Route - Operator create new coverage:")
+  public void createNewCoverage(Map<String, String> data) {
+    CreateCoverageRequest request = new CreateCoverageRequest(resolveKeyValues(data));
+    CreateCoverageResponse response = getRouteClient().createCoverage(request);
+    doWithRetry(
+        () -> getRouteClient().createCoverage(request),
+        "create new coverage");
+    put(KEY_COVERAGE,response.getData());
   }
 }
