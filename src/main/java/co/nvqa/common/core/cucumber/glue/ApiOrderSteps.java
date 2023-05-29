@@ -124,6 +124,21 @@ public class ApiOrderSteps extends CoreStandardSteps {
   }
 
   /**
+   * API Core - Operator update order granular status:
+   * @param data <br/> <b>orderId</b>: order id of the order/parcel
+   *             <br/> <b>granularStatus</b>: granular status to be updated for the given order
+   */
+  @Given("API Core - Operator update order granular status:")
+  public void apiCoreOperatorUpdateGranularStatusOrder(Map<String, String> data) {
+    data = resolveKeyValues(data);
+    Long orderId = Long.valueOf(data.get("orderId"));
+    String granularStatus = data.get("granularStatus");
+    doWithRetry(
+        () -> getOrderClient().updateGranularStatusOrder(orderId, granularStatus),
+        "update order granular status", 3000, 10);
+  }
+
+  /**
    * API Core - Operator force success order "{KEY_LIST_OF_CREATED_ORDERS[1].id}"
    *
    * @param orderIdString example: {KEY_LIST_OF_CREATED_ORDERS[1].id}
