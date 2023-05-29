@@ -3,6 +3,7 @@ package co.nvqa.common.core.cucumber.glue;
 import co.nvqa.common.core.client.OrderClient;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.model.order.Order;
+import co.nvqa.common.core.model.order.Order.Dimension;
 import co.nvqa.common.core.model.order.RescheduleOrderRequest;
 import co.nvqa.common.core.model.order.RescheduleOrderResponse;
 import co.nvqa.common.core.model.order.RtsOrderRequest;
@@ -13,11 +14,13 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.response.Response;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import javax.inject.Inject;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
+import org.assertj.core.api.Assertions;
 import org.hamcrest.Matchers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -116,6 +119,21 @@ public class ApiOrderSteps extends CoreStandardSteps {
       LOGGER.warn(
           "failed to get the order with the expected granular status! cause: " + ex.getMessage());
     }
+  }
+
+  /**
+   * API Core - Operator update order granular status:
+   * @param data <br/> <b>orderId</b>: order id of the order/parcel
+   *             <br/> <b>granularStatus</b>: granular status to be updated for the given order
+   */
+  @Given("API Core - Operator update order granular status:")
+  public void apiCoreOperatorUpdateGranularStatusOrder(Map<String, String> data) {
+    data = resolveKeyValues(data);
+    Long orderId = Long.valueOf(data.get("orderId"));
+    String granularStatus = data.get("granularStatus");
+    doWithRetry(
+        () -> getOrderClient().updateGranularStatusOrder(orderId, granularStatus),
+        "update order granular status", 3000, 10);
   }
 
   /**
@@ -263,5 +281,24 @@ public class ApiOrderSteps extends CoreStandardSteps {
     doWithRetry(
         () -> getOrderClient().revertRts(new RtsOrderRequest(), orderId), "Revert RTS order"
     );
+  }
+
+  @Given("API Core - update order dimensions:")
+  public void apiOperatorUpdateDimensionsOfAnOrder(Map<String, String> data) {
+    data = resolveKeyValues(data);
+    String orderId = data.get("orderId");
+    Assertions.assertThat(orderId).as("Order ID").isNotNull();
+    String dimensionsJson = data.get("dimensions");
+    Assertions.assertThat(dimensionsJson).as("Dimensions").isNotNull();
+    getOrderClient().updateParcelDimensions(Long.parseLong(orderId), new Dimension(dimensionsJson));
+  }
+
+  @When("API Core - Operator bulk tags parcel with below tag:")
+  public void apiCoreBulkTagsParcelsWithBelowTag(Map<String, String> dataTableRaw) {
+    final Map<String, String> dataTable = resolveKeyValues(dataTableRaw);
+    final Long orderId = Long.valueOf(dataTable.get("orderId"));
+    Long tag = Long.valueOf(dataTable.get("orderTag"));
+    List<Long> tags = Collections.singletonList(tag);
+    getOrderClient().addOrderLevelTags(orderId, tags);
   }
 }

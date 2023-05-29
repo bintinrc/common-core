@@ -1,6 +1,6 @@
 package co.nvqa.common.core.cucumber.glue;
 
-import co.nvqa.common.core.client.EventClient;;
+import co.nvqa.common.core.client.EventClient;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.model.event.Event;
 import co.nvqa.common.core.model.event.Events;
@@ -8,7 +8,6 @@ import io.cucumber.guice.ScenarioScoped;
 import io.cucumber.java.en.Then;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import javax.inject.Inject;
 import lombok.Getter;
 import org.assertj.core.api.Assertions;
@@ -31,7 +30,8 @@ public class ApiEventsSteps extends CoreStandardSteps {
    *                     <b>userId</b> User ID (Address Geolocator)
    *                     <b>status</b> Status of address (UNVERIFIED)
    *                     <b>mode</b> mode of Auto AV (AUTO)
-   *                     <b>source</b> source if Auto AV (MODEL_AV)*/
+   *                     <b>source</b> source if Auto AV (MODEL_AV)
+   */
   @Then("API Core - Operator verify Auto AV event")
   public void apiOperatorMakeSureAutoAvEventIsCorrect(Map<String, String> dataTableRaw) {
     Map<String, String> resolvedData = resolveKeyValues(dataTableRaw);
@@ -50,14 +50,11 @@ public class ApiEventsSteps extends CoreStandardSteps {
       if (eventData.getType().equals(eventName)) {
         if (eventData.getUserName().equals(userId)) {
           Assertions.assertThat(eventData.getData().getStatus())
-              .as("Auto AV order event status is correct")
-              .isEqualTo(status);
+              .as("Auto AV order event status is correct").isEqualTo(status);
           Assertions.assertThat(eventData.getData().getMode())
-              .as("Auto AV order event mode is correct")
-              .isEqualTo(mode);
+              .as("Auto AV order event mode is correct").isEqualTo(mode);
           Assertions.assertThat(eventData.getData().getSource())
-              .as("order event delivery waypoint id is correct")
-              .isEqualTo(source);
+              .as("order event delivery waypoint id is correct").isEqualTo(source);
         }
       }
     }
@@ -66,12 +63,38 @@ public class ApiEventsSteps extends CoreStandardSteps {
 
   /**
    * <br/> <b>orderId</b>: order ID of the order/parcel<br/>
-  */
+   */
   @Then("API Core - Operator get the order event from Order Id {string}")
   public void apiOperatorGetOrderEventByOrderId(String createdOrderId) {
     final long orderId = Long.parseLong(resolveValue(createdOrderId));
 
     final Events events = getEventClient().getOrderEventsByOrderId(orderId);
-    putInList(KEY_CORE_LIST_OF_ORDER_EVENTS,events);
+    putInList(KEY_CORE_LIST_OF_ORDER_EVENTS, events);
+  }
+
+  /**
+   * @Example Then API Core - Operator verify that "UPDATE_AV" event is published for order id *
+   * "{KEY_LIST_OF_CREATED_ORDERS[1].id}"
+   */
+  @Then("API Core - Operator verify that {string} event is published for order id {string}")
+  public void operatorVerifiesOrderEventPublished(String orderEvent, String createdOrderId) {
+    final Event expectedOrderEvent = new Event();
+    expectedOrderEvent.setType(resolveValue(orderEvent));
+    final long orderId = Long.parseLong(resolveValue(createdOrderId));
+
+    doWithRetry(() -> {
+      final Events actualOrderEvents = getEventClient().getOrderEventsByOrderId(orderId);
+
+      Assertions.assertThat(actualOrderEvents.getData())
+          .withFailMessage(f("Order events should not empty, order id: %d, event: %s", orderId,
+              expectedOrderEvent)).isNotEmpty();
+
+      Assertions.assertThat(actualOrderEvents.getData()).withFailMessage(
+              f("%s event is NOT published for order id: %s", expectedOrderEvent.getType(), orderId))
+          .anySatisfy(
+              event -> Assertions.assertThat(event.getType())
+                  .isEqualTo(expectedOrderEvent.getType()));
+
+    }, String.format("%s event is published for order id %d", expectedOrderEvent, orderId));
   }
 }
