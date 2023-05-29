@@ -54,18 +54,27 @@ public class HookSteps extends CoreStandardSteps {
   @After("@CancelCreatedReservations")
   public void cancelReservation() {
     final List<ReservationResponse> reservations = get(KEY_LIST_OF_CREATED_RESERVATIONS);
-    if (Objects.isNull(reservations) || reservations.isEmpty()) {
-      LOGGER.trace(
-          "no reservations have been created under key \"KEY_LIST_OF_CREATED_RESERVATIONS\"");
-      return;
+    final List<ReservationResponse> reservationResponses = get(KEY_LIST_OF_RESERVATIONS);
+    if (!Objects.isNull(reservations) && !reservations.isEmpty()) {
+      reservations.forEach(r -> {
+        try {
+          getReservationClient().cancelReservation(r.getId());
+          LOGGER.debug("Reservation ID = {} cancelled successfully", r.getId());
+        } catch (Throwable t) {
+          LOGGER.warn("error to cancel reservation: " + t.getMessage());
+        }
+      });
     }
-    reservations.forEach(r -> {
-      try {
-        getReservationClient().cancelReservation(r.getId());
-        LOGGER.debug("Reservation ID = {} cancelled successfully", r.getId());
-      } catch (Throwable t) {
-        LOGGER.warn("error to cancel reservation: " + t.getMessage());
-      }
-    });
+
+    if (!Objects.isNull(reservationResponses) && !reservationResponses.isEmpty()) {
+      reservationResponses.forEach(r -> {
+        try {
+          getReservationClient().cancelReservation(r.getId());
+          LOGGER.debug("Reservation ID = {} cancelled successfully", r.getId());
+        } catch (Throwable t) {
+          LOGGER.warn("error to cancel reservation: " + t.getMessage());
+        }
+      });
+    }
   }
 }

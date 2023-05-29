@@ -292,8 +292,12 @@ public class OrderClient extends SimpleApiClient {
     return doPut("Core - Cancel Order V1", spec, url);
   }
 
-  public Response cancelOrder(long orderId) {
-    return cancelOrderV1AndGetRawResponse(orderId, "cancelled for testing purposes");
+  public void cancelOrder(long orderId) {
+    Response response = cancelOrderV1AndGetRawResponse(orderId, "cancelled for testing purposes");
+    if (response.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + response.statusCode());
+    }
+    response.then().body(equalToIgnoringCase("{\"message\":\"Order cancelled\"}"));
   }
 
   public void cancelOrderV1(Long orderId, String reason) {
