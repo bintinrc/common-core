@@ -44,7 +44,7 @@ public class ReservationClient extends SimpleApiClient {
     return fromJson(r.body().asString(), ReservationResponse.class);
   }
 
-  public List<ReservationResponse> getReservations(ReservationFilter filter) {
+  public ReservationResponse getReservations(ReservationFilter filter) {
     String url = "reservation/2.0/reservations";
 
     RequestSpecification spec = createAuthenticatedRequest()
@@ -57,7 +57,7 @@ public class ReservationClient extends SimpleApiClient {
     }
 
     ReservationWrapper wrapper = fromJsonSnakeCase(r.body().asString(), ReservationWrapper.class);
-    return wrapper.getData();
+    return wrapper.getData().get(0);
   }
 
   public void deleteReservation(long reservationId, long shipperId) {
