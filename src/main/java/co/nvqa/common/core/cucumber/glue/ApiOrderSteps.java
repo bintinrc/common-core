@@ -124,17 +124,18 @@ public class ApiOrderSteps extends CoreStandardSteps {
   }
 
   /**
-   * API Core - Operator update order granular status to "Pending Pickup" for order id: "{KEY_LIST_OF_CREATED_ORDERS[1].id}"
-   * @param granularStatus example: Pending Pickup
-   * @param orderIdString example: {KEY_LIST_OF_CREATED_ORDERS[1].id}
+   * API Core - Operator update order granular status:
+   * @param data <br/> <b>orderId</b>: order id of the order/parcel
+   *             <br/> <b>granularStatus</b>: granular status to be updated for the given order
    */
-
-  @Given("API Core - Operator update order granular status to {string} for order id: {string}")
-  public void apiCoreOperatorUpdateOrderGranularStatusToForOrderId(String granularStatus, String orderIdString) {
-    final long orderId = Long.parseLong(resolveValue(orderIdString));
+  @Given("API Core - Operator update order granular status:")
+  public void apiCoreOperatorUpdateGranularStatusOrder(Map<String, String> data) {
+    data = resolveKeyValues(data);
+    Long orderId = Long.valueOf(data.get("orderId"));
+    String granularStatus = data.get("granularStatus");
     doWithRetry(
         () -> getOrderClient().updateGranularStatusOrder(orderId, granularStatus),
-        "Update order granular status", 3000, 10);
+        "update order granular status", 3000, 10);
   }
 
   /**
