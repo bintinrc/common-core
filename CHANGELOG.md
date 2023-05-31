@@ -2,6 +2,14 @@
 
 <hr>
 
+## [1.3.3] 2023-05-31
+
+### Added
+
+- API Core - Operator verify that event is published with correct details:
+
+<hr>
+
 ## [1.2.44] 2023-05-25
 
 ### Added
