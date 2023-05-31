@@ -10,6 +10,32 @@
 
 <hr>
 
+## [1.3.2] 2023-05-29
+
+### Added
+
+- API Core - force cancel order {value}
+
+<hr>
+
+## [1.3.2] 2023-05-29
+
+### Added
+
+- API Core - Operator update order granular status:
+- API Route - Operator create new coverage:
+
+<hr>
+
+## [1.3.1] 2023-05-29
+
+### Added
+
+- API Core - Operator update order granular status:
+- API Route - Operator create new coverage:
+
+<hr>
+
 ## [1.2.44] 2023-05-25
 
 ### Added
