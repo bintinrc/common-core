@@ -1,8 +1,10 @@
 package co.nvqa.common.core.cucumber.glue;
 
+import co.nvqa.common.core.client.OrderClient;
 import co.nvqa.common.core.client.ReservationClient;
 import co.nvqa.common.core.client.RouteClient;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
+import co.nvqa.common.core.model.order.Order;
 import co.nvqa.common.core.model.reservation.ReservationResponse;
 import co.nvqa.common.core.model.route.RouteResponse;
 import io.cucumber.guice.ScenarioScoped;
@@ -22,6 +24,10 @@ public class HookSteps extends CoreStandardSteps {
   @Inject
   @Getter
   private RouteClient routeClient;
+
+  @Inject
+  @Getter
+  private OrderClient orderClient;
 
   @Inject
   @Getter
@@ -76,5 +82,43 @@ public class HookSteps extends CoreStandardSteps {
         }
       });
     }
+  }
+
+  @After("@ForceSuccessCommonV2")
+  public void forceSuccess() {
+    final List<Order> orders = get(KEY_LIST_OF_CREATED_ORDERS);
+    if (Objects.isNull(orders) || orders.isEmpty()) {
+      LOGGER.trace(
+          "no routes been created under key \"KEY_LIST_OF_CREATED_ORDERS\", skip the force success");
+      return;
+    }
+    orders.forEach(o -> {
+      try {
+        doWithRetry(() -> getOrderClient().forceSuccess(o.getId(), true),
+            "After hook: @ForceSuccess");
+        LOGGER.debug("Order ID = {} force successfully", o.getId());
+      } catch (Throwable t) {
+        LOGGER.warn("Error to force success: " + t.getMessage());
+      }
+    });
+  }
+
+  @After("@DeleteRoutes")
+  public void deleteRoutes() {
+    final List<RouteResponse> routes = get(KEY_LIST_OF_CREATED_ROUTES);
+    if (Objects.isNull(routes) || routes.isEmpty()) {
+      LOGGER.trace(
+          "no routes been created under key \"KEY_LIST_OF_CREATED_ROUTES\", skip the delete routes");
+      return;
+    }
+    routes.forEach(r -> {
+      try {
+        doWithRetry(() -> getRouteClient().deleteRoute(r.getId()),
+            "After hook: @DeleteRoutes");
+        LOGGER.debug("Route ID = {} deleted successfully", r.getId());
+      } catch (Throwable t) {
+        LOGGER.warn("error to delete route: " + t.getMessage());
+      }
+    });
   }
 }
