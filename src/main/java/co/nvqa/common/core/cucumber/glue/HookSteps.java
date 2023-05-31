@@ -89,13 +89,13 @@ public class HookSteps extends CoreStandardSteps {
     final List<Order> orders = get(KEY_LIST_OF_CREATED_ORDERS);
     if (Objects.isNull(orders) || orders.isEmpty()) {
       LOGGER.trace(
-          "no routes been created under key \"KEY_LIST_OF_CREATED_ORDERS\", skip the force success");
+          "no orders been created under key \"KEY_LIST_OF_CREATED_ORDERS\", skip the force success");
       return;
     }
     orders.forEach(o -> {
       try {
         doWithRetry(() -> getOrderClient().forceSuccess(o.getId(), true),
-            "After hook: @ForceSuccess");
+            "After hook: @ForceSuccessCommonV2");
         LOGGER.debug("Order ID = {} force successfully", o.getId());
       } catch (Throwable t) {
         LOGGER.warn("Error to force success: " + t.getMessage());
