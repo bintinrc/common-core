@@ -1,6 +1,7 @@
 package co.nvqa.common.core.model.event;
 
 import co.nvqa.common.core.utils.EventDetailDeserializer;
+import co.nvqa.common.model.DataEntity;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +12,7 @@ import lombok.Setter;
 @JsonDeserialize(using = EventDetailDeserializer.class)
 @Getter
 @Setter
-public class EventDetail {
+public class EventDetail extends DataEntity {
 
   private Long shipmentId;
   private Long currHubId;
@@ -43,10 +44,18 @@ public class EventDetail {
 
   //from update status event
   private String reason;
+  private EventValueString granularStatus;
+  private EventValueString orderStatus;
 
   //get auto AV event
   private String status;
   private String mode;
+
+  //order Dimensions
+  private EventValue weight;
+  private EventValue length;
+  private EventValue height;
+  private EventValue width;
 
   @Getter
   @Setter
@@ -57,6 +66,18 @@ public class EventDetail {
 
     private Long oldValue;
     private Long newValue;
+
+  }
+
+  @Getter
+  @Setter
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class EventValueString {
+
+    private String oldValue;
+    private String newValue;
 
   }
 
