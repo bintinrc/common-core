@@ -7,6 +7,7 @@
 ### Added
 
 - API Core - Operator verify that event is published with correct details:
+- API Core - Customer collect from dp:
 
 <hr>
 
