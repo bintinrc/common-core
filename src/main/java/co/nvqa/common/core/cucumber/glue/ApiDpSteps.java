@@ -2,6 +2,7 @@ package co.nvqa.common.core.cucumber.glue;
 
 import co.nvqa.common.core.client.CoreDpClient;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
+import co.nvqa.common.core.model.dp.CustomerCollectRequest;
 import co.nvqa.common.core.model.dp.DpTagging;
 import co.nvqa.common.core.model.dp.DpUntagging;
 import io.cucumber.java.en.And;
@@ -93,6 +94,17 @@ public class ApiDpSteps extends CoreStandardSteps {
     doWithRetry(
         () -> getCoreDpClient().untagOrderFromDp(orderId, version),
         "untag from dp");
+  }
+
+  @And("API Core - Customer collect from dp:")
+  public void customerCollectDpOrder(Map<String, String> source) {
+    final Map<String, String> resolvedDataTable = resolveKeyValues(source);
+    final long orderId = Long.parseLong(resolvedDataTable.get("orderId"));
+    final CustomerCollectRequest request = fromJsonSnakeCase(resolvedDataTable.get("request"),
+        CustomerCollectRequest.class);
+    doWithRetry(
+        () -> getCoreDpClient().customerCollect(orderId, request),
+        "customer collect from dp");
   }
 
   @And("API Core - Operator overstay order from dp:")
