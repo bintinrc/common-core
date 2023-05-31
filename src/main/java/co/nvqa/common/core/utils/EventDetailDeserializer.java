@@ -2,6 +2,7 @@ package co.nvqa.common.core.utils;
 
 import co.nvqa.common.core.model.event.EventDetail;
 import co.nvqa.common.core.model.event.EventDetail.EventValue;
+import co.nvqa.common.core.model.event.EventDetail.EventValueString;
 import co.nvqa.common.utils.JsonUtils;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -96,6 +97,42 @@ public class EventDetailDeserializer extends JsonDeserializer<EventDetail> {
     }
     if (node.get("mode") != null) {
       result.setMode(node.get("mode").asText());
+    }
+    if (node.get("weight") != null) {
+      if (node.get("weight").isObject()) {
+        result.setWeight(
+            JsonUtils.fromJsonSnakeCase(node.get("weight").toString(), EventValue.class));
+      }
+    }
+    if (node.get("length") != null) {
+      if (node.get("length").isObject()) {
+        result.setLength(
+            JsonUtils.fromJsonSnakeCase(node.get("length").toString(), EventValue.class));
+      }
+    }
+    if (node.get("height") != null) {
+      if (node.get("height").isObject()) {
+        result.setHeight(
+            JsonUtils.fromJsonSnakeCase(node.get("height").toString(), EventValue.class));
+      }
+    }
+    if (node.get("width") != null) {
+      if (node.get("width").isObject()) {
+        result.setWidth(
+            JsonUtils.fromJsonSnakeCase(node.get("width").toString(), EventValue.class));
+      }
+    }
+    if (node.get("granular_status") != null) {
+      if (node.get("granular_status").isObject()) {
+        result.setGranularStatus(
+            JsonUtils.fromJsonSnakeCase(node.get("granular_status").toString(), EventValueString.class));
+      }
+    }
+    if (node.get("order_status") != null) {
+      if (node.get("order_status").isObject()) {
+        result.setOrderStatus(
+            JsonUtils.fromJsonSnakeCase(node.get("order_status").toString(), EventValueString.class));
+      }
     }
     return result;
   }
