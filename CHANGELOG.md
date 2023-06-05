@@ -2,6 +2,23 @@
 
 <hr>
 
+## [1.3.5] 2023-06-05
+
+### Added
+
+- API Core - Operator add/update order COD amount:
+
+<hr>
+
+## [1.3.4] 2023-06-01
+
+### Added
+
+- Hook: @After("@ForceSuccessCommonV2")
+- Hook: @After("@DeleteRoutes")
+
+<hr>
+
 ## [1.3.3] 2023-05-31
 
 ### Added
