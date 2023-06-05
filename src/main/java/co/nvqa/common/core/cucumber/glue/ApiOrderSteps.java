@@ -302,12 +302,12 @@ public class ApiOrderSteps extends CoreStandardSteps {
    * @param dataTableRaw <br/> <b>orderId</b>: {KEY_LIST_OF_CREATED_ORDERS[1].id} <br>
    *                     <b>newCodAmount</b>: 100
    */
-  @When("API Core - Operator update order COD amount:")
+  @When("API Core - Operator add/update order COD amount:")
   public void apiCoreUpdateOrderCodAmount(Map<String, String> dataTableRaw) {
     final Map<String, String> dataTable = resolveKeyValues(dataTableRaw);
     final Long orderId = Long.valueOf(dataTable.get("orderId"));
     final Double newCodAmount = Double.valueOf(dataTable.get("newCodAmount"));
     doWithRetry(() -> getOrderClient().updateOrderCod(orderId, newCodAmount),
-        "Operator update order COD amount");
+        "Operator add/update order COD amount:");
   }
 }

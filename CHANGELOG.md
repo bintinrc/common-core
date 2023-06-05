@@ -6,7 +6,7 @@
 
 ### Added
 
-- API Core - Operator update order COD amount:
+- API Core - Operator add/update order COD amount:
 
 <hr>
 
