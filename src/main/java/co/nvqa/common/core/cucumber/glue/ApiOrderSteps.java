@@ -46,7 +46,8 @@ public class ApiOrderSteps extends CoreStandardSteps {
    * order with the same tracking id. <br/><br/><b>Note</b>: becareful that you may face unintended
    * order status due to event propagation delay to Core service
    *
-   * @param tracking key that contains order's tracking id, example: KEY_LIST_OF_CREATED_TRACKING_IDS
+   * @param tracking key that contains order's tracking id, example:
+   *                 KEY_LIST_OF_CREATED_TRACKING_IDS
    */
   @When("API Core - Operator get order details for tracking order {string}")
   public void apiOperatorGetOrderDetailsForTrackingOrder(String tracking) {
@@ -71,7 +72,8 @@ public class ApiOrderSteps extends CoreStandardSteps {
    * previous order with the same tracking id. this is intended to check if you have done certain
    * action to same order and you need previous data prior to the action being done
    *
-   * @param tracking key that contains order's tracking id, example: KEY_LIST_OF_CREATED_TRACKING_IDS
+   * @param tracking key that contains order's tracking id, example:
+   *                 KEY_LIST_OF_CREATED_TRACKING_IDS
    */
   @When("API Core - Operator get order details for previous order {string}")
   public void apiOperatorGetOrderDetailsForPreviousOrder(String tracking) {
@@ -123,8 +125,9 @@ public class ApiOrderSteps extends CoreStandardSteps {
 
   /**
    * API Core - Operator update order granular status:
-   * @param data <br/> <b>orderId</b>: order id of the order/parcel
-   *             <br/> <b>granularStatus</b>: granular status to be updated for the given order
+   *
+   * @param data <br/> <b>orderId</b>: order id of the order/parcel <br/> <b>granularStatus</b>:
+   *             granular status to be updated for the given order
    */
   @Given("API Core - Operator update order granular status:")
   public void apiCoreOperatorUpdateGranularStatusOrder(Map<String, String> data) {
@@ -280,7 +283,8 @@ public class ApiOrderSteps extends CoreStandardSteps {
     Assertions.assertThat(orderId).as("Order ID").isNotNull();
     String dimensionsJson = data.get("dimensions");
     Assertions.assertThat(dimensionsJson).as("Dimensions").isNotNull();
-    getOrderClient().updateParcelDimensions(Long.parseLong(orderId), new Dimension(dimensionsJson));
+    doWithRetry(() -> getOrderClient().updateParcelDimensions(Long.parseLong(orderId),
+        new Dimension(dimensionsJson)), "Update Order Dimensions");
   }
 
   @When("API Core - Operator bulk tags parcel with below tag:")
@@ -289,6 +293,21 @@ public class ApiOrderSteps extends CoreStandardSteps {
     final Long orderId = Long.valueOf(dataTable.get("orderId"));
     Long tag = Long.valueOf(dataTable.get("orderTag"));
     List<Long> tags = Collections.singletonList(tag);
-    getOrderClient().addOrderLevelTags(orderId, tags);
+    doWithRetry(() -> getOrderClient().addOrderLevelTags(orderId, tags),
+        "Operator bulk tags parcel with below tag");
+  }
+
+
+  /**
+   * @param dataTableRaw <br/> <b>orderId</b>: {KEY_LIST_OF_CREATED_ORDERS[1].id} <br>
+   *                     <b>newCodAmount</b>: 100
+   */
+  @When("API Core - Operator update order COD amount:")
+  public void apiCoreUpdateOrderCodAmount(Map<String, String> dataTableRaw) {
+    final Map<String, String> dataTable = resolveKeyValues(dataTableRaw);
+    final Long orderId = Long.valueOf(dataTable.get("orderId"));
+    final Double newCodAmount = Double.valueOf(dataTable.get("newCodAmount"));
+    doWithRetry(() -> getOrderClient().updateOrderCod(orderId, newCodAmount),
+        "Operator update order COD amount");
   }
 }
