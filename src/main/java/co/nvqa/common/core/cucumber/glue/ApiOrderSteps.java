@@ -104,12 +104,8 @@ public class ApiOrderSteps extends CoreStandardSteps {
       final Order order = doWithRetry(() -> {
         final Order tempOrder = getOrderClient().searchOrderByTrackingId(trackingId);
         final String actualGranularStatus = tempOrder.getGranularStatus();
-        if (!StringUtils.equalsIgnoreCase(actualGranularStatus, expectedGranularStatus)) {
-          final String message = f("Order actual status is not match, expected: %s but was: %s",
-              expectedGranularStatus, actualGranularStatus);
-          LOGGER.debug(message);
-          throw new NvTestRuntimeException(message);
-        }
+        Assertions.assertThat(actualGranularStatus).as("order granular status doesnt match")
+            .isEqualToIgnoringCase(expectedGranularStatus);
         return tempOrder;
       }, "Order client search order by tracking id", 20_000, 3);
 
@@ -123,8 +119,9 @@ public class ApiOrderSteps extends CoreStandardSteps {
 
   /**
    * API Core - Operator update order granular status:
-   * @param data <br/> <b>orderId</b>: order id of the order/parcel
-   *             <br/> <b>granularStatus</b>: granular status to be updated for the given order
+   *
+   * @param data <br/> <b>orderId</b>: order id of the order/parcel <br/> <b>granularStatus</b>:
+   *             granular status to be updated for the given order
    */
   @Given("API Core - Operator update order granular status:")
   public void apiCoreOperatorUpdateGranularStatusOrder(Map<String, String> data) {
