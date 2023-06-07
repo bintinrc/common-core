@@ -106,14 +106,10 @@ public class ApiOrderSteps extends CoreStandardSteps {
       final Order order = doWithRetry(() -> {
         final Order tempOrder = getOrderClient().searchOrderByTrackingId(trackingId);
         final String actualGranularStatus = tempOrder.getGranularStatus();
-        if (!StringUtils.equalsIgnoreCase(actualGranularStatus, expectedGranularStatus)) {
-          final String message = f("Order actual status is not match, expected: %s but was: %s",
-              expectedGranularStatus, actualGranularStatus);
-          LOGGER.debug(message);
-          throw new NvTestRuntimeException(message);
-        }
+        Assertions.assertThat(actualGranularStatus).as("order granular status doesnt match")
+            .isEqualToIgnoringCase(expectedGranularStatus);
         return tempOrder;
-      }, "Order client search order by tracking id", 20_000, 3);
+      }, "Order client search order by tracking id", 30_000, 3);
 
       putInList(KEY_LIST_OF_CREATED_ORDERS, order,
           (o1, o2) -> StringUtils.equalsAnyIgnoreCase(o1.getTrackingId(), o2.getTrackingId()));
