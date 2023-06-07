@@ -2,6 +2,58 @@
 
 <hr>
 
+## [1.3.5] 2023-06-05
+
+### Added
+
+- API Core - Operator add/update order COD amount:
+
+<hr>
+
+## [1.3.4] 2023-06-01
+
+### Added
+
+- Hook: @After("@ForceSuccessCommonV2")
+- Hook: @After("@DeleteRoutes")
+
+<hr>
+
+## [1.3.3] 2023-05-31
+
+### Added
+
+- API Core - Operator verify that event is published with correct details:
+- API Core - Customer collect from dp:
+
+<hr>
+
+## [1.3.2] 2023-05-29
+
+### Added
+
+- API Core - force cancel order {value}
+
+<hr>
+
+## [1.3.2] 2023-05-29
+
+### Added
+
+- API Core - Operator update order granular status:
+- API Route - Operator create new coverage:
+
+<hr>
+
+## [1.3.1] 2023-05-29
+
+### Added
+
+- API Core - Operator update order granular status:
+- API Route - Operator create new coverage:
+
+<hr>
+
 ## [1.2.44] 2023-05-25
 
 ### Added
