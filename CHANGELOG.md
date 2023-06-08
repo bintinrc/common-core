@@ -2,6 +2,30 @@
 
 <hr>
 
+## [1.3.8] 2023-06-08
+
+### Added
+
+- DB Core - verify order id {string} orders.data.belt_dimensions record:
+
+<hr>
+
+## [1.3.7] 2023-06-08
+
+### Added
+
+- API Core - Operator parcel transfer to a new route:
+
+<hr>
+
+## [1.3.6] 2023-06-08
+
+### Added
+
+- API Core - Operator update order COP:
+
+<hr>
+
 ## [1.3.5] 2023-06-05
 
 ### Added
