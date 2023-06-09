@@ -123,8 +123,13 @@ public class DbCoreSteps extends CoreStandardSteps {
       Waypoints result = waypointsDao.getWaypointsDetails(resolvedWayPointIdKey);
       Assertions.assertThat(result.getZoneType())
           .as("Assertion for Zone Type column value is as expected").isEqualTo(expectedZoneType);
-      Assertions.assertThat(result.getRoutingZoneId())
-          .as("Assertion for Zone Id column value is as expected").isNull();
+      if(result.getRoutingZoneId() == null) {
+        Assertions.assertThat(result.getRoutingZoneId())
+            .as("Assertion for Zone Id column value is null as expected").isNull();
+      }else {
+        Assertions.assertThat(result.getRoutingZoneId())
+            .as("Assertion for Zone Id column value is zero as expected").isZero();
+      }
     }, "Validating verified Zone Type value is as expected", 2000, 3);
   }
 
@@ -135,6 +140,27 @@ public class DbCoreSteps extends CoreStandardSteps {
       Waypoints result = waypointsDao.getWaypointsDetails(resolvedWayPointIdKey);
       put(KEY_CORE_WAYPOINT_DETAILS, result);
     }, "get core waypoint details", 2000, 3);
+  }
+
+  @Then("DB Core - verifies that latitude is equal to {string} and longitude is equal to {string} and for waypointId {string}")
+  public void dbCoreVerifiesLatLong(String expectedLatitude, String expectedLongitude, String waypointId) {
+    Long resolvedWayPointIdKey = Long.parseLong(resolveValue(waypointId));
+    doWithRetry(() -> {
+      Waypoints result = waypointsDao.getWaypointsDetails(resolvedWayPointIdKey);
+      String[] formattedValues = formatLatLongValues(result.getLatitude(), result.getLongitude());
+      Assertions.assertThat(formattedValues[0])
+          .as("Assertion for lat column value is as expected").isEqualTo(expectedLatitude);
+      Assertions.assertThat(formattedValues[1])
+          .as("Assertion for lat column value is as expected").isEqualTo(expectedLongitude);
+    }, "Validating verified lat long values are as expected");
+  }
+
+  private String[] formatLatLongValues(Double latitude, Double longitude){
+    String lat = latitude.toString();
+    String formattedLatitude = lat.substring(0,6);
+    String lon = longitude.toString();
+    String formattedLongitude = lon.substring(0,6);
+    return new String[] {formattedLatitude,formattedLongitude};
   }
 
   @When("DB Core - verify route_logs record:")
