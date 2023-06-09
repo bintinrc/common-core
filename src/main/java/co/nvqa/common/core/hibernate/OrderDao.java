@@ -64,6 +64,11 @@ public class OrderDao extends DbBase {
     return dimension.getManualDimensions();
   }
 
+  public Dimension getOrderBeltDimensions(Long orderId) {
+    Dimension dimension = getOrderData(orderId);
+    return dimension.getBeltDimensions();
+  }
+
   public Orders getSingleOrderDetailsByTrackingId(String trackingId) {
     String query = "FROM Orders WHERE trackingId = :trackingId";
     var result = findAll(session ->

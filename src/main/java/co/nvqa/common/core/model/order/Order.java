@@ -508,6 +508,8 @@ public class Order extends DataEntity<Order> implements Serializable {
     private Dimension originalDimensions;
     @JsonProperty("manual_dimensions")
     private Dimension manualDimensions;
+    @JsonProperty("belt_dimensions")
+    private Dimension beltDimensions;
 
     public Dimension() {
     }
