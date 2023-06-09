@@ -52,6 +52,8 @@ public class ApiReservationSteps extends CoreStandardSteps {
     ReservationResponse reservationResult = apiOperatorCreateV2Reservation(reservationRequest);
 
     putInList(KEY_LIST_OF_CREATED_RESERVATIONS, reservationResult);
+    put(KEY_CREATED_RESERVATION_ID, reservationResult.getId());
+    put(KEY_CREATED_WAYPOINT_ID , reservationResult.getWaypointId());
   }
 
   @When("API Core - Operator get reservation from reservation id {string}")
@@ -120,6 +122,24 @@ public class ApiReservationSteps extends CoreStandardSteps {
     getReservationClient()
         .updatePriorityLevelOfReservation(pickupAddressId, legacyShipperId, priorityLevel,
             reservationId);
+  }
+
+  /**
+   * Sample:<p>
+   * <p>
+   * When API Core - Operator update pick up date and time for the reservation using data below:<p> |
+   | reservationId             |  {KEY_CREATED_RESERVATION_ID}                                     |
+   | reservationUpdateRequest  | request                                                           |
+   * <p>
+   *
+   * @param dataTableAsMap Map of data from feature file.
+   */
+  @When("API Core - Operator update pick up date and time for the reservation using data below:")
+  public void apiOperatorUpdatePickUpDateAndTimeForTheReservation(Map<String, String> dataTableAsMap) {
+    dataTableAsMap = resolveKeyValues(dataTableAsMap);
+    long legacyShipperId = Long.parseLong(resolveValue(dataTableAsMap.get("reservationId")));
+    getReservationClient()
+        .updateDateAndTimeOfReservation(legacyShipperId,dataTableAsMap.get("reservationUpdateRequest"));
   }
 
   /**
