@@ -52,7 +52,6 @@ public class ApiReservationSteps extends CoreStandardSteps {
     ReservationResponse reservationResult = apiOperatorCreateV2Reservation(reservationRequest);
 
     putInList(KEY_LIST_OF_CREATED_RESERVATIONS, reservationResult);
-    put(KEY_CREATED_WAYPOINT_ID , reservationResult.getWaypointId());
   }
 
   @When("API Core - Operator get reservation from reservation id {string}")
