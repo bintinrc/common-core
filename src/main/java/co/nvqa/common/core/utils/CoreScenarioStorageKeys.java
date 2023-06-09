@@ -3,6 +3,7 @@ package co.nvqa.common.core.utils;
 public interface CoreScenarioStorageKeys {
 
   String KEY_LIST_OF_CREATED_RESERVATIONS = "KEY_LIST_OF_CREATED_RESERVATIONS";
+
   String KEY_DESTINATION_HUB_ID = "KEY_DESTINATION_HUB_ID";
   String KEY_LIST_OF_CREATED_ROUTES = "KEY_LIST_OF_CREATED_ROUTES";
   @Deprecated

@@ -123,6 +123,24 @@ public class ApiReservationSteps extends CoreStandardSteps {
   }
 
   /**
+   * Sample:<p>
+   * <p>
+   * When API Core - Operator update pick up date and time for the reservation using data below:<p> |
+   | reservationId             |  {KEY_CREATED_RESERVATION_ID}                                     |
+   | reservationUpdateRequest  | request                                                           |
+   * <p>
+   *
+   * @param dataTableAsMap Map of data from feature file.
+   */
+  @When("API Core - Operator update pick up date and time for the reservation using data below:")
+  public void apiOperatorUpdatePickUpDateAndTimeForTheReservation(Map<String, String> dataTableAsMap) {
+    dataTableAsMap = resolveKeyValues(dataTableAsMap);
+    long legacyShipperId = Long.parseLong(resolveValue(dataTableAsMap.get("reservationId")));
+    getReservationClient()
+        .updateDateAndTimeOfReservation(legacyShipperId,dataTableAsMap.get("reservationUpdateRequest"));
+  }
+
+  /**
    * Sample:
    * <p>
    * API Core - Operator cancel reservation for id "{KEY_LIST_OF_CREATED_RESERVATIONS[1].id}"
