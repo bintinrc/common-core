@@ -125,10 +125,10 @@ public class DbCoreSteps extends CoreStandardSteps {
           .as("Assertion for Zone Type column value is as expected").isEqualTo(expectedZoneType);
       if(result.getRoutingZoneId() == null) {
         Assertions.assertThat(result.getRoutingZoneId())
-            .as("Assertion for Zone Id column value is as expected").isNull();
+            .as("Assertion for Zone Id column value is null as expected").isNull();
       }else {
         Assertions.assertThat(result.getRoutingZoneId())
-            .as("Assertion for Zone Id column value is as expected").isZero();
+            .as("Assertion for Zone Id column value is zero as expected").isZero();
       }
     }, "Validating verified Zone Type value is as expected", 2000, 3);
   }
@@ -152,10 +152,10 @@ public class DbCoreSteps extends CoreStandardSteps {
           .as("Assertion for lat column value is as expected").isEqualTo(expectedLatitude);
       Assertions.assertThat(formattedValues[1])
           .as("Assertion for lat column value is as expected").isEqualTo(expectedLongitude);
-    }, "Validating verified lat long values are as expected", 2000, 3);
+    }, "Validating verified lat long values are as expected");
   }
 
-  public String[] formatLatLongValues(Double latitude, Double longitude){
+  private String[] formatLatLongValues(Double latitude, Double longitude){
     String lat = latitude.toString();
     String formattedLatitude = lat.substring(0,6);
     String lon = longitude.toString();
