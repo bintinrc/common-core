@@ -221,6 +221,19 @@ public class RouteClient extends SimpleApiClient {
     }
   }
 
+  public void failedAddReservationToRoute(long routeId, long reservationId, String overwrite) {
+    String url = "core/2.0/reservations/{reservationId}/route";
+
+    RequestSpecification spec = createAuthenticatedRequest()
+        .pathParam("reservationId", reservationId)
+        .body(f("{\"new_route_id\":%d,\"route_index\":-1,\"overwrite\":%s}", routeId, overwrite));
+    Response r = doPut("Core - Add Reservation to Route", spec, url);
+    r.then().contentType(ContentType.JSON);
+    if (r.statusCode() == HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+  }
+
   public BulkRouteReservationResponse bulkAddToRouteReservation(String request) {
     Response r = bulkAddToRouteReservationAndGetRawResponse(request);
     r.then().contentType(ContentType.JSON);

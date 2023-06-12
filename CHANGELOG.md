@@ -2,6 +2,12 @@
 
 <hr>
 
+## [1.3.9] 2023-06-12
+
+### Added
+
+- API Core - Operator failed to add reservation to route using data below:
+
 ## [1.3.8] 2023-06-08
 
 ### Added

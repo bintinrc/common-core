@@ -301,6 +301,19 @@ public class ApiRouteSteps extends CoreStandardSteps {
         "add reservation to route ");
   }
 
+  @When("API Core - Operator failed to add reservation to route using data below:")
+  public void apiOperatorFailedAddReservationPickUpsToTheRoute(Map<String, String> dataTableAsMap) {
+    Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
+
+    final long reservationResultId = Long.parseLong(resolvedDataTable.get("reservationId"));
+    final long routeId = Long.parseLong(resolvedDataTable.get("routeId"));
+    final String overwrite = resolvedDataTable.get("overwrite");
+
+    doWithRetry(
+        () -> getRouteClient().failedAddReservationToRoute(routeId, reservationResultId, overwrite),
+        "(expected) failed add reservation to route");
+  }
+
   /**
    * Sample:<p>
    * <p>
