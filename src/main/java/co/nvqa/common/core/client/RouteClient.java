@@ -227,7 +227,7 @@ public class RouteClient extends SimpleApiClient {
     RequestSpecification spec = createAuthenticatedRequest()
         .pathParam("reservationId", reservationId)
         .body(f("{\"new_route_id\":%d,\"route_index\":-1,\"overwrite\":%s}", routeId, overwrite));
-    Response r = doPut("Core - Add Reservation to Route", spec, url);
+    Response r = doPut("Core - Failed to Add Reservation to Route", spec, url);
     r.then().contentType(ContentType.JSON);
     if (r.statusCode() == HttpConstants.RESPONSE_200_SUCCESS) {
       throw new NvTestHttpException("unexpected http status: " + r.statusCode());
