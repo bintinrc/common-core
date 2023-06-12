@@ -2,6 +2,7 @@ package co.nvqa.common.core.cucumber.glue;
 
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.hibernate.CodInboundsDao;
+import co.nvqa.common.core.hibernate.OrderDao;
 import co.nvqa.common.core.hibernate.OrderDetailsDao;
 import co.nvqa.common.core.hibernate.OrderJaroScoresV2Dao;
 import co.nvqa.common.core.hibernate.OrderTagsDao;
@@ -23,6 +24,7 @@ import co.nvqa.common.core.model.persisted_class.core.OrderDetails;
 import co.nvqa.common.core.model.persisted_class.core.OrderJaroScoresV2;
 import co.nvqa.common.core.model.persisted_class.core.OrderTags;
 import co.nvqa.common.core.model.persisted_class.core.OrderTagsSearch;
+import co.nvqa.common.core.model.persisted_class.core.Orders;
 import co.nvqa.common.core.model.persisted_class.core.OutboundScans;
 import co.nvqa.common.core.model.persisted_class.core.Reservations;
 import co.nvqa.common.core.model.persisted_class.core.RouteMonitoringData;
@@ -80,6 +82,9 @@ public class DbCoreSteps extends CoreStandardSteps {
   @Inject
   private RouteWaypointDao routeWaypointDao;
 
+  @Inject
+  private OrderDao orderDao;
+
   @Override
   public void init() {
   }
@@ -123,10 +128,10 @@ public class DbCoreSteps extends CoreStandardSteps {
       Waypoints result = waypointsDao.getWaypointsDetails(resolvedWayPointIdKey);
       Assertions.assertThat(result.getZoneType())
           .as("Assertion for Zone Type column value is as expected").isEqualTo(expectedZoneType);
-      if(result.getRoutingZoneId() == null) {
+      if (result.getRoutingZoneId() == null) {
         Assertions.assertThat(result.getRoutingZoneId())
             .as("Assertion for Zone Id column value is null as expected").isNull();
-      }else {
+      } else {
         Assertions.assertThat(result.getRoutingZoneId())
             .as("Assertion for Zone Id column value is zero as expected").isZero();
       }
@@ -143,7 +148,8 @@ public class DbCoreSteps extends CoreStandardSteps {
   }
 
   @Then("DB Core - verifies that latitude is equal to {string} and longitude is equal to {string} and for waypointId {string}")
-  public void dbCoreVerifiesLatLong(String expectedLatitude, String expectedLongitude, String waypointId) {
+  public void dbCoreVerifiesLatLong(String expectedLatitude, String expectedLongitude,
+      String waypointId) {
     Long resolvedWayPointIdKey = Long.parseLong(resolveValue(waypointId));
     doWithRetry(() -> {
       Waypoints result = waypointsDao.getWaypointsDetails(resolvedWayPointIdKey);
@@ -155,12 +161,12 @@ public class DbCoreSteps extends CoreStandardSteps {
     }, "Validating verified lat long values are as expected");
   }
 
-  private String[] formatLatLongValues(Double latitude, Double longitude){
+  private String[] formatLatLongValues(Double latitude, Double longitude) {
     String lat = latitude.toString();
-    String formattedLatitude = lat.substring(0,6);
+    String formattedLatitude = lat.substring(0, 6);
     String lon = longitude.toString();
-    String formattedLongitude = lon.substring(0,6);
-    return new String[] {formattedLatitude,formattedLongitude};
+    String formattedLongitude = lon.substring(0, 6);
+    return new String[]{formattedLatitude, formattedLongitude};
   }
 
   @When("DB Core - verify route_logs record:")
@@ -556,4 +562,18 @@ public class DbCoreSteps extends CoreStandardSteps {
             })
         , "verify route_waypoint records", 10_000, 3);
   }
+
+  @When("DB Core - get order by order tracking id {string}")
+  public void getOrderDetailByTrackingId(String trackingNumber) {
+    String resolvedTrackingNumber = resolveValue(trackingNumber);
+    doWithRetry(() -> {
+      Orders orders = orderDao.getSingleOrderDetailsByTrackingId(resolvedTrackingNumber);
+      Assertions.assertThat(orders)
+          .withFailMessage("Unexpected order not found with tracking number: %s", trackingNumber)
+          .isNotNull();
+      put(KEY_LIST_OF_CREATED_ORDERS, orders);
+    }, "get order record", 10_000, 3);
+  }
+
+
 }
