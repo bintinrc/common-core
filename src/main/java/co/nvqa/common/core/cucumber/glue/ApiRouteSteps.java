@@ -313,7 +313,9 @@ public class ApiRouteSteps extends CoreStandardSteps {
 
     final long reservationResultId = Long.parseLong(resolvedDataTable.get("reservationId"));
     final long routeId = Long.parseLong(resolvedDataTable.get("routeId"));
-    final Boolean overwrite = Boolean.valueOf(resolvedDataTable.get("overwrite"));
+    final Optional<Boolean> overwriteParam = dataTableAsMap.containsKey("overwrite") ?
+        Optional.of(Boolean.valueOf(dataTableAsMap.get("overwrite"))) : Optional.of(true);
+    final Boolean overwrite = overwriteParam.get();
 
     doWithRetry(
         () -> getRouteClient().failedAddReservationToRoute(routeId, reservationResultId, overwrite),
