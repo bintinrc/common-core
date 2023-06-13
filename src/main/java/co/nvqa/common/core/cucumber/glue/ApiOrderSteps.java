@@ -319,4 +319,19 @@ public class ApiOrderSteps extends CoreStandardSteps {
     doWithRetry(() -> getOrderClient().updateOrderCop(orderId, copAmount),
         "API Core - Operator update order COP");
   }
+
+  /**
+   * @param dataTableRaw <br><b>trackingId:</b>
+   *                     {KEY_LIST_OF_CREATED_TRACKING_IDS[1]}<br><b>mode:</b> OTP | NONE | AGE |
+   *                     SIGNATURE | IDENTIFICATION<br><i>Choose one of the delivery verification
+   *                     mode</i>
+   */
+  @When("API Core -  Update order delivery verification mode:")
+  public void apiCoreUpdateOrderDeliveryVerification(Map<String, String> dataTableRaw) {
+    final Map<String, String> dataTable = resolveKeyValues(dataTableRaw);
+    final String trackingId = dataTable.get("trackingId");
+    final String mode = dataTable.get("mode");
+    doWithRetry(() -> getOrderClient().editDeliveryVerificationRequired(trackingId, mode),
+        "API Core - Update order delivery verification mode");
+  }
 }
