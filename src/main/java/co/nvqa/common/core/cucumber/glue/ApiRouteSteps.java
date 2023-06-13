@@ -299,18 +299,12 @@ public class ApiRouteSteps extends CoreStandardSteps {
     final long routeId = Long.parseLong(resolvedDataTable.get("routeId"));
 
     final Optional<Boolean> overwriteParam = dataTableAsMap.containsKey("overwrite") ?
-        Optional.of(Boolean.valueOf(dataTableAsMap.get("overwrite"))) : Optional.empty();
+        Optional.of(Boolean.valueOf(dataTableAsMap.get("overwrite"))) : Optional.of(true);
+    final Boolean overwrite = overwriteParam.get();
 
-    if (overwriteParam.isEmpty()) {
       doWithRetry(
-          () -> getRouteClient().addReservationToRoute(routeId, reservationResultId, true),
+          () -> getRouteClient().addReservationToRoute(routeId, reservationResultId, overwrite),
           "add reservation to route with overwrite: true");
-    } else {
-      doWithRetry(
-          () -> getRouteClient().addReservationToRoute(routeId, reservationResultId,
-              Boolean.valueOf(resolvedDataTable.get("overwrite"))),
-          "add reservation to route with overwrite: false");
-    }
   }
 
   @When("API Core - Operator failed to add reservation to route using data below:")
