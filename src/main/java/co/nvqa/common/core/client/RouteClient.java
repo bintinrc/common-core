@@ -208,12 +208,12 @@ public class RouteClient extends SimpleApiClient {
     return fromJsonSnakeCaseToList(response.getBody().asString(), Waypoint.class);
   }
 
-  public void addReservationToRoute(long routeId, long reservationId) {
+  public void addReservationToRoute(long routeId, long reservationId, Boolean overwrite) {
     String url = "core/2.0/reservations/{reservationId}/route";
-
     RequestSpecification spec = createAuthenticatedRequest()
         .pathParam("reservationId", reservationId)
-        .body(f("{\"new_route_id\":%d,\"route_index\":-1,\"overwrite\":true}", routeId));
+        .body(f("{\"new_route_id\":%d,\"route_index\":-1,\"overwrite\":%s}", routeId,
+            String.valueOf(overwrite)));
     Response r = doPut("Core - Add Reservation to Route", spec, url);
     r.then().contentType(ContentType.JSON);
     if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {

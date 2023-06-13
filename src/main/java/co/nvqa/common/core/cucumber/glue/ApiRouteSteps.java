@@ -31,6 +31,7 @@ import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import lombok.Getter;
@@ -285,7 +286,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
    * Sample:<p>
    * <p>
    * When API Operator add reservation pick-ups to the route using data below:<p> | reservationId |
-   * 111111 |<p> | routeId       | 222222 |<p>
+   * 111111 |<p> | routeId       | 222222 |<p> |overwrite|true|
    * <p>
    *
    * @param dataTableAsMap Map of data from feature file.
@@ -296,9 +297,20 @@ public class ApiRouteSteps extends CoreStandardSteps {
 
     final long reservationResultId = Long.parseLong(resolvedDataTable.get("reservationId"));
     final long routeId = Long.parseLong(resolvedDataTable.get("routeId"));
-    doWithRetry(
-        () -> getRouteClient().addReservationToRoute(routeId, reservationResultId),
-        "add reservation to route ");
+
+    final Optional<Boolean> overwriteParam = dataTableAsMap.containsKey("overwrite") ?
+        Optional.of(Boolean.valueOf(dataTableAsMap.get("overwrite"))) : Optional.empty();
+
+    if (overwriteParam.isEmpty()) {
+      doWithRetry(
+          () -> getRouteClient().addReservationToRoute(routeId, reservationResultId, true),
+          "add reservation to route with overwrite: true");
+    } else {
+      doWithRetry(
+          () -> getRouteClient().addReservationToRoute(routeId, reservationResultId,
+              Boolean.valueOf(resolvedDataTable.get("overwrite"))),
+          "add reservation to route with overwrite: false");
+    }
   }
 
   @When("API Core - Operator failed to add reservation to route using data below:")
