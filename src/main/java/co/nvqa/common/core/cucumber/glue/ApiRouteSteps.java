@@ -302,24 +302,36 @@ public class ApiRouteSteps extends CoreStandardSteps {
         Optional.of(Boolean.valueOf(dataTableAsMap.get("overwrite"))) : Optional.of(true);
     final Boolean overwrite = overwriteParam.get();
 
-      doWithRetry(
-          () -> getRouteClient().addReservationToRoute(routeId, reservationResultId, overwrite),
-          "add reservation to route with overwrite: true");
+    doWithRetry(
+        () -> getRouteClient().addReservationToRoute(routeId, reservationResultId, overwrite),
+        "add reservation to route with overwrite: true");
   }
 
   @When("API Core - Operator failed to add reservation to route using data below:")
   public void apiOperatorFailedAddReservationPickUpsToTheRoute(Map<String, String> dataTableAsMap) {
     Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
 
-    final long reservationResultId = Long.parseLong(resolvedDataTable.get("reservationId"));
+    final long reservationId = Long.parseLong(resolvedDataTable.get("reservationId"));
     final long routeId = Long.parseLong(resolvedDataTable.get("routeId"));
     final Optional<Boolean> overwriteParam = dataTableAsMap.containsKey("overwrite") ?
         Optional.of(Boolean.valueOf(dataTableAsMap.get("overwrite"))) : Optional.of(true);
     final Boolean overwrite = overwriteParam.get();
 
-    doWithRetry(
-        () -> getRouteClient().failedAddReservationToRoute(routeId, reservationResultId, overwrite),
-        "(expected) failed add reservation to route");
+    final int expectedStatusCode = Integer.parseInt(resolvedDataTable.get("expectedStatusCode"));
+    final String expectedErrorMessage = resolvedDataTable.get("expectedErrorMessage");
+
+    doWithRetry(() -> {
+          Response r = getRouteClient().addReservationToRouteAndGetRawResponse(routeId,
+              reservationId, overwrite);
+
+          Assertions.assertThat(r.statusCode())
+              .withFailMessage("unexpected http status: " + r.statusCode())
+              .isEqualTo(expectedStatusCode);
+
+          Assertions.assertThat(r.getBody().asString())
+              .withFailMessage("unexpected error message: " + r.getBody().asString())
+              .isEqualTo(expectedErrorMessage);
+        }, "(expected) failed add reservation to route");
   }
 
   /**

@@ -9,9 +9,9 @@ import co.nvqa.common.core.model.pickup.MilkRunGroup;
 import co.nvqa.common.core.model.reservation.BulkRouteReservationResponse;
 import co.nvqa.common.core.model.route.AddParcelToRouteRequest;
 import co.nvqa.common.core.model.route.AddPickupJobToRouteRequest;
-import co.nvqa.common.core.model.route.GetRouteDetailsResponse;
 import co.nvqa.common.core.model.route.BulkAddPickupJobToRouteRequest;
 import co.nvqa.common.core.model.route.BulkAddPickupJobToRouteResponse;
+import co.nvqa.common.core.model.route.GetRouteDetailsResponse;
 import co.nvqa.common.core.model.route.MergeWaypointsResponse;
 import co.nvqa.common.core.model.route.ParcelRouteTransferRequest;
 import co.nvqa.common.core.model.route.ParcelRouteTransferResponse;
@@ -208,29 +208,20 @@ public class RouteClient extends SimpleApiClient {
     return fromJsonSnakeCaseToList(response.getBody().asString(), Waypoint.class);
   }
 
-  public void addReservationToRoute(long routeId, long reservationId, Boolean overwrite) {
-    String url = "core/2.0/reservations/{reservationId}/route";
+  public Response addReservationToRouteAndGetRawResponse(long routeId, long reservationId,
+      Boolean overwrite) {
+    final String url = "core/2.0/reservations/{reservationId}/route";
     RequestSpecification spec = createAuthenticatedRequest()
         .pathParam("reservationId", reservationId)
         .body(f("{\"new_route_id\":%d,\"route_index\":-1,\"overwrite\":%s}", routeId,
             String.valueOf(overwrite)));
-    Response r = doPut("Core - Add Reservation to Route", spec, url);
-    r.then().contentType(ContentType.JSON);
-    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
-      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
-    }
+    return doPut("Core - Add Reservation to Route", spec, url);
   }
 
-  public void failedAddReservationToRoute(long routeId, long reservationId, Boolean overwrite) {
-    String url = "core/2.0/reservations/{reservationId}/route";
-
-    RequestSpecification spec = createAuthenticatedRequest()
-        .pathParam("reservationId", reservationId)
-        .body(f("{\"new_route_id\":%d,\"route_index\":-1,\"overwrite\":%s}", routeId,
-            String.valueOf(overwrite)));
-    Response r = doPut("Core - Failed to Add Reservation to Route", spec, url);
+  public void addReservationToRoute(long routeId, long reservationId, Boolean overwrite) {
+    Response r = addReservationToRouteAndGetRawResponse(routeId, reservationId, overwrite);
     r.then().contentType(ContentType.JSON);
-    if (r.statusCode() == HttpConstants.RESPONSE_200_SUCCESS) {
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
       throw new NvTestHttpException("unexpected http status: " + r.statusCode());
     }
   }
