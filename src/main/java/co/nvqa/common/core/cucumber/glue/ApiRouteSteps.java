@@ -321,17 +321,17 @@ public class ApiRouteSteps extends CoreStandardSteps {
     final String expectedErrorMessage = resolvedDataTable.get("expectedErrorMessage");
 
     doWithRetry(() -> {
-          Response r = getRouteClient().addReservationToRouteAndGetRawResponse(routeId,
-              reservationId, overwrite);
+      Response r = getRouteClient().addReservationToRouteAndGetRawResponse(routeId,
+          reservationId, overwrite);
 
-          Assertions.assertThat(r.statusCode())
-              .withFailMessage("unexpected http status: " + r.statusCode())
-              .isEqualTo(expectedStatusCode);
+      Assertions.assertThat(r.statusCode())
+          .withFailMessage("unexpected http status: " + r.statusCode())
+          .isEqualTo(expectedStatusCode);
 
-          Assertions.assertThat(r.getBody().asString())
-              .withFailMessage("unexpected error message: " + r.getBody().asString())
-              .isEqualTo(expectedErrorMessage);
-        }, "(expected) failed add reservation to route");
+      Assertions.assertThat(r.getBody().asString())
+          .withFailMessage("unexpected error message: " + r.getBody().asString())
+          .isEqualTo(expectedErrorMessage);
+    }, "(expected) failed add reservation to route");
   }
 
   /**
@@ -346,6 +346,29 @@ public class ApiRouteSteps extends CoreStandardSteps {
     doWithRetry(
         () -> getRouteClient().pullReservationOutOfRoute(reservationResultId),
         "remove reservation from route ");
+  }
+
+  @When("API Core - Operator failed to remove reservation id {string} from route")
+  public void apiOperatorFailedToAddReservationPickUpsToTheRoute(String reservationId,
+      Map<String, String> dataTableAsMap) {
+    Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
+    final long reservationResultId = Long.parseLong(resolveValue(reservationId));
+    final int expectedStatusCode = Integer.parseInt(resolvedDataTable.get("expectedStatusCode"));
+    final String expectedErrorMessage = resolvedDataTable.get("expectedErrorMessage");
+
+
+    doWithRetry(() -> {
+      Response r = getRouteClient().pullReservationOutOfRouteAndGetRawResponse(
+          reservationResultId);
+
+      Assertions.assertThat(r.statusCode())
+          .withFailMessage("unexpected http status: " + r.statusCode())
+          .isEqualTo(expectedStatusCode);
+
+      Assertions.assertThat(r.getBody().asString())
+          .withFailMessage("unexpected error message: " + r.getBody().asString())
+          .isEqualTo(expectedErrorMessage);
+    }, "(expected) failed add reservation to route");
   }
 
   /**
