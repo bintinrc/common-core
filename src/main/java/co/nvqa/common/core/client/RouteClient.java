@@ -291,14 +291,16 @@ public class RouteClient extends SimpleApiClient {
         GetRouteDetailsResponse.class).getData();
   }
 
-  public void pullReservationOutOfRoute(long reservationId) {
+  public Response pullReservationOutOfRouteAndGetRawResponse(long reservationId) {
     String url = "core/2.0/reservations/{reservationId}/unroute";
-
     RequestSpecification spec = createAuthenticatedRequest()
         .pathParam("reservationId", reservationId)
         .body("{}");
+    return doPut("Core - Pull Reservation Out of Route", spec, url);
+  }
 
-    Response r = doPut("Core - Pull Reservation Out of Route", spec, url);
+  public void pullReservationOutOfRoute(long reservationId) {
+    Response r = pullReservationOutOfRouteAndGetRawResponse(reservationId);
     r.then().contentType(ContentType.JSON);
     if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
       throw new NvTestHttpException("unexpected http status: " + r.statusCode());
