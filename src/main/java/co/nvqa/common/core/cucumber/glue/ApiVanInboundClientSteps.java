@@ -36,7 +36,7 @@ public class ApiVanInboundClientSteps extends CoreStandardSteps {
   @Given("API Core - Operator van inbound order:")
   public void apiOperatorVanInbound(Map<String, String> data) {
     String routListKey = data.get("routeListKey");
-    String ordersListKey = data.get("orders");
+    String ordersListKey = data.get("ordersListKey");
     List<Order> orders = get(ordersListKey);
     Long routeId = get(routListKey);
     if (CollectionUtils.isEmpty(orders)) {
