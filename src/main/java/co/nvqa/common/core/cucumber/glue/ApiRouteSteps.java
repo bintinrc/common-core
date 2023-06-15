@@ -31,6 +31,7 @@ import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import lombok.Getter;
@@ -285,7 +286,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
    * Sample:<p>
    * <p>
    * When API Operator add reservation pick-ups to the route using data below:<p> | reservationId |
-   * 111111 |<p> | routeId       | 222222 |<p>
+   * 111111 |<p> | routeId       | 222222 |<p> |overwrite|true|
    * <p>
    *
    * @param dataTableAsMap Map of data from feature file.
@@ -296,9 +297,41 @@ public class ApiRouteSteps extends CoreStandardSteps {
 
     final long reservationResultId = Long.parseLong(resolvedDataTable.get("reservationId"));
     final long routeId = Long.parseLong(resolvedDataTable.get("routeId"));
+
+    final Optional<Boolean> overwriteParam = dataTableAsMap.containsKey("overwrite") ?
+        Optional.of(Boolean.valueOf(dataTableAsMap.get("overwrite"))) : Optional.of(true);
+    final Boolean overwrite = overwriteParam.get();
+
     doWithRetry(
-        () -> getRouteClient().addReservationToRoute(routeId, reservationResultId),
-        "add reservation to route ");
+        () -> getRouteClient().addReservationToRoute(routeId, reservationResultId, overwrite),
+        "add reservation to route with overwrite: true");
+  }
+
+  @When("API Core - Operator failed to add reservation to route using data below:")
+  public void apiOperatorFailedAddReservationPickUpsToTheRoute(Map<String, String> dataTableAsMap) {
+    Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
+
+    final long reservationId = Long.parseLong(resolvedDataTable.get("reservationId"));
+    final long routeId = Long.parseLong(resolvedDataTable.get("routeId"));
+    final Optional<Boolean> overwriteParam = dataTableAsMap.containsKey("overwrite") ?
+        Optional.of(Boolean.valueOf(dataTableAsMap.get("overwrite"))) : Optional.of(true);
+    final Boolean overwrite = overwriteParam.get();
+
+    final int expectedStatusCode = Integer.parseInt(resolvedDataTable.get("expectedStatusCode"));
+    final String expectedErrorMessage = resolvedDataTable.get("expectedErrorMessage");
+
+    doWithRetry(() -> {
+      Response r = getRouteClient().addReservationToRouteAndGetRawResponse(routeId,
+          reservationId, overwrite);
+
+      Assertions.assertThat(r.statusCode())
+          .withFailMessage("unexpected http status: " + r.statusCode())
+          .isEqualTo(expectedStatusCode);
+
+      Assertions.assertThat(r.getBody().asString())
+          .withFailMessage("unexpected error message: " + r.getBody().asString())
+          .isEqualTo(expectedErrorMessage);
+    }, "(expected) failed add reservation to route");
   }
 
   /**
@@ -315,11 +348,35 @@ public class ApiRouteSteps extends CoreStandardSteps {
         "remove reservation from route ");
   }
 
+  @When("API Core - Operator failed to remove reservation id {string} from route")
+  public void apiOperatorFailedToAddReservationPickUpsToTheRoute(String reservationId,
+      Map<String, String> dataTableAsMap) {
+    Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
+    final long reservationResultId = Long.parseLong(resolveValue(reservationId));
+    final int expectedStatusCode = Integer.parseInt(resolvedDataTable.get("expectedStatusCode"));
+    final String expectedErrorMessage = resolvedDataTable.get("expectedErrorMessage");
+
+
+    doWithRetry(() -> {
+      Response r = getRouteClient().pullReservationOutOfRouteAndGetRawResponse(
+          reservationResultId);
+
+      Assertions.assertThat(r.statusCode())
+          .withFailMessage("unexpected http status: " + r.statusCode())
+          .isEqualTo(expectedStatusCode);
+
+      Assertions.assertThat(r.getBody().asString())
+          .withFailMessage("unexpected error message: " + r.getBody().asString())
+          .isEqualTo(expectedErrorMessage);
+    }, "(expected) failed add reservation to route");
+  }
+
   /**
    * Sample:<p>
    * <p>
    * When API Core - Operator bulk add reservation to route using data below: | request | {"ids":
-   * [{KEY_LIST_OF_CREATED_RESERVATIONS[1].id}, {KEY_LIST_OF_CREATED_RESERVATIONS[2].id}],"new_route_id":{KEY_LIST_OF_CREATED_ROUTES[1].id},"overwrite":true}
+   * [{KEY_LIST_OF_CREATED_RESERVATIONS[1].id},
+   * {KEY_LIST_OF_CREATED_RESERVATIONS[2].id}],"new_route_id":{KEY_LIST_OF_CREATED_ROUTES[1].id},"overwrite":true}
    * |
    * <p>
    *
@@ -343,7 +400,8 @@ public class ApiRouteSteps extends CoreStandardSteps {
    * Sample:<p>
    * <p>
    * When API Core - Operator bulk add reservation to route with partial success: | request |
-   * {"ids": [{KEY_LIST_OF_CREATED_RESERVATIONS[1].id}, {KEY_LIST_OF_CREATED_RESERVATIONS[2].id}],"new_route_id":{KEY_LIST_OF_CREATED_ROUTES[1].id},"overwrite":true}
+   * {"ids": [{KEY_LIST_OF_CREATED_RESERVATIONS[1].id},
+   * {KEY_LIST_OF_CREATED_RESERVATIONS[2].id}],"new_route_id":{KEY_LIST_OF_CREATED_ROUTES[1].id},"overwrite":true}
    * |
    * <p>
    *
@@ -527,8 +585,10 @@ public class ApiRouteSteps extends CoreStandardSteps {
   /**
    * Sample:
    * <p>
-   * API Core - Operator parcel transfer to a new route:
-   * | request | {{"route_id":null,"route_date":"2021-01-19 08:25:13","from_driver_id":null,"to_driver_id":2679,"to_driver_hub_id":3,"orders":[{"tracking_id":"NVSGDIMMI000238068","inbound_type":"VAN_FROM_NINJAVAN","hub_id":3}]|
+   * API Core - Operator parcel transfer to a new route: | request |
+   * {{"route_id":null,"route_date":"2021-01-19
+   * 08:25:13","from_driver_id":null,"to_driver_id":2679,"to_driver_hub_id":3,"orders":[{"tracking_id":"NVSGDIMMI000238068","inbound_type":"VAN_FROM_NINJAVAN","hub_id":3}]|
+   *
    * @param dataTableAsMap Map of data from feature file.
    */
   @Given("API Core - Operator parcel transfer to a new route:")
