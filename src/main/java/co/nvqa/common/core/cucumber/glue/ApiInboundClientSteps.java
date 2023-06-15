@@ -45,7 +45,6 @@ public class ApiInboundClientSteps extends CoreStandardSteps {
     String methodInfo = f("%s - [Route ID = %d]", getCurrentMethodName(), routeId);
     retryIfAssertionErrorOrRuntimeExceptionOccurred(() -> getRouteClient().startRoute(routeId),
         methodInfo);
-    getRouteClient().startRoute(routeId);
   }
   public void apiOperatorVanInboundParcel(String trackingId, Long deliveryWaypointId) {
     String methodInfo = f("%s - [Tracking ID = %s]", getCurrentMethodName(), trackingId);
