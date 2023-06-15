@@ -7,6 +7,7 @@
 ### Added
 
 - API Core - Operator failed to add reservation to route using data below:
+- API Core - Operator failed to remove reservation id {string} from route
 
 ## [1.3.8] 2023-06-08
 
