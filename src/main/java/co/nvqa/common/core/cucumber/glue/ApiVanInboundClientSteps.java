@@ -31,6 +31,7 @@ public class ApiVanInboundClientSteps extends CoreStandardSteps {
   /**
    * Example: And API Core - Operator van inbound orders
    * |ordersListKey|{KEY_LIST_OF_CREATED_ORDERS[1]}| |routeKey|{KEY_LIST_OF_CREATED_ROUTES[1].id}|
+   * @param data Map of data from feature file.
    */
 
   @Given("API Core - Operator van inbound order:")
