@@ -1,6 +1,6 @@
 package co.nvqa.common.core.cucumber.glue;
 
-import co.nvqa.common.core.client.InboundClient;
+import co.nvqa.common.core.client.VanInboundClient;
 import co.nvqa.common.core.client.RouteClient;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.model.VanInboundRequest;
@@ -11,12 +11,12 @@ import java.util.List;
 import javax.inject.Inject;
 import lombok.Getter;
 
-public class ApiInboundClientSteps extends CoreStandardSteps {
+public class ApiVanInboundClientSteps extends CoreStandardSteps {
 
   public static final int MAX_COMMENTS_LENGTH_ON_SHIPPER_PICKUP_PAGE = 255;
   @Inject
   @Getter
-  private InboundClient inboundClient;
+  private VanInboundClient vanInboundClient;
   @Inject
   @Getter
   private RouteClient routeClient;
@@ -56,7 +56,7 @@ public class ApiInboundClientSteps extends CoreStandardSteps {
       vanInboundRequest.setTrackingId(trackingId);
       vanInboundRequest.setWaypointId(deliveryWaypointId);
       vanInboundRequest.setType("VAN_FROM_NINJAVAN");
-      getInboundClient().vanInbound(vanInboundRequest, routeId);
+      getVanInboundClient().vanInbound(vanInboundRequest, routeId);
     }, methodInfo);
   }
 

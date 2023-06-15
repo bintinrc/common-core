@@ -10,8 +10,8 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
-public class InboundClient extends SimpleApiClient {
-  public InboundClient() {
+public class VanInboundClient extends SimpleApiClient {
+  public VanInboundClient() {
     super(StandardTestConstants.API_BASE_URL, TokenUtils.getOperatorAuthToken(),
         DEFAULT_CAMEL_CASE_MAPPER);
   }
