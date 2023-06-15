@@ -326,7 +326,7 @@ public class ApiOrderSteps extends CoreStandardSteps {
    *                     SIGNATURE | IDENTIFICATION<br><i>Choose one of the delivery verification
    *                     mode</i>
    */
-  @When("API Core -  Update order delivery verification mode:")
+  @When("API Core - Update order delivery verification mode:")
   public void apiCoreUpdateOrderDeliveryVerification(Map<String, String> dataTableRaw) {
     final Map<String, String> dataTable = resolveKeyValues(dataTableRaw);
     final String trackingId = dataTable.get("trackingId");
