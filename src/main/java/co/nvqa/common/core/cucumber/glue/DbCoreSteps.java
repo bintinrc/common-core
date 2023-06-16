@@ -1,6 +1,7 @@
 package co.nvqa.common.core.cucumber.glue;
 
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
+import co.nvqa.common.core.hibernate.CodCollectionDao;
 import co.nvqa.common.core.hibernate.CodInboundsDao;
 import co.nvqa.common.core.hibernate.OrderDao;
 import co.nvqa.common.core.hibernate.OrderDetailsDao;
@@ -18,6 +19,7 @@ import co.nvqa.common.core.hibernate.WarehouseSweepsDao;
 import co.nvqa.common.core.hibernate.WaypointsDao;
 import co.nvqa.common.core.model.order.Order;
 import co.nvqa.common.core.model.order.Order.Transaction;
+import co.nvqa.common.core.model.persisted_class.core.CodCollections;
 import co.nvqa.common.core.model.persisted_class.core.CodInbounds;
 import co.nvqa.common.core.model.persisted_class.core.CoreRouteLogs;
 import co.nvqa.common.core.model.persisted_class.core.OrderDetails;
@@ -81,6 +83,8 @@ public class DbCoreSteps extends CoreStandardSteps {
   private OrderTagsSearchDao orderTagsSearchDao;
   @Inject
   private RouteWaypointDao routeWaypointDao;
+  @Inject
+  private CodCollectionDao codCollectionDao;
 
   @Inject
   private OrderDao orderDao;
@@ -575,5 +579,16 @@ public class DbCoreSteps extends CoreStandardSteps {
     }, "get order record", 10_000, 3);
   }
 
+  @And("DB Core - Operator verifies cod_collections record:")
+  public void verifyCodCollections(Map<String, String> data) {
+    CodCollections expected = new CodCollections(resolveKeyValues(data));
+    var actual = codCollectionDao.getMultipleCodCollections(expected.getWaypointId());
+    Assertions.assertThat(actual)
+        .as("List of cod_collections records for waypointId=%s", expected.getWaypointId())
+        .isNotEmpty();
+    Assertions.assertThat(actual)
+        .as("List of cod_collections records for waypointId=%s", expected.getWaypointId())
+        .anyMatch(expected::matchedTo);
+  }
 
 }
