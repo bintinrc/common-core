@@ -5,6 +5,7 @@ import co.nvqa.common.core.client.RouteClient;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.model.coverage.CreateCoverageRequest;
 import co.nvqa.common.core.model.coverage.CreateCoverageResponse;
+import co.nvqa.common.core.model.other.CoreExceptionResponse;
 import co.nvqa.common.core.model.other.CoreExceptionResponse.Error;
 import co.nvqa.common.core.model.reservation.BulkRouteReservationResponse;
 import co.nvqa.common.core.model.route.AddParcelToRouteRequest;
@@ -357,7 +358,6 @@ public class ApiRouteSteps extends CoreStandardSteps {
     final int expectedStatusCode = Integer.parseInt(resolvedDataTable.get("expectedStatusCode"));
     final String expectedErrorMessage = resolvedDataTable.get("expectedErrorMessage");
 
-
     doWithRetry(() -> {
       Response r = getRouteClient().pullReservationOutOfRouteAndGetRawResponse(
           reservationResultId);
@@ -376,8 +376,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
    * Sample:<p>
    * <p>
    * When API Core - Operator bulk add reservation to route using data below: | request | {"ids":
-   * [{KEY_LIST_OF_CREATED_RESERVATIONS[1].id},
-   * {KEY_LIST_OF_CREATED_RESERVATIONS[2].id}],"new_route_id":{KEY_LIST_OF_CREATED_ROUTES[1].id},"overwrite":true}
+   * [{KEY_LIST_OF_CREATED_RESERVATIONS[1].id}, {KEY_LIST_OF_CREATED_RESERVATIONS[2].id}],"new_route_id":{KEY_LIST_OF_CREATED_ROUTES[1].id},"overwrite":true}
    * |
    * <p>
    *
@@ -401,8 +400,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
    * Sample:<p>
    * <p>
    * When API Core - Operator bulk add reservation to route with partial success: | request |
-   * {"ids": [{KEY_LIST_OF_CREATED_RESERVATIONS[1].id},
-   * {KEY_LIST_OF_CREATED_RESERVATIONS[2].id}],"new_route_id":{KEY_LIST_OF_CREATED_ROUTES[1].id},"overwrite":true}
+   * {"ids": [{KEY_LIST_OF_CREATED_RESERVATIONS[1].id}, {KEY_LIST_OF_CREATED_RESERVATIONS[2].id}],"new_route_id":{KEY_LIST_OF_CREATED_ROUTES[1].id},"overwrite":true}
    * |
    * <p>
    *
@@ -584,10 +582,8 @@ public class ApiRouteSteps extends CoreStandardSteps {
   }
 
   /**
-   * Sample:
-   * API Core - Operator parcel transfer to a new route: | request |
-   * {{"route_id":null,"route_date":"2021-01-19
-   * 08:25:13","from_driver_id":null,"to_driver_id":2679,"to_driver_hub_id":3,"orders":[{"tracking_id":"NVSGDIMMI000238068","inbound_type":"VAN_FROM_NINJAVAN","hub_id":3}]|
+   * Sample: API Core - Operator parcel transfer to a new route: | request |
+   * {{"route_id":null,"route_date":"2021-01-19 08:25:13","from_driver_id":null,"to_driver_id":2679,"to_driver_hub_id":3,"orders":[{"tracking_id":"NVSGDIMMI000238068","inbound_type":"VAN_FROM_NINJAVAN","hub_id":3}]|
    *
    * @param dataTableAsMap Map of data from feature file.
    */
@@ -642,9 +638,10 @@ public class ApiRouteSteps extends CoreStandardSteps {
               .addMultipleWaypointsToRouteAndGetRawResponse(routeId, waypointIds);
           Assertions.assertThat(response.getStatusCode()).as("status code Message")
               .isEqualTo(responseCode);
-          Error actualResponse = fromJsonSnakeCase(response.body().asString(), Error.class);
-          Error expectedResponse = fromJsonSnakeCase(
-              resolvedDataTable.get("error"), Error.class);
+          CoreExceptionResponse actualResponse = fromJsonSnakeCase(response.body().asString(),
+              CoreExceptionResponse.class);
+          CoreExceptionResponse expectedResponse = fromJsonSnakeCase(
+              resolvedDataTable.get("error"), CoreExceptionResponse.class);
           expectedResponse.compareWithActual(actualResponse, resolvedDataTable);
         },
         "add multiple waypoints to route");
