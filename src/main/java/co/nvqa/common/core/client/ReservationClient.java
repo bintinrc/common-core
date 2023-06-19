@@ -94,6 +94,22 @@ public class ReservationClient extends SimpleApiClient {
     return fromJson(r.body().asString(), ReservationResponse.class);
   }
 
+  public ReservationResponse updateDateAndTimeOfReservation(long reservationId, String request) {
+    String url = "reservation/2.0/reservations/{reservation_id}";
+
+    RequestSpecification spec = createAuthenticatedRequest()
+        .pathParam("reservation_id", reservationId)
+        .body(request);
+
+    Response r = doPost("RESERVATION - UPDATE START AND END PICK UP TIME", spec, url);
+    r.then().contentType(ContentType.JSON);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+
+    return fromJson(r.body().asString(), ReservationResponse.class);
+  }
+
   public ReservationResponse cancelGrabBookingByExternalApi(String grabBookingId) {
     Response r = cancelGrabBookingByExternalApiAndGetRawResponse(grabBookingId);
     r.then().contentType(ContentType.JSON);

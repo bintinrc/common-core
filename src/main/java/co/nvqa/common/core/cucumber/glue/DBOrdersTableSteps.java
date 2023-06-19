@@ -187,6 +187,20 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
     }, "verify orders.data.manual_dimensions records", 10_000, 3);
   }
 
+  @When("DB Core - verify order id {string} orders.data.belt_dimensions record:")
+  public void verifyOrderDataBeltDimensionsRecords(String id, Map<String, String> data) {
+    final Map<String, String> resolvedData = resolveKeyValues(data);
+    final long orderId = Long.parseLong(resolveValue(id));
+    Dimension expected = new Dimension(resolvedData);
+    doWithRetry(() -> {
+      Dimension actual = orderDao.getOrderBeltDimensions(orderId);
+      Assertions.assertThat(actual)
+          .withFailMessage("orders record was not found: " + resolvedData)
+          .isNotNull();
+      expected.compareWithActual(actual, resolvedData);
+    }, "verify orders.data.belt_dimensions records", 10_000, 3);
+  }
+
   @When("DB Core - operator verify orders.data.previousDeliveryDetails is updated correctly:")
   public void verifyOrdersDataPreviousDelivery(Map<String, String> source) {
     Long resolvedOrderId = Long.parseLong(resolveValue(source.get("orderId")));
