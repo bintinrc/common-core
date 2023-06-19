@@ -694,4 +694,22 @@ public class RouteClient extends SimpleApiClient {
       throw new NvTestHttpException("unexpected http status: " + r.statusCode());
     }
   }
+
+  public void addMultipleWaypointsToRoute(long routeId, List<Long> waypointIds) {
+    Response r = addMultipleWaypointsToRouteAndGetRawResponse(routeId, waypointIds);
+    if (r.statusCode() != HttpConstants.RESPONSE_204_NO_CONTENT) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+  }
+
+  public Response addMultipleWaypointsToRouteAndGetRawResponse(long routeId,
+      List<Long> waypointIds) {
+    String url = "route-v2/routes/{routeId}/waypoints";
+    String json = f("{\"waypoint_ids\": %s}", toJsonSnakeCase(waypointIds));
+
+    RequestSpecification spec = createAuthenticatedRequest()
+        .pathParam("routeId", routeId)
+        .body(json);
+    return doPut("Route - Add Multiple Waypoints to Route", spec, url);
+  }
 }
