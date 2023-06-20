@@ -578,7 +578,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
     doWithRetry(
         () -> getRouteClient().createCoverage(request),
         "create new coverage");
-    putInList(KEY_COVERAGE, response.getData());
+    put(KEY_COVERAGE, response.getData());
   }
 
   /**
