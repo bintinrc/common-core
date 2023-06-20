@@ -5,6 +5,7 @@ import co.nvqa.common.core.client.RouteClient;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.model.coverage.CreateCoverageRequest;
 import co.nvqa.common.core.model.coverage.CreateCoverageResponse;
+import co.nvqa.common.core.model.other.CoreExceptionResponse;
 import co.nvqa.common.core.model.other.CoreExceptionResponse.Error;
 import co.nvqa.common.core.model.reservation.BulkRouteReservationResponse;
 import co.nvqa.common.core.model.route.AddParcelToRouteRequest;
@@ -18,6 +19,7 @@ import co.nvqa.common.core.model.route.ParcelRouteTransferResponse;
 import co.nvqa.common.core.model.route.RouteRequest;
 import co.nvqa.common.core.model.route.RouteResponse;
 import co.nvqa.common.core.model.waypoint.Waypoint;
+import co.nvqa.common.core.utils.CoreScenarioStorageKeys;
 import co.nvqa.common.core.utils.CoreTestUtils;
 import co.nvqa.common.model.DataEntity;
 import co.nvqa.common.utils.StandardTestUtils;
@@ -356,7 +358,6 @@ public class ApiRouteSteps extends CoreStandardSteps {
     final int expectedStatusCode = Integer.parseInt(resolvedDataTable.get("expectedStatusCode"));
     final String expectedErrorMessage = resolvedDataTable.get("expectedErrorMessage");
 
-
     doWithRetry(() -> {
       Response r = getRouteClient().pullReservationOutOfRouteAndGetRawResponse(
           reservationResultId);
@@ -375,8 +376,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
    * Sample:<p>
    * <p>
    * When API Core - Operator bulk add reservation to route using data below: | request | {"ids":
-   * [{KEY_LIST_OF_CREATED_RESERVATIONS[1].id},
-   * {KEY_LIST_OF_CREATED_RESERVATIONS[2].id}],"new_route_id":{KEY_LIST_OF_CREATED_ROUTES[1].id},"overwrite":true}
+   * [{KEY_LIST_OF_CREATED_RESERVATIONS[1].id}, {KEY_LIST_OF_CREATED_RESERVATIONS[2].id}],"new_route_id":{KEY_LIST_OF_CREATED_ROUTES[1].id},"overwrite":true}
    * |
    * <p>
    *
@@ -400,8 +400,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
    * Sample:<p>
    * <p>
    * When API Core - Operator bulk add reservation to route with partial success: | request |
-   * {"ids": [{KEY_LIST_OF_CREATED_RESERVATIONS[1].id},
-   * {KEY_LIST_OF_CREATED_RESERVATIONS[2].id}],"new_route_id":{KEY_LIST_OF_CREATED_ROUTES[1].id},"overwrite":true}
+   * {"ids": [{KEY_LIST_OF_CREATED_RESERVATIONS[1].id}, {KEY_LIST_OF_CREATED_RESERVATIONS[2].id}],"new_route_id":{KEY_LIST_OF_CREATED_ROUTES[1].id},"overwrite":true}
    * |
    * <p>
    *
@@ -583,11 +582,8 @@ public class ApiRouteSteps extends CoreStandardSteps {
   }
 
   /**
-   * Sample:
-   * <p>
-   * API Core - Operator parcel transfer to a new route: | request |
-   * {{"route_id":null,"route_date":"2021-01-19
-   * 08:25:13","from_driver_id":null,"to_driver_id":2679,"to_driver_hub_id":3,"orders":[{"tracking_id":"NVSGDIMMI000238068","inbound_type":"VAN_FROM_NINJAVAN","hub_id":3}]|
+   * Sample: API Core - Operator parcel transfer to a new route: | request |
+   * {{"route_id":null,"route_date":"2021-01-19 08:25:13","from_driver_id":null,"to_driver_id":2679,"to_driver_hub_id":3,"orders":[{"tracking_id":"NVSGDIMMI000238068","inbound_type":"VAN_FROM_NINJAVAN","hub_id":3}]|
    *
    * @param dataTableAsMap Map of data from feature file.
    */
@@ -610,5 +606,44 @@ public class ApiRouteSteps extends CoreStandardSteps {
           .parcelRouteTransfer(request);
       put(KEY_LIST_OF_CREATED_ROUTES, createRouteResponse.getRoutes());
     }, "parcel route transfer");
+  }
+
+  /**
+   * Sample:
+   * <p>
+   * API Route - Operator add multiple waypoints to route: |routeId|123456 |
+   * |waypointIds|[1234,4567, 8990]|
+   *
+   * @param dataTableAsMap Map of data from feature file.
+   */
+  @Given("API Route - Operator add multiple waypoints to route:")
+  public void apiAddMultipleWaypointsToRoute(Map<String, String> dataTableAsMap) {
+    Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
+    final long routeId = Long.parseLong(resolvedDataTable.get("routeId"));
+    final List<Long> waypointIds = fromJsonToList(resolvedDataTable.get("waypointIds"), Long.class);
+    doWithRetry(() ->
+            getRouteClient().addMultipleWaypointsToRoute(routeId, waypointIds),
+        "add multiple waypoints to route");
+  }
+
+  @Given("API Route - Operator failed to add multiple waypoints to route:")
+  public void apiFailedAddMultipleWaypointsToRoute(Map<String, String> dataTableAsMap) {
+    Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
+    final long routeId = Long.parseLong(resolvedDataTable.get("routeId"));
+    final int responseCode = Integer.parseInt(resolvedDataTable.get("responseCode"));
+    final List<Long> waypointIds = fromJsonToList(resolvedDataTable.get("waypointIds"), Long.class);
+    doWithRetry(() ->
+        {
+          Response response = getRouteClient()
+              .addMultipleWaypointsToRouteAndGetRawResponse(routeId, waypointIds);
+          Assertions.assertThat(response.getStatusCode()).as("status code Message")
+              .isEqualTo(responseCode);
+          CoreExceptionResponse actualResponse = fromJsonSnakeCase(response.body().asString(),
+              CoreExceptionResponse.class);
+          CoreExceptionResponse expectedResponse = fromJsonSnakeCase(
+              resolvedDataTable.get("error"), CoreExceptionResponse.class);
+          expectedResponse.compareWithActual(actualResponse, resolvedDataTable);
+        },
+        "add multiple waypoints to route");
   }
 }
