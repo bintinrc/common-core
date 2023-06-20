@@ -31,11 +31,12 @@ public class CoreExceptionResponse extends DataEntity<CoreExceptionResponse> {
     private String description;
     private String title;
     private Data data;
+    private Integer applicationExceptionCode;
+    private String message;
 
     @Getter
     @Setter
-    public static class Data extends DataEntity<Data>{
-
+    public static class Data extends DataEntity<Data> {
       private String message;
     }
   }
