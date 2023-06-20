@@ -4,15 +4,21 @@ import co.nvqa.common.core.client.OrderClient;
 import co.nvqa.common.core.client.ReservationClient;
 import co.nvqa.common.core.client.RouteClient;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
+import co.nvqa.common.core.hibernate.RouteDbDao;
+import co.nvqa.common.core.model.coverage.CreateCoverageResponse;
 import co.nvqa.common.core.model.order.Order;
+import co.nvqa.common.core.model.persisted_class.route.Coverage;
 import co.nvqa.common.core.model.reservation.ReservationResponse;
 import co.nvqa.common.core.model.route.RouteResponse;
 import io.cucumber.guice.ScenarioScoped;
 import io.cucumber.java.After;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import javax.inject.Inject;
 import lombok.Getter;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +38,10 @@ public class HookSteps extends CoreStandardSteps {
   @Inject
   @Getter
   private ReservationClient reservationClient;
+
+  @Inject
+  @Getter
+  private RouteDbDao routeDbDao;
 
   @Override
   public void init() {
@@ -120,5 +130,36 @@ public class HookSteps extends CoreStandardSteps {
         LOGGER.warn("error to delete route: " + t.getMessage());
       }
     });
+  }
+
+  @After("@DeleteCoverageV2")
+  public void deleteCoverageV2() {
+    final List<CreateCoverageResponse.Data> coveragesResponse = get(KEY_LIST_OF_COVERAGE);
+    final List<String> coverages = get(KEY_LIST_OF_CREATED_AREAS);
+    if (!Objects.isNull(coveragesResponse) && !coveragesResponse.isEmpty()) {
+      coveragesResponse.forEach(r -> {
+        try {
+          getRouteClient().deleteCoverage(r.getId());
+          LOGGER.debug("Coverages ID = {} delete successfully", r.getId());
+        } catch (Throwable t) {
+          LOGGER.warn("error to delete coveraged: " + t.getMessage());
+        }
+      });
+    }
+
+    if (CollectionUtils.isNotEmpty(coverages)) {
+      Set<String> uniqueAreas = new HashSet<>(coverages);
+      uniqueAreas.forEach(area -> {
+        List<Coverage> actual = routeDbDao.getCoverageByArea(area);
+        actual.forEach(c -> {
+          try {
+            getRouteClient().deleteCoverage(c.getId());
+          } catch (Throwable ex) {
+            LOGGER.warn("Could not delete coverage {}", c.getId(), ex);
+          }
+        });
+      });
+    }
+
   }
 }
