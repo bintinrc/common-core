@@ -134,7 +134,7 @@ public class HookSteps extends CoreStandardSteps {
 
   @After("@DeleteCoverageV2")
   public void deleteCoverageV2() {
-    final List<CreateCoverageResponse.Data> coveragesResponse = get(KEY_LIST_OF_COVERAGE);
+    final List<CreateCoverageResponse.Data> coveragesResponse = get(KEY_COVERAGE);
     final List<String> coverages = get(KEY_LIST_OF_CREATED_AREAS);
     if (!Objects.isNull(coveragesResponse) && !coveragesResponse.isEmpty()) {
       coveragesResponse.forEach(r -> {
