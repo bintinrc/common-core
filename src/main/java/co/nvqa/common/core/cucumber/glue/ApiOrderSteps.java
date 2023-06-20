@@ -2,11 +2,14 @@ package co.nvqa.common.core.cucumber.glue;
 
 import co.nvqa.common.core.client.OrderClient;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
+import co.nvqa.common.core.hibernate.OrderDao;
 import co.nvqa.common.core.model.order.Order;
 import co.nvqa.common.core.model.order.Order.Dimension;
 import co.nvqa.common.core.model.order.RescheduleOrderRequest;
 import co.nvqa.common.core.model.order.RescheduleOrderResponse;
 import co.nvqa.common.core.model.order.RtsOrderRequest;
+import co.nvqa.common.core.model.persisted_class.core.OrderPickup;
+import co.nvqa.common.core.model.persisted_class.core.Orders;
 import co.nvqa.common.utils.JsonUtils;
 import co.nvqa.common.utils.NvTestRuntimeException;
 import io.cucumber.guice.ScenarioScoped;
@@ -14,9 +17,11 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.response.Response;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
@@ -33,6 +38,9 @@ public class ApiOrderSteps extends CoreStandardSteps {
   @Inject
   @Getter
   private OrderClient orderClient;
+
+  @Inject
+  private OrderDao orderDao;
 
   @Override
   public void init() {
@@ -333,5 +341,25 @@ public class ApiOrderSteps extends CoreStandardSteps {
     final String mode = dataTable.get("mode");
     doWithRetry(() -> getOrderClient().editDeliveryVerificationRequired(trackingId, mode),
         "API Core - Update order delivery verification mode");
+  }
+
+  /**
+   * API Core - Operator force success order for legacy shipper id "{legacyShipperId}"
+   *
+   * @param legacyShipperId example: 111111
+   */
+  @When("API Core - Operator force success order for legacy shipper id {string}")
+  public void apiOperatorForceSuccessOrderByShipperId(String legacyShipperId) {
+    final long legacyId = Long.parseLong(resolveValue(legacyShipperId));
+    List<Orders> orders = orderDao.getIncompleteOrderListByShipperId(legacyId);
+
+    if(orders.size() != 0 || orders != null) {
+      for (Orders or:orders) {
+        String orderId = or.getId().toString();
+        apiOperatorForceSuccessOrder(orderId, "true");
+      }
+    } else{
+     LOGGER.debug("order is not found for legacy shipper id " + legacyId);
+    }
   }
 }

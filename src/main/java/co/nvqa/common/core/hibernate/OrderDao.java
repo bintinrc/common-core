@@ -85,4 +85,12 @@ public class OrderDao extends DbBase {
     return CollectionUtils.isEmpty(result) ? null : result.get(0);
   }
 
+  public List<Orders> getIncompleteOrderListByShipperId(Long shipperId) {
+    String query = "FROM Orders WHERE shipperId = :shipperId AND status != 'Completed'";
+    var results = findAll(session ->
+        session.createQuery(query, Orders.class)
+            .setParameter("shipperId", shipperId));
+    return results;
+  }
+
 }
