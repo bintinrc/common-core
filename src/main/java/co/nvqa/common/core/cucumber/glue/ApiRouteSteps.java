@@ -483,7 +483,16 @@ public class ApiRouteSteps extends CoreStandardSteps {
         () -> getRouteClient().addToRouteDp(orderId, routeId),
         "Add to route dp order");
   }
-
+  @Given("API Core - Operator Get Delivery Waypoint ID for tracking ID {string}")
+  public void operatorGetDeliveryWaypointId(String tid) {
+    String resolvedTid = resolveValue(tid);
+    doWithRetry(
+        () -> {
+          Long wayPointId = getRouteClient().getDeliveryWaypointId(resolvedTid);
+          put(KEY_WAYPOINT_ID, wayPointId);
+        },
+        "Get delivery waypoint id");
+  }
   //  DO NOT use this to pull order out from route for normal order (non-DP order)
 
   /**
