@@ -12,7 +12,8 @@ import lombok.Getter;
 @ScenarioScoped
 public class ApiPickupSteps extends CoreStandardSteps {
 
-  @Inject @Getter
+  @Inject
+  @Getter
   private PickupClient pickupClient;
 
   @Override
@@ -31,7 +32,10 @@ public class ApiPickupSteps extends CoreStandardSteps {
   @When("API Core - Operator get pickup from reservation id {string}")
   public void getPickupFromReservationId(String reservationIdString) {
     final long reservationId = Long.parseLong(resolveValue(reservationIdString));
-    final List<Pickup> pickups = getPickupClient().getPickupById(reservationId);
-    put(KEY_LIST_OF_PICKUPS, pickups);
+    doWithRetry(
+        () -> {
+          final List<Pickup> pickups = getPickupClient().getPickupById(reservationId);
+          put(KEY_LIST_OF_PICKUPS, pickups);
+        }, "get pickup details");
   }
 }
