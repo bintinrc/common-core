@@ -87,7 +87,7 @@ public class OrderVerificationSteps extends CoreStandardSteps {
   /**
    * Given API Core - Operator refresh the following orders | {KEY_LIST_OF_CREATED_ORDERS[1].id} |
    */
-  @Given("^API Core - Operator refresh the following orders")
+  @Given("API Core - Operator refresh the following orders")
   public void apiOperatorRefreshCreatedOrderData(List<String> orderIds) {
     doWithRetry(
         () -> orderIds.forEach(
