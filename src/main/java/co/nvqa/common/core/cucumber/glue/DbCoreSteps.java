@@ -550,12 +550,18 @@ public class DbCoreSteps extends CoreStandardSteps {
 
   @And("DB Core - Operator verifies order_tags_search record of {string} order:")
   public void verifyOrderTagsSearch(String orderId, Map<String, String> data) {
-    OrderTagsSearch expected = new OrderTagsSearch(resolveKeyValues(data));
+    Map<String, String> resolvedDataTable = resolveKeyValues(data);
+    OrderTagsSearch expected = new OrderTagsSearch(resolvedDataTable);
     doWithRetry(
         () -> {
           OrderTagsSearch actual = orderTagsSearchDao
               .getOrderTagsSearch(Long.parseLong(resolveValue(orderId)));
           expected.compareWithActual(actual, resolveKeyValues(data));
+          List<String> actualTags = fromJsonToList(f("[%s]", actual.getOrderTagIds()),
+              String.class);
+          List<String> expectedTags = fromJsonToList(f("[%s]", resolvedDataTable.get("tagIds")),
+              String.class);
+          Assertions.assertThat(actualTags.containsAll(expectedTags));
         }, "verify order_tags_search");
   }
 
