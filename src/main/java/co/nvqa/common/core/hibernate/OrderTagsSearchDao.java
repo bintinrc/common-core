@@ -6,6 +6,7 @@ import co.nvqa.common.database.DbBase;
 import co.nvqa.common.utils.StandardTestConstants;
 import java.util.List;
 import javax.inject.Singleton;
+import org.apache.commons.collections.CollectionUtils;
 
 @Singleton
 public class OrderTagsSearchDao extends DbBase {
@@ -15,10 +16,12 @@ public class OrderTagsSearchDao extends DbBase {
         StandardTestConstants.DB_PASS, "co.nvqa.common.core.model.persisted_class.core");
   }
 
-  public List<OrderTagsSearch> getOrderTagsSearch(Long orderId) {
+  public OrderTagsSearch getOrderTagsSearch(Long orderId) {
     String query = "FROM OrderTagsSearch WHERE orderId = :orderId";
-    return findAll(session -> session.createQuery(query, OrderTagsSearch.class)
-        .setParameter("orderId", orderId));
+    List<OrderTagsSearch> result = findAll(
+        session -> session.createQuery(query, OrderTagsSearch.class)
+            .setParameter("orderId", orderId));
+    return CollectionUtils.isEmpty(result) ? null : result.get(0);
   }
 
 }

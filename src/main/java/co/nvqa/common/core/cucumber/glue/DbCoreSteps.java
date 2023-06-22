@@ -553,14 +553,9 @@ public class DbCoreSteps extends CoreStandardSteps {
     OrderTagsSearch expected = new OrderTagsSearch(resolveKeyValues(data));
     doWithRetry(
         () -> {
-          List<OrderTagsSearch> actual = orderTagsSearchDao
+          OrderTagsSearch actual = orderTagsSearchDao
               .getOrderTagsSearch(Long.parseLong(resolveValue(orderId)));
-          Assertions.assertThat(actual)
-              .as("List of order_tags_search records for order_id=%s", orderId)
-              .isNotEmpty();
-          Assertions.assertThat(actual)
-              .as("List of order_tags_search records for order_id=%s", orderId)
-              .anyMatch(expected::matchedTo);
+          expected.compareWithActual(actual, resolveKeyValues(data));
         }, "verify order_tags_search");
   }
 
