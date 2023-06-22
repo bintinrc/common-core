@@ -350,13 +350,13 @@ public class ApiOrderSteps extends CoreStandardSteps {
     final long legacyId = Long.parseLong(resolveValue(legacyShipperId));
     List<Orders> orders = orderDao.getIncompleteOrderListByShipperId(legacyId);
 
-    if(orders.size() != 0 || orders != null) {
-      for (Orders or:orders) {
-        String orderId = or.getId().toString();
-        apiOperatorForceSuccessOrder(orderId, "true");
+    if (orders != null && !orders.isEmpty()) {
+      for (Orders or : orders) {
+        doWithRetry(() -> getOrderClient().forceSuccess(or.getId(), true),
+            "apiOperatorForceSuccessOrderByShipperId");
       }
-    } else{
-     LOGGER.debug("order is not found for legacy shipper id " + legacyId);
+    } else {
+      LOGGER.debug("order is not found for legacy shipper id {}", legacyId);
     }
   }
 }
