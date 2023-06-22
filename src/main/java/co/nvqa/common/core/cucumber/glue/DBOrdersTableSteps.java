@@ -9,6 +9,7 @@ import co.nvqa.common.core.model.order.Order.Dimension;
 import co.nvqa.common.core.model.order.Order.PreviousAddressDetails;
 import co.nvqa.common.core.model.persisted_class.core.Cods;
 import co.nvqa.common.core.model.persisted_class.core.OrderDeliveryVerifications;
+import co.nvqa.common.core.model.persisted_class.core.OrderPickup;
 import co.nvqa.common.core.model.persisted_class.core.Orders;
 import co.nvqa.common.utils.NvTestRuntimeException;
 import co.nvqa.common.utils.StandardTestUtils;
@@ -18,6 +19,7 @@ import io.cucumber.java.en.When;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
 import javax.inject.Inject;
 import org.assertj.core.api.Assertions;
@@ -285,4 +287,18 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
     }, "verify cods records", 10_000, 3);
   }
 
+  @When("DB Core - get order id of incomplete orders for legacy shipper id {string}")
+  public void apiOperatorForceSuccessOrderByShipperId(String legacyShipperId) {
+    final long legacyId = Long.parseLong(resolveValue(legacyShipperId));
+    final List<Orders> orders = doWithRetry(() -> {
+      List<Orders> result = orderDao.getIncompleteOrderListByShipperId(legacyId);
+      if (result.isEmpty()) {
+        throw new NvTestRuntimeException("order is not found for legacy shipper id " + legacyId);
+      }
+      return result;
+    }, "reading order from legacy id: " + legacyId, 3000, 30);
+    putAllInList(KEY_CORE_LIST_OF_CREATED_ORDERS_CORE_DB, orders.stream()
+        .map(Orders::getId)
+        .collect(Collectors.toList()));
+  }
 }
