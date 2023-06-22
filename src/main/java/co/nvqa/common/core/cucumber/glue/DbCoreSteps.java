@@ -276,8 +276,11 @@ public class DbCoreSteps extends CoreStandardSteps {
   @When("DB Core - operator get order details of order id {string}")
   public void getOrderDetailsByOrderId(String orderId) {
     Long resolvedOrderId = Long.parseLong(resolveValue(orderId));
-    OrderDetails orderDetails = orderDetailsDao.getOrderDetailsByOrderId(resolvedOrderId);
-    putInList(KEY_CORE_LIST_OF_ORDER_DETAILS, orderDetails);
+    doWithRetry(
+        () -> {
+          OrderDetails orderDetails = orderDetailsDao.getOrderDetailsByOrderId(resolvedOrderId);
+          putInList(KEY_CORE_LIST_OF_ORDER_DETAILS, orderDetails);
+        }, "get order details");
   }
 
   @When("DB Core - verify transactions record:")
@@ -532,25 +535,33 @@ public class DbCoreSteps extends CoreStandardSteps {
   }
 
   @And("DB Core - Operator verifies tags of {string} order:")
-  public void verifyOrderTags(String orderId, List<String> expected) {
-    expected = resolveValues(expected);
-    List<OrderTags> actual = orderTagsDao.getOrderTags(Long.parseLong(resolveValue(orderId)));
-    Assertions.assertThat(actual).as("List of order_tag records for order_id=%s", orderId)
-        .isNotEmpty();
-    Assertions.assertThat(actual).extracting(o -> String.valueOf(o.getTagId()))
-        .as("List of tag_id for order_id=%s", orderId)
-        .containsExactlyInAnyOrderElementsOf(expected);
+  public void verifyOrderTags(String orderId, List<String> data) {
+    List<String> expected = resolveValues(data);
+    doWithRetry(
+        () -> {
+          List<OrderTags> actual = orderTagsDao.getOrderTags(Long.parseLong(resolveValue(orderId)));
+          Assertions.assertThat(actual).as("List of order_tag records for order_id=%s", orderId)
+              .isNotEmpty();
+          Assertions.assertThat(actual).extracting(o -> String.valueOf(o.getTagId()))
+              .as("List of tag_id for order_id=%s", orderId)
+              .containsExactlyInAnyOrderElementsOf(expected);
+        }, "verify tags");
   }
 
   @And("DB Core - Operator verifies order_tags_search record of {string} order:")
   public void verifyOrderTagsSearch(String orderId, Map<String, String> data) {
     OrderTagsSearch expected = new OrderTagsSearch(resolveKeyValues(data));
-    List<OrderTagsSearch> actual = orderTagsSearchDao
-        .getOrderTagsSearch(Long.parseLong(resolveValue(orderId)));
-    Assertions.assertThat(actual).as("List of order_tags_search records for order_id=%s", orderId)
-        .isNotEmpty();
-    Assertions.assertThat(actual).as("List of order_tags_search records for order_id=%s", orderId)
-        .anyMatch(expected::matchedTo);
+    doWithRetry(
+        () -> {
+          List<OrderTagsSearch> actual = orderTagsSearchDao
+              .getOrderTagsSearch(Long.parseLong(resolveValue(orderId)));
+          Assertions.assertThat(actual)
+              .as("List of order_tags_search records for order_id=%s", orderId)
+              .isNotEmpty();
+          Assertions.assertThat(actual)
+              .as("List of order_tags_search records for order_id=%s", orderId)
+              .anyMatch(expected::matchedTo);
+        }, "verify order_tags_search");
   }
 
   @When("DB Core - verify route_waypoint records are hard-deleted:")
@@ -582,13 +593,15 @@ public class DbCoreSteps extends CoreStandardSteps {
   @And("DB Core - Operator verifies cod_collections record:")
   public void verifyCodCollections(Map<String, String> data) {
     CodCollections expected = new CodCollections(resolveKeyValues(data));
-    var actual = codCollectionDao.getMultipleCodCollections(expected.getWaypointId());
-    Assertions.assertThat(actual)
-        .as("List of cod_collections records for waypointId=%s", expected.getWaypointId())
-        .isNotEmpty();
-    Assertions.assertThat(actual)
-        .as("List of cod_collections records for waypointId=%s", expected.getWaypointId())
-        .anyMatch(expected::matchedTo);
+    doWithRetry(() -> {
+      var actual = codCollectionDao.getMultipleCodCollections(expected.getWaypointId());
+      Assertions.assertThat(actual)
+          .as("List of cod_collections records for waypointId=%s", expected.getWaypointId())
+          .isNotEmpty();
+      Assertions.assertThat(actual)
+          .as("List of cod_collections records for waypointId=%s", expected.getWaypointId())
+          .anyMatch(expected::matchedTo);
+    }, "verify cod_collections");
   }
 
 }
