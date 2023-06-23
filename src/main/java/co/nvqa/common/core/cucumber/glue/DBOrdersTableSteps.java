@@ -15,9 +15,11 @@ import co.nvqa.common.utils.StandardTestUtils;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
 import javax.inject.Inject;
 import org.assertj.core.api.Assertions;
@@ -253,10 +255,12 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
     data = resolveKeyValues(data);
     String stampId = data.get("stampId");
     String trackingId = data.get("trackingId");
-    Orders orders = orderDao.getSingleOrderDetailsByStampId(stampId);
-    Assertions.assertThat(orders.getTrackingId())
-        .as(f("Order trackingId is not matched to trackingId with %s stampId", stampId))
-        .isEqualTo(trackingId);
+    doWithRetry(() -> {
+      Orders orders = orderDao.getSingleOrderDetailsByStampId(stampId);
+      Assertions.assertThat(orders.getTrackingId())
+          .as(f("Order trackingId is not matched to trackingId with %s stampId", stampId))
+          .isEqualTo(trackingId);
+    }, "verify order stamp id");
   }
 
   @When("DB Core - verify order_delivery_verifications record:")
@@ -285,4 +289,17 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
     }, "verify cods records", 10_000, 3);
   }
 
+  @When("DB Core - get order id of incomplete orders for legacy shipper id {string}")
+  public void getOrderByShipperId(String legacyShipperId) {
+    final long legacyId = Long.parseLong(resolveValue(legacyShipperId));
+    List<Orders> orders = new ArrayList<>();
+    orders = orderDao.getIncompleteOrderListByShipperId(legacyId);
+    if (orders.size() != 0 || !orders.isEmpty()) {
+      putAllInList(KEY_CORE_LIST_OF_CREATED_ORDERS_CORE_DB, orders.stream()
+          .map(Orders::getTrackingId)
+          .collect(Collectors.toList()));
+    } else {
+      putAllInList(KEY_CORE_LIST_OF_CREATED_ORDERS_CORE_DB, orders);
+    }
+  }
 }

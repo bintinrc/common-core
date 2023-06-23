@@ -2,6 +2,7 @@ package co.nvqa.common.core.cucumber.glue;
 
 import co.nvqa.common.core.client.OrderClient;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
+import co.nvqa.common.core.model.EditDeliveryOrderRequest;
 import co.nvqa.common.core.model.order.Order;
 import co.nvqa.common.core.model.order.Order.Dimension;
 import co.nvqa.common.core.model.order.RescheduleOrderRequest;
@@ -132,6 +133,24 @@ public class ApiOrderSteps extends CoreStandardSteps {
     String granularStatus = data.get("granularStatus");
     doWithRetry(
         () -> getOrderClient().updateGranularStatusOrder(orderId, granularStatus),
+        "update order granular status", 3000, 10);
+  }
+
+  /**
+   * API Core - Operator Update Delivery Order Details:
+   *
+   * @param data <br/> <b>orderId</b>: 123456 <br/>
+   *             <br/> <b>request</b>: { "parcel_job": { "delivery_date": "2023-06-24", "delivery_timewindow": -1 }, "to": { "name": "sfksdjldsf", "email": "quix@ninjavan.co", "phone_number": "+6289517318260", "address": { "address1": "Jonas Street", "address2": "DKI Jakarta, Kota Jakarta Selatan, Kebayoran Lama", "postcode": "16514", "city": "Jakarta", "country": "ID", "district": "DKI Jakarta" } } } <br/>
+   */
+  @Given("API Core - Operator update delivery order details:")
+  public void apiCoreOperatorUpdateDeliveryOrderDetails(Map<String, String> data) {
+    data = resolveKeyValues(data);
+    EditDeliveryOrderRequest request = JsonUtils
+        .fromJsonSnakeCase(resolveValue(data.get("request")),
+            EditDeliveryOrderRequest.class);
+    Long orderId = Long.parseLong(resolveValue(data.get("orderId")));
+    doWithRetry(
+        () -> getOrderClient().editDeliveryOrderDetails(request, orderId),
         "update order granular status", 3000, 10);
   }
 
