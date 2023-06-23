@@ -2,6 +2,28 @@
 
 <hr>
 
+## [1.3.12] 2023-06-23
+
+### Added
+
+- API Core - Operator update delivery order details:
+- API Route - Operator add multiple waypoints to route:
+- API Core - Operator refresh the following orders
+- DB Core - get order id of incomplete orders for legacy shipper id {string}
+- @DeleteCoverageV2
+
+<hr>
+
+## [1.3.11] 2023-06-17
+
+### Added
+
+- API Core - Operator van inbound order:
+- API Core - Operator van inbound and start route using data:
+- DB Core - Operator verifies cod_collections record:
+
+<hr>
+
 ## [1.3.10] 2023-06-15
 
 ### Added
@@ -9,6 +31,7 @@
 - API Core - Operator failed to add reservation to route using data below:
 - API Core - Operator failed to remove reservation id {string} from route
 
+<hr>
 
 ## [1.3.9] 2023-06-14
 
