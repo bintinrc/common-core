@@ -2,7 +2,6 @@ package co.nvqa.common.core.client;
 
 import co.nvqa.common.client.SimpleApiClient;
 import co.nvqa.common.constants.HttpConstants;
-import co.nvqa.common.core.model.EditDeliveryOrderRequest;
 import co.nvqa.common.core.model.dp.CustomerCollectRequest;
 import co.nvqa.common.core.model.dp.DpTagging;
 import co.nvqa.common.core.model.dp.DpUntagging;
@@ -78,18 +77,6 @@ public class CoreDpClient extends SimpleApiClient {
         .body(json);
 
     Response r = doPost("CORE - OVERSTAY FROM DP", spec, uri);
-    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
-      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
-    }
-  }
-
-  public void editDeliveryOrderDetails(EditDeliveryOrderRequest editDeliveryOrderRequest, Long orderId) {
-    String uri = "core/2.0/orders/{orderId}";
-    RequestSpecification spec = createAuthenticatedRequest()
-        .pathParam("orderId", orderId)
-        .body(toJsonSnakeCase(editDeliveryOrderRequest));
-
-    Response r = doPatch("CORE - Edit Order Delivery Details", spec, uri);
     if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
       throw new NvTestHttpException("unexpected http status: " + r.statusCode());
     }
