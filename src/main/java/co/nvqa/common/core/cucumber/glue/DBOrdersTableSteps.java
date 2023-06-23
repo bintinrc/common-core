@@ -255,10 +255,12 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
     data = resolveKeyValues(data);
     String stampId = data.get("stampId");
     String trackingId = data.get("trackingId");
-    Orders orders = orderDao.getSingleOrderDetailsByStampId(stampId);
-    Assertions.assertThat(orders.getTrackingId())
-        .as(f("Order trackingId is not matched to trackingId with %s stampId", stampId))
-        .isEqualTo(trackingId);
+    doWithRetry(() -> {
+      Orders orders = orderDao.getSingleOrderDetailsByStampId(stampId);
+      Assertions.assertThat(orders.getTrackingId())
+          .as(f("Order trackingId is not matched to trackingId with %s stampId", stampId))
+          .isEqualTo(trackingId);
+    }, "verify order stamp id");
   }
 
   @When("DB Core - verify order_delivery_verifications record:")

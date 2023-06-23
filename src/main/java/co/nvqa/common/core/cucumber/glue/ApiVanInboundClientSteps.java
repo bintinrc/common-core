@@ -29,8 +29,9 @@ public class ApiVanInboundClientSteps extends CoreStandardSteps {
   }
 
   /**
-   * Example: And API Core - Operator van inbound orders
-   * |ordersListKey|{KEY_LIST_OF_CREATED_ORDERS[1]}| |routeKey|{KEY_LIST_OF_CREATED_ROUTES[1].id}|
+   * Example: And API Core - Operator van inbound orders |ordersListKey|{KEY_LIST_OF_CREATED_ORDERS[1]}|
+   * |routeKey|{KEY_LIST_OF_CREATED_ROUTES[1].id}|
+   *
    * @param data Map of data from feature file.
    */
 
@@ -58,7 +59,7 @@ public class ApiVanInboundClientSteps extends CoreStandardSteps {
     String routListKey = data.get("routeListKey");
     Long routeId = get(routListKey);
     String methodInfo = f("%s - [Route ID = %d]", getCurrentMethodName(), routeId);
-    retryIfAssertionErrorOrRuntimeExceptionOccurred(() -> getRouteClient().startRoute(routeId),
+    doWithRetry(() -> getRouteClient().startRoute(routeId),
         methodInfo);
   }
 
@@ -66,7 +67,7 @@ public class ApiVanInboundClientSteps extends CoreStandardSteps {
       Long routeId) {
     String methodInfo = f("%s - [Tracking ID = %s]", getCurrentMethodName(), trackingId);
 
-    retryIfAssertionErrorOrRuntimeExceptionOccurred(() ->
+    doWithRetry(() ->
     {
       VanInboundRequest vanInboundRequest = new VanInboundRequest();
       vanInboundRequest.setTrackingId(trackingId);

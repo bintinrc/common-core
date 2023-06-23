@@ -25,12 +25,14 @@ public class ApiMessagingSteps extends CoreStandardSteps {
   @Then("API Core - Operator gets all the SMS notification by Tracking ID {string}")
   public void apiOperatorGetsAllTheSmsNotificationByTrackingId(String trackingId) {
     String tid = resolveValue(trackingId);
+    doWithRetry(
+        () -> {
+          List<MessagingHistoryResponse> messagingHistoryResponses =
+              getMessagingClient().getMessageNotificationBasedOnTrackingId(tid);
 
-    List<MessagingHistoryResponse> messagingHistoryResponses =
-        getMessagingClient().getMessageNotificationBasedOnTrackingId(tid);
-
-    for (MessagingHistoryResponse historyResponse : messagingHistoryResponses){
-      putInList(KEY_CORE_LIST_OF_MESSAGING_HISTORY_DATA,historyResponse);
-    }
+          for (MessagingHistoryResponse historyResponse : messagingHistoryResponses) {
+            putInList(KEY_CORE_LIST_OF_MESSAGING_HISTORY_DATA, historyResponse);
+          }
+        }, "get sms notifs");
   }
 }

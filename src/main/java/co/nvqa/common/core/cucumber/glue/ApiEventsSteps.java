@@ -46,21 +46,24 @@ public class ApiEventsSteps extends CoreStandardSteps {
     String source = resolvedData.get("source");
 
     pause4s();
-    final Events events = getEventClient().getOrderEventsByOrderId(orderId);
-    final List<Event> eventsData = events.getData();
+    doWithRetry(
+        () -> {
+          final Events events = getEventClient().getOrderEventsByOrderId(orderId);
+          final List<Event> eventsData = events.getData();
 
-    for (Event eventData : eventsData) {
-      if (eventData.getType().equals(eventName)) {
-        if (eventData.getUserName().equals(userId)) {
-          Assertions.assertThat(eventData.getData().getStatus())
-              .as("Auto AV order event status is correct").isEqualTo(status);
-          Assertions.assertThat(eventData.getData().getMode())
-              .as("Auto AV order event mode is correct").isEqualTo(mode);
-          Assertions.assertThat(eventData.getData().getSource())
-              .as("order event delivery waypoint id is correct").isEqualTo(source);
-        }
-      }
-    }
+          for (Event eventData : eventsData) {
+            if (eventData.getType().equals(eventName)) {
+              if (eventData.getUserName().equals(userId)) {
+                Assertions.assertThat(eventData.getData().getStatus())
+                    .as("Auto AV order event status is correct").isEqualTo(status);
+                Assertions.assertThat(eventData.getData().getMode())
+                    .as("Auto AV order event mode is correct").isEqualTo(mode);
+                Assertions.assertThat(eventData.getData().getSource())
+                    .as("order event delivery waypoint id is correct").isEqualTo(source);
+              }
+            }
+          }
+        }, "verify AV event");
 
   }
 
@@ -70,9 +73,11 @@ public class ApiEventsSteps extends CoreStandardSteps {
   @Then("API Core - Operator get the order event from Order Id {string}")
   public void apiOperatorGetOrderEventByOrderId(String createdOrderId) {
     final long orderId = Long.parseLong(resolveValue(createdOrderId));
-
-    final Events events = getEventClient().getOrderEventsByOrderId(orderId);
-    putInList(KEY_CORE_LIST_OF_ORDER_EVENTS, events);
+    doWithRetry(
+        () -> {
+          final Events events = getEventClient().getOrderEventsByOrderId(orderId);
+          putInList(KEY_CORE_LIST_OF_ORDER_EVENTS, events);
+        }, "get order events");
   }
 
   /**
@@ -100,10 +105,10 @@ public class ApiEventsSteps extends CoreStandardSteps {
 
 
   /**
-   * And API Core - Operator verify that event is published with correct details:<br>
-   * | orderId   | {KEY_LIST_OF_CREATED_ORDERS[1].id} |  <br>
-   * | eventType | HUB_INBOUND_SCAN | <br>
-   * | eventData | {"weight":{"old_value":5,"new_value":5},"length":{"new_value":30},"width":{"new_value":10},"height":{"new_value":20}} |<br>
+   * And API Core - Operator verify that event is published with correct details:<br> | orderId   |
+   * {KEY_LIST_OF_CREATED_ORDERS[1].id} |  <br> | eventType | HUB_INBOUND_SCAN | <br> | eventData |
+   * {"weight":{"old_value":5,"new_value":5},"length":{"new_value":30},"width":{"new_value":10},"height":{"new_value":20}}
+   * |<br>
    **/
   @Then("API Core - Operator verify that event is published with correct details:")
   public void operatorVerifiesOrderEventDetails(Map<String, String> dataTableRaw) {
@@ -120,13 +125,13 @@ public class ApiEventsSteps extends CoreStandardSteps {
 
       Assertions.assertThat(actualOrderEvents).anySatisfy(
           event -> Assertions.assertThat(event.getType()).withFailMessage(
-                  f("Event %s is NOT published for order id: %d", expectedEventType, orderId))
+              f("Event %s is NOT published for order id: %d", expectedEventType, orderId))
               .isEqualTo(expectedEventType));
 
       Assertions.assertThat(actualOrderEvents).anySatisfy(
           event -> Assertions.assertThat(event.getData()).withFailMessage(
-                  f("Actual data:\n %s \ndoes not match expected data:\n %s", toJson(event.getData()),
-                      toJson(expectedEventDetail))).usingRecursiveComparison()
+              f("Actual data:\n %s \ndoes not match expected data:\n %s", toJson(event.getData()),
+                  toJson(expectedEventDetail))).usingRecursiveComparison()
               .ignoringExpectedNullFields().isEqualTo(expectedEventDetail));
 
     }, String.format("%s event is published for order id %d with expected details %s",
