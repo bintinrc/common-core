@@ -49,9 +49,12 @@ public class ApiReservationSteps extends CoreStandardSteps {
             StandardTestUtils.createDefaultTokens());
     ReservationRequest reservationRequest = fromJson(getDefaultSnakeCaseMapper(),
         reservationRequestReplaced, ReservationRequest.class);
-    ReservationResponse reservationResult = apiOperatorCreateV2Reservation(reservationRequest);
-
-    putInList(KEY_LIST_OF_CREATED_RESERVATIONS, reservationResult);
+    doWithRetry(
+        () -> {
+          ReservationResponse reservationResult = apiOperatorCreateV2Reservation(
+              reservationRequest);
+          putInList(KEY_LIST_OF_CREATED_RESERVATIONS, reservationResult);
+        }, "create reservation");
   }
 
   @When("API Core - Operator get reservation from reservation id {string}")
@@ -61,8 +64,11 @@ public class ApiReservationSteps extends CoreStandardSteps {
     final ReservationFilter filter = ReservationFilter.builder()
         .reservationId(reservationId)
         .build();
-    final ReservationResponse responses = getReservationClient().getReservations(filter);
-    putInList(KEY_LIST_OF_RESERVATIONS, responses);
+    doWithRetry(
+        () -> {
+          final ReservationResponse responses = getReservationClient().getReservations(filter);
+          putInList(KEY_LIST_OF_RESERVATIONS, responses);
+        }, "get reservation details");
   }
 
   private ReservationResponse apiOperatorCreateV2Reservation(
@@ -117,27 +123,33 @@ public class ApiReservationSteps extends CoreStandardSteps {
     long legacyShipperId = Long.parseLong(resolveValue(dataTableAsMap.get("legacyShipperId")));
     long priorityLevel = Long.parseLong(resolveValue(dataTableAsMap.get("priorityLevel")));
     long reservationId = Long.parseLong(resolveValue(dataTableAsMap.get("reservationId")));
-    getReservationClient()
-        .updatePriorityLevelOfReservation(pickupAddressId, legacyShipperId, priorityLevel,
-            reservationId);
+    doWithRetry(
+        () ->
+            getReservationClient()
+                .updatePriorityLevelOfReservation(pickupAddressId, legacyShipperId, priorityLevel,
+                    reservationId), "update priority level");
   }
 
   /**
    * Sample:<p>
    * <p>
-   * When API Core - Operator update pick up date and time for the reservation using data below:<p> |
-   | reservationId             |  {KEY_CREATED_RESERVATION_ID}                                     |
-   | reservationUpdateRequest  | request                                                           |
+   * When API Core - Operator update pick up date and time for the reservation using data below:<p>
+   * | | reservationId             |  {KEY_CREATED_RESERVATION_ID} | | reservationUpdateRequest  |
+   * request |
    * <p>
    *
    * @param dataTableAsMap Map of data from feature file.
    */
   @When("API Core - Operator update pick up date and time for the reservation using data below:")
-  public void apiOperatorUpdatePickUpDateAndTimeForTheReservation(Map<String, String> dataTableAsMap) {
-    dataTableAsMap = resolveKeyValues(dataTableAsMap);
-    long legacyShipperId = Long.parseLong(resolveValue(dataTableAsMap.get("reservationId")));
-    getReservationClient()
-        .updateDateAndTimeOfReservation(legacyShipperId,dataTableAsMap.get("reservationUpdateRequest"));
+  public void apiOperatorUpdatePickUpDateAndTimeForTheReservation(
+      Map<String, String> dataTableAsMap) {
+    Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
+    long legacyShipperId = Long.parseLong(resolveValue(resolvedDataTable.get("reservationId")));
+    doWithRetry(
+        () ->
+            getReservationClient()
+                .updateDateAndTimeOfReservation(legacyShipperId,
+                    resolvedDataTable.get("reservationUpdateRequest")), "update reservation date");
   }
 
   /**
