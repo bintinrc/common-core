@@ -5,6 +5,7 @@ import co.nvqa.common.core.client.ReservationClient;
 import co.nvqa.common.core.client.RouteClient;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.hibernate.RouteDbDao;
+import co.nvqa.common.core.model.RouteGroup;
 import co.nvqa.common.core.model.coverage.CreateCoverageResponse;
 import co.nvqa.common.core.model.order.Order;
 import co.nvqa.common.core.model.persisted_class.route.Coverage;
@@ -12,6 +13,7 @@ import co.nvqa.common.core.model.reservation.ReservationResponse;
 import co.nvqa.common.core.model.route.RouteResponse;
 import io.cucumber.guice.ScenarioScoped;
 import io.cucumber.java.After;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -19,6 +21,7 @@ import java.util.Set;
 import javax.inject.Inject;
 import lombok.Getter;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -160,6 +163,31 @@ public class HookSteps extends CoreStandardSteps {
         });
       });
     }
+  }
 
+  @After("@DeleteRouteGroupsV2")
+  public void deleteRouteGroups() {
+    List<RouteGroup> routeGroups = get(KEY_LIST_OF_CREATED_ROUTE_GROUPS);
+    if (CollectionUtils.isNotEmpty(routeGroups)) {
+      List<RouteGroup> allRouteGroups = new ArrayList<>();
+      routeGroups.forEach(routeGroup -> {
+        try {
+          if (routeGroup.getId() != null) {
+            getRouteClient().deleteRouteGroup(routeGroup.getId());
+          } else {
+            if (allRouteGroups.isEmpty()) {
+              allRouteGroups.addAll(getRouteClient().getRouteGroups());
+            }
+            allRouteGroups.stream()
+                .filter(
+                    group -> StringUtils.equalsIgnoreCase(routeGroup.getName(), group.getName()))
+                .findFirst()
+                .ifPresent(group -> getRouteClient().deleteRouteGroup(group.getId()));
+          }
+        } catch (Throwable ex) {
+          LOGGER.warn("Could not delete Route Group " + routeGroup.getName(), ex);
+        }
+      });
+    }
   }
 }

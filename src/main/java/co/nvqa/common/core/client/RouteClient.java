@@ -421,6 +421,22 @@ public class RouteClient extends SimpleApiClient {
     r.then().contentType(ContentType.JSON);
   }
 
+  public void addReferencesToRouteGroup(long routeGroupId, String body) {
+    String apiMethod = "route/1.0/route-groups/{routeGroupId}/references";
+
+    RequestSpecification requestSpecification = createAuthenticatedRequest()
+        .pathParam("routeGroupId", routeGroupId)
+        .queryParam("append", true)
+        .body(body);
+
+    Response r = doPost("Route - Add References to Route Group", requestSpecification,
+        apiMethod);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+    r.then().contentType(ContentType.JSON);
+  }
+
   public void deleteRoute(long routeId) {
     Response r = deleteRouteAndGetRawResponse(routeId);
     r.then().assertThat().contentType(ContentType.JSON);

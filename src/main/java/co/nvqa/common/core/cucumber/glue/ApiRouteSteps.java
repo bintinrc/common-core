@@ -3,6 +3,7 @@ package co.nvqa.common.core.cucumber.glue;
 import co.nvqa.common.constants.HttpConstants;
 import co.nvqa.common.core.client.RouteClient;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
+import co.nvqa.common.core.model.RouteGroup;
 import co.nvqa.common.core.model.coverage.CreateCoverageRequest;
 import co.nvqa.common.core.model.coverage.CreateCoverageResponse;
 import co.nvqa.common.core.model.other.CoreExceptionResponse;
@@ -19,7 +20,6 @@ import co.nvqa.common.core.model.route.ParcelRouteTransferResponse;
 import co.nvqa.common.core.model.route.RouteRequest;
 import co.nvqa.common.core.model.route.RouteResponse;
 import co.nvqa.common.core.model.waypoint.Waypoint;
-import co.nvqa.common.core.utils.CoreScenarioStorageKeys;
 import co.nvqa.common.core.utils.CoreTestUtils;
 import co.nvqa.common.model.DataEntity;
 import co.nvqa.common.utils.StandardTestUtils;
@@ -376,7 +376,8 @@ public class ApiRouteSteps extends CoreStandardSteps {
    * Sample:<p>
    * <p>
    * When API Core - Operator bulk add reservation to route using data below: | request | {"ids":
-   * [{KEY_LIST_OF_CREATED_RESERVATIONS[1].id}, {KEY_LIST_OF_CREATED_RESERVATIONS[2].id}],"new_route_id":{KEY_LIST_OF_CREATED_ROUTES[1].id},"overwrite":true}
+   * [{KEY_LIST_OF_CREATED_RESERVATIONS[1].id},
+   * {KEY_LIST_OF_CREATED_RESERVATIONS[2].id}],"new_route_id":{KEY_LIST_OF_CREATED_ROUTES[1].id},"overwrite":true}
    * |
    * <p>
    *
@@ -400,7 +401,8 @@ public class ApiRouteSteps extends CoreStandardSteps {
    * Sample:<p>
    * <p>
    * When API Core - Operator bulk add reservation to route with partial success: | request |
-   * {"ids": [{KEY_LIST_OF_CREATED_RESERVATIONS[1].id}, {KEY_LIST_OF_CREATED_RESERVATIONS[2].id}],"new_route_id":{KEY_LIST_OF_CREATED_ROUTES[1].id},"overwrite":true}
+   * {"ids": [{KEY_LIST_OF_CREATED_RESERVATIONS[1].id},
+   * {KEY_LIST_OF_CREATED_RESERVATIONS[2].id}],"new_route_id":{KEY_LIST_OF_CREATED_ROUTES[1].id},"overwrite":true}
    * |
    * <p>
    *
@@ -482,6 +484,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
         () -> getRouteClient().addToRouteDp(orderId, routeId),
         "Add to route dp order");
   }
+
   @Given("API Core - Operator Get Delivery Waypoint ID for tracking ID {string}")
   public void operatorGetDeliveryWaypointId(String tid) {
     String resolvedTid = resolveValue(tid);
@@ -592,7 +595,8 @@ public class ApiRouteSteps extends CoreStandardSteps {
 
   /**
    * Sample: API Core - Operator parcel transfer to a new route: | request |
-   * {{"route_id":null,"route_date":"2021-01-19 08:25:13","from_driver_id":null,"to_driver_id":2679,"to_driver_hub_id":3,"orders":[{"tracking_id":"NVSGDIMMI000238068","inbound_type":"VAN_FROM_NINJAVAN","hub_id":3}]|
+   * {{"route_id":null,"route_date":"2021-01-19
+   * 08:25:13","from_driver_id":null,"to_driver_id":2679,"to_driver_hub_id":3,"orders":[{"tracking_id":"NVSGDIMMI000238068","inbound_type":"VAN_FROM_NINJAVAN","hub_id":3}]|
    *
    * @param dataTableAsMap Map of data from feature file.
    */
@@ -654,5 +658,19 @@ public class ApiRouteSteps extends CoreStandardSteps {
           expectedResponse.compareWithActual(actualResponse, resolvedDataTable);
         },
         "add multiple waypoints to route");
+  }
+
+  @Given("API Route - add references to Route Group:")
+  public void apiOperatorAddTransactionsToRouteGroup(Map<String, String> data) {
+    data = resolveKeyValues(data);
+    getRouteClient().addReferencesToRouteGroup(Long.parseLong(data.get("routeGroupId")),
+        data.get("requestBody"));
+  }
+
+  @Given("API Route - create route group:")
+  public void apiOperatorCreateNewRouteGroup(Map<String, String> data) {
+    RouteGroup routeGroup = new RouteGroup(resolveKeyValues(data));
+    routeGroup = getRouteClient().createRouteGroup(routeGroup);
+    putInList(KEY_LIST_OF_CREATED_ROUTE_GROUPS, routeGroup);
   }
 }
