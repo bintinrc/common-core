@@ -1,4 +1,4 @@
-package co.nvqa.common.core.model.persisted_class.core;
+package co.nvqa.common.core.model.persisted_class.route;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,11 +23,17 @@ public class JobWaypoint {
   @Column(name = "id")
   private Long id;
 
-  @Column(name = "job_type")
-  private String jobType;
+  @Column(name = "legacy_id")
+  private Long legacyId;
+
+  @Column(name = "system_id")
+  private String systemId;
 
   @Column(name = "job_id")
   private Long jobId;
+
+  @Column(name = "job_type")
+  private String jobType;
 
   @Column(name = "waypoint_id")
   private Long waypointId;

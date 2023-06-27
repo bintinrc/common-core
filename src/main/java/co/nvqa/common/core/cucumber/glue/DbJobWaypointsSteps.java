@@ -2,7 +2,7 @@ package co.nvqa.common.core.cucumber.glue;
 
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.hibernate.JobWaypointDao;
-import co.nvqa.common.core.model.persisted_class.core.JobWaypoint;
+import co.nvqa.common.core.model.persisted_class.route.JobWaypoint;
 import co.nvqa.common.utils.NvTestRuntimeException;
 import io.cucumber.java.en.When;
 import javax.inject.Inject;
