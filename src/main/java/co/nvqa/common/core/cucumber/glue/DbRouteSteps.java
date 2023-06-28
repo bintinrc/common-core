@@ -12,7 +12,6 @@ import co.nvqa.common.core.model.persisted_class.route.RouteLogs;
 import co.nvqa.common.core.model.persisted_class.route.Waypoints;
 import co.nvqa.common.model.DataEntity;
 import co.nvqa.common.utils.NvTestRuntimeException;
-import co.nvqa.common.utils.StandardTestConstants;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import java.util.Collections;

@@ -10,7 +10,6 @@ import co.nvqa.common.core.hibernate.OrderTagsDao;
 import co.nvqa.common.core.hibernate.OrderTagsSearchDao;
 import co.nvqa.common.core.hibernate.OutboundScansDao;
 import co.nvqa.common.core.hibernate.ReservationsDao;
-import co.nvqa.common.core.hibernate.RouteLogsDao;
 import co.nvqa.common.core.hibernate.RouteMonitoringDataDao;
 import co.nvqa.common.core.hibernate.RouteWaypointDao;
 import co.nvqa.common.core.hibernate.ShipperPickupSearchDao;
@@ -21,7 +20,6 @@ import co.nvqa.common.core.model.order.Order;
 import co.nvqa.common.core.model.order.Order.Transaction;
 import co.nvqa.common.core.model.persisted_class.core.CodCollections;
 import co.nvqa.common.core.model.persisted_class.core.CodInbounds;
-import co.nvqa.common.core.model.persisted_class.core.CoreRouteLogs;
 import co.nvqa.common.core.model.persisted_class.core.OrderDetails;
 import co.nvqa.common.core.model.persisted_class.core.OrderJaroScoresV2;
 import co.nvqa.common.core.model.persisted_class.core.OrderTags;
@@ -57,8 +55,6 @@ public class DbCoreSteps extends CoreStandardSteps {
 
   @Inject
   private OrderDetailsDao orderDetailsDao;
-  @Inject
-  private RouteLogsDao routeLogsDao;
   @Inject
   private WaypointsDao waypointsDao;
   @Inject
@@ -171,21 +167,6 @@ public class DbCoreSteps extends CoreStandardSteps {
     String lon = longitude.toString();
     String formattedLongitude = lon.substring(0, 6);
     return new String[]{formattedLatitude, formattedLongitude};
-  }
-
-  @When("DB Core - verify route_logs record:")
-  public void verifyRouteLogs(Map<String, String> data) {
-    Map<String, String> resolvedData = resolveKeyValues(data);
-    CoreRouteLogs expected = new CoreRouteLogs(resolvedData);
-
-    doWithRetry(() -> {
-      CoreRouteLogs actual = routeLogsDao.getRouteLogs(expected.getId());
-      Assertions.assertThat(actual)
-          .withFailMessage("Roure logs was not found: " + resolvedData);
-      Assertions.assertThat(actual).withFailMessage("Roure logs was not found: " + resolvedData)
-          .isNotNull();
-      expected.compareWithActual(actual, resolvedData);
-    }, f("verify route_logs records"), 10_000, 3);
   }
 
   @When("DB Core - verify waypoints record:")
