@@ -1,6 +1,6 @@
 package co.nvqa.common.core.hibernate;
 
-import co.nvqa.common.core.model.persisted_class.core.CoreRouteLogs;
+import co.nvqa.common.core.model.persisted_class.route.JobWaypoint;
 import co.nvqa.common.core.model.persisted_class.route.AreaVariation;
 import co.nvqa.common.core.model.persisted_class.route.Coverage;
 import co.nvqa.common.core.model.persisted_class.route.Keyword;
@@ -127,6 +127,18 @@ public class RouteDbDao extends DbBase {
             .setParameter("systemId", StandardTestConstants.NV_SYSTEM_ID)
             .setMaxResults(1));
     return CollectionUtils.isEmpty(result) ? null : result.get(0);
+  }
+
+  public JobWaypoint getWaypointIdByJobId(Long jobId) {
+    List<JobWaypoint> results;
+    String query = "FROM JobWaypoint "
+        + "WHERE jobId = :jobId "
+        + "AND systemId = :systemId";
+    results = findAll(session ->
+        session.createQuery(query, JobWaypoint.class)
+            .setParameter("jobId", jobId)
+            .setParameter("systemId", StandardTestConstants.NV_SYSTEM_ID));
+    return results.get(0);
   }
 
 }
