@@ -2,6 +2,14 @@
 
 <hr>
 
+## [1.3.13-RC1] 2023-06-27
+
+### Added
+
+- DB Route - get waypoint id for job id {string}
+
+<hr>
+
 ## [1.3.12] 2023-06-23
 
 ### Added
