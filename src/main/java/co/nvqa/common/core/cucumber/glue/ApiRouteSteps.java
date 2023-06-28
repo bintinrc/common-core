@@ -662,15 +662,18 @@ public class ApiRouteSteps extends CoreStandardSteps {
 
   @Given("API Route - add references to Route Group:")
   public void apiOperatorAddTransactionsToRouteGroup(Map<String, String> data) {
-    data = resolveKeyValues(data);
-    getRouteClient().addReferencesToRouteGroup(Long.parseLong(data.get("routeGroupId")),
-        data.get("requestBody"));
+    var finalData = resolveKeyValues(data);
+    doWithRetry(() -> getRouteClient().addReferencesToRouteGroup(
+        Long.parseLong(finalData.get("routeGroupId")),
+        finalData.get("requestBody")), "add references to Route Group", 2000, 3);
   }
 
   @Given("API Route - create route group:")
   public void apiOperatorCreateNewRouteGroup(Map<String, String> data) {
     RouteGroup routeGroup = new RouteGroup(resolveKeyValues(data));
-    routeGroup = getRouteClient().createRouteGroup(routeGroup);
-    putInList(KEY_LIST_OF_CREATED_ROUTE_GROUPS, routeGroup);
+    doWithRetry(() -> {
+      var response = getRouteClient().createRouteGroup(routeGroup);
+      putInList(KEY_LIST_OF_CREATED_ROUTE_GROUPS, response);
+    }, "Create route group", 2000, 3);
   }
 }

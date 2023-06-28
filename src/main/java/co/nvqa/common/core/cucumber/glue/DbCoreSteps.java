@@ -612,12 +612,14 @@ public class DbCoreSteps extends CoreStandardSteps {
   @And("DB Core - Operator verifies inbound_scans record:")
   public void verifyInboundScans(Map<String, String> data) {
     InboundScans expected = new InboundScans(resolveKeyValues(data));
-    var actual = inboundScansDao.findInboundScansByOrderId(expected.getOrderId());
-    Assertions.assertThat(actual)
-        .as("List of inbound_scans records for orderId=%s", expected.getOrderId())
-        .isNotEmpty()
-        .anyMatch(expected::matchedTo);
-    putInList(KEY_CORE_LIST_OF_INBOUND_SCANS, actual);
+    doWithRetry(() -> {
+      var actual = inboundScansDao.findInboundScansByOrderId(expected.getOrderId());
+      Assertions.assertThat(actual)
+          .as("List of inbound_scans records for orderId=%s", expected.getOrderId())
+          .isNotEmpty()
+          .anyMatch(expected::matchedTo);
+      putInList(KEY_CORE_LIST_OF_INBOUND_SCANS, actual);
+    }, "Fetch InboundScans", 2000, 3);
   }
 
 }
