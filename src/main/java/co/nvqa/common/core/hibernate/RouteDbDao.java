@@ -81,11 +81,6 @@ public class RouteDbDao extends DbBase {
     return CollectionUtils.isEmpty(result) ? null : result.get(0);
   }
 
-  public void softDeleteRoute(long routeId) {
-    String query = "UPDATE CoreRouteLogs SET deletedAt = NOW() WHERE legacyId = " + routeId;
-    saveOrUpdate(s -> s.createQuery(query));
-  }
-
   public void setWaypointsZoneId(long zoneId, List<Long> waypointIds) {
     String query = "UPDATE Waypoints SET routingZoneId = " + zoneId + " WHERE legacyId in ("
         + waypointIds.stream().map(Object::toString).collect(Collectors.joining(",")) + ")";
@@ -140,5 +135,4 @@ public class RouteDbDao extends DbBase {
             .setParameter("systemId", StandardTestConstants.NV_SYSTEM_ID));
     return results.get(0);
   }
-
 }
