@@ -173,21 +173,6 @@ public class DbCoreSteps extends CoreStandardSteps {
     return new String[]{formattedLatitude, formattedLongitude};
   }
 
-  @When("DB Core - verify route_logs record:")
-  public void verifyRouteLogs(Map<String, String> data) {
-    Map<String, String> resolvedData = resolveKeyValues(data);
-    CoreRouteLogs expected = new CoreRouteLogs(resolvedData);
-
-    doWithRetry(() -> {
-      CoreRouteLogs actual = routeLogsDao.getRouteLogs(expected.getId());
-      Assertions.assertThat(actual)
-          .withFailMessage("Roure logs was not found: " + resolvedData);
-      Assertions.assertThat(actual).withFailMessage("Roure logs was not found: " + resolvedData)
-          .isNotNull();
-      expected.compareWithActual(actual, resolvedData);
-    }, f("verify route_logs records"), 10_000, 3);
-  }
-
   @When("DB Core - verify waypoints record:")
   public void verifyWaypoints(Map<String, String> data) {
     Map<String, String> resolvedData = resolveKeyValues(data);
