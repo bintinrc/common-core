@@ -2,6 +2,7 @@ package co.nvqa.common.core.client;
 
 import co.nvqa.common.client.SimpleApiClient;
 import co.nvqa.common.constants.HttpConstants;
+import co.nvqa.common.core.model.EditDeliveryOrderRequest;
 import co.nvqa.common.core.model.order.BatchOrderInfo;
 import co.nvqa.common.core.model.order.BulkForceSuccessOrderRequest;
 import co.nvqa.common.core.model.order.DeliveryDetails;
@@ -142,6 +143,18 @@ public class OrderClient extends SimpleApiClient {
   public void forceSuccess(long orderId, boolean codCollected) {
     Response r = forceSuccessAsRawResponse(orderId, codCollected);
     if (r.statusCode() != HttpConstants.RESPONSE_204_NO_CONTENT) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+  }
+
+  public void editDeliveryOrderDetails(EditDeliveryOrderRequest editDeliveryOrderRequest, Long orderId) {
+    String uri = "core/2.0/orders/{orderId}";
+    RequestSpecification spec = createAuthenticatedRequest()
+        .pathParam("orderId", orderId)
+        .body(toJsonSnakeCase(editDeliveryOrderRequest));
+
+    Response r = doPatch("CORE - Edit Order Delivery Details", spec, uri);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
       throw new NvTestHttpException("unexpected http status: " + r.statusCode());
     }
   }
