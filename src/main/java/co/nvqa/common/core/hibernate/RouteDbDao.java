@@ -129,13 +129,15 @@ public class RouteDbDao extends DbBase {
     return CollectionUtils.isEmpty(result) ? null : result.get(0);
   }
 
-  public JobWaypoint getWaypointIdByJobId(Long jobId) {
+  public JobWaypoint getWaypointIdByJobId(Long jobId, String systemId) {
     List<JobWaypoint> results;
     String query = "FROM JobWaypoint "
-        + "WHERE jobId = :jobId";
+        + "WHERE jobId = :jobId "
+        + "AND systemId = :systemId";
     results = findAll(session ->
         session.createQuery(query, JobWaypoint.class)
-            .setParameter("jobId", jobId));
+            .setParameter("jobId", jobId)
+            .setParameter("systemId", systemId));
     return results.get(0);
   }
 
