@@ -12,6 +12,7 @@ import co.nvqa.common.core.model.persisted_class.route.RouteLogs;
 import co.nvqa.common.core.model.persisted_class.route.Waypoints;
 import co.nvqa.common.model.DataEntity;
 import co.nvqa.common.utils.NvTestRuntimeException;
+import co.nvqa.common.utils.StandardTestConstants;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import java.util.Collections;
@@ -176,18 +177,14 @@ public class DbRouteSteps extends CoreStandardSteps {
     }, f("get route_logs record"), 10_000, 5);
   }
 
-  @When("DB Route - get waypoint id for job id {string} and system id {string}")
-  public void getWaypointIdByJobId(String StringJobId, String expectedSystemId) {
+  @When("DB Route - get waypoint id for job id {string}")
+  public void getWaypointIdByJobId(String StringJobId) {
     final long jobId = Long.parseLong(resolveValue(StringJobId));
-    final String systemId = resolveValue(expectedSystemId);
     final JobWaypoint jobWaypoint = doWithRetry(() -> {
-      final JobWaypoint result = routeDbDao.getWaypointIdByJobId(jobId, systemId);
-      final String actualSystemId = result.getSystemId();
+      final JobWaypoint result = routeDbDao.getWaypointIdByJobId(jobId);
       if (result == null) {
         throw new NvTestRuntimeException("waypoint is not found for job id " + jobId);
       }
-      Assertions.assertThat(actualSystemId).as("system id doesnt match")
-          .isEqualToIgnoringCase(expectedSystemId);
       return result;
     }, "reading job waypoint from job id: " + jobId);
     put(KEY_WAYPOINT_ID, jobWaypoint.getWaypointId());
