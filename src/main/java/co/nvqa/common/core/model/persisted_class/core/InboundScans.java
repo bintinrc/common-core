@@ -1,5 +1,7 @@
 package co.nvqa.common.core.model.persisted_class.core;
 
+import co.nvqa.common.model.DataEntity;
+import java.util.Map;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -15,7 +17,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Entity
 @Table(name = "inbound_scans")
-public class InboundScans {
+public class InboundScans extends DataEntity<InboundScans> {
 
   @Id
   private Long id;
@@ -32,4 +34,7 @@ public class InboundScans {
   @Column(name = "scanned_by")
   private Long scannedBy;
 
+  public InboundScans(Map<String, ?> data) {
+    super(data);
+  }
 }

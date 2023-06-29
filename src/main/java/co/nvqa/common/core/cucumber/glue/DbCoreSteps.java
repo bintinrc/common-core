@@ -3,6 +3,7 @@ package co.nvqa.common.core.cucumber.glue;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.hibernate.CodCollectionDao;
 import co.nvqa.common.core.hibernate.CodInboundsDao;
+import co.nvqa.common.core.hibernate.InboundScansDao;
 import co.nvqa.common.core.hibernate.OrderDao;
 import co.nvqa.common.core.hibernate.OrderDetailsDao;
 import co.nvqa.common.core.hibernate.OrderJaroScoresV2Dao;
@@ -20,6 +21,7 @@ import co.nvqa.common.core.model.order.Order;
 import co.nvqa.common.core.model.order.Order.Transaction;
 import co.nvqa.common.core.model.persisted_class.core.CodCollections;
 import co.nvqa.common.core.model.persisted_class.core.CodInbounds;
+import co.nvqa.common.core.model.persisted_class.core.InboundScans;
 import co.nvqa.common.core.model.persisted_class.core.OrderDetails;
 import co.nvqa.common.core.model.persisted_class.core.OrderJaroScoresV2;
 import co.nvqa.common.core.model.persisted_class.core.OrderTags;
@@ -81,6 +83,8 @@ public class DbCoreSteps extends CoreStandardSteps {
   private RouteWaypointDao routeWaypointDao;
   @Inject
   private CodCollectionDao codCollectionDao;
+  @Inject
+  private InboundScansDao inboundScansDao;
 
   @Inject
   private OrderDao orderDao;
@@ -584,6 +588,19 @@ public class DbCoreSteps extends CoreStandardSteps {
           .as("List of cod_collections records for waypointId=%s", expected.getWaypointId())
           .anyMatch(expected::matchedTo);
     }, "verify cod_collections");
+  }
+
+  @And("DB Core - Operator verifies inbound_scans record:")
+  public void verifyInboundScans(Map<String, String> data) {
+    InboundScans expected = new InboundScans(resolveKeyValues(data));
+    doWithRetry(() -> {
+      var actual = inboundScansDao.findInboundScansByOrderId(expected.getOrderId());
+      Assertions.assertThat(actual)
+          .as("List of inbound_scans records for orderId=%s", expected.getOrderId())
+          .isNotEmpty()
+          .anyMatch(expected::matchedTo);
+      putInList(KEY_CORE_LIST_OF_INBOUND_SCANS, actual);
+    }, "Fetch InboundScans", 2000, 3);
   }
 
 }
