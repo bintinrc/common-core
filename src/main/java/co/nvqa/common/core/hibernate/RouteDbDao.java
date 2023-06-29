@@ -1,6 +1,6 @@
 package co.nvqa.common.core.hibernate;
 
-import co.nvqa.common.core.model.persisted_class.core.CoreRouteLogs;
+import co.nvqa.common.core.model.persisted_class.route.JobWaypoint;
 import co.nvqa.common.core.model.persisted_class.route.AreaVariation;
 import co.nvqa.common.core.model.persisted_class.route.Coverage;
 import co.nvqa.common.core.model.persisted_class.route.Keyword;
@@ -81,11 +81,6 @@ public class RouteDbDao extends DbBase {
     return CollectionUtils.isEmpty(result) ? null : result.get(0);
   }
 
-  public void softDeleteRoute(long routeId) {
-    String query = "UPDATE CoreRouteLogs SET deletedAt = NOW() WHERE legacyId = " + routeId;
-    saveOrUpdate(s -> s.createQuery(query));
-  }
-
   public void setWaypointsZoneId(long zoneId, List<Long> waypointIds) {
     String query = "UPDATE Waypoints SET routingZoneId = " + zoneId + " WHERE legacyId in ("
         + waypointIds.stream().map(Object::toString).collect(Collectors.joining(",")) + ")";
@@ -129,4 +124,15 @@ public class RouteDbDao extends DbBase {
     return CollectionUtils.isEmpty(result) ? null : result.get(0);
   }
 
+  public JobWaypoint getWaypointIdByJobId(Long jobId) {
+    List<JobWaypoint> results;
+    String query = "FROM JobWaypoint "
+        + "WHERE jobId = :jobId "
+        + "AND systemId = :systemId";
+    results = findAll(session ->
+        session.createQuery(query, JobWaypoint.class)
+            .setParameter("jobId", jobId)
+            .setParameter("systemId", StandardTestConstants.NV_SYSTEM_ID));
+    return results.get(0);
+  }
 }
