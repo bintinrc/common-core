@@ -2,11 +2,20 @@
 
 <hr>
 
-## [1.3.13-RC1] 2023-06-27
+## [1.3.13] 2023-06-30
 
 ### Added
 
+- API Route - add references to Route Group:
+- API Route - create route group:
 - DB Route - get waypoint id for job id {string}
+- DB Core - Operator verifies inbound_scans record:
+- DB Route - get waypoint id for job id {string}
+- @DeleteRouteGroupsV2
+
+### Deleted
+
+- DB Core - get waypoint id for job id {string}
 
 <hr>
 
