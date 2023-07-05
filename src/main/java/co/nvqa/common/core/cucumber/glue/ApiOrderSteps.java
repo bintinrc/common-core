@@ -139,8 +139,12 @@ public class ApiOrderSteps extends CoreStandardSteps {
   /**
    * API Core - Operator Update Delivery Order Details:
    *
-   * @param data <br/> <b>orderId</b>: 123456 <br/>
-   *             <br/> <b>request</b>: { "parcel_job": { "delivery_date": "2023-06-24", "delivery_timewindow": -1 }, "to": { "name": "sfksdjldsf", "email": "quix@ninjavan.co", "phone_number": "+6289517318260", "address": { "address1": "Jonas Street", "address2": "DKI Jakarta, Kota Jakarta Selatan, Kebayoran Lama", "postcode": "16514", "city": "Jakarta", "country": "ID", "district": "DKI Jakarta" } } } <br/>
+   * @param data <br/> <b>orderId</b>: 123456 <br/> <br/> <b>request</b>: { "parcel_job": {
+   *             "delivery_date": "2023-06-24", "delivery_timewindow": -1 }, "to": { "name":
+   *             "sfksdjldsf", "email": "quix@ninjavan.co", "phone_number": "+6289517318260",
+   *             "address": { "address1": "Jonas Street", "address2": "DKI Jakarta, Kota Jakarta
+   *             Selatan, Kebayoran Lama", "postcode": "16514", "city": "Jakarta", "country": "ID",
+   *             "district": "DKI Jakarta" } } } <br/>
    */
   @Given("API Core - Operator update delivery order details:")
   public void apiCoreOperatorUpdateDeliveryOrderDetails(Map<String, String> data) {
@@ -352,5 +356,20 @@ public class ApiOrderSteps extends CoreStandardSteps {
     final String mode = dataTable.get("mode");
     doWithRetry(() -> getOrderClient().editDeliveryVerificationRequired(trackingId, mode),
         "API Core - Update order delivery verification mode");
+  }
+
+  /**
+   * @param dataTable <br><b>orderId:</b>
+   *                  {KEY_LIST_OF_CREATED_ORDERS[1].id}<br><b>priorityLevel:</b>
+   *                  positive_integer_number<br>
+   */
+  @Given("API Core - Update priority level of an order:")
+  public void apiOperatorUpdatePriorityLevelOfAnOrderTo(Map<String, String> dataTable) {
+    final Map<String, String> dataTableAsMap = resolveKeyValues(dataTable);
+    final Long orderId = Long.parseLong(dataTableAsMap.get("orderId"));
+    final Long priorityLevel = Long.parseLong(dataTableAsMap.get("priorityLevel"));
+    doWithRetry(() -> {
+      getOrderClient().updatePriorityLevelOfTransaction(orderId, priorityLevel.intValue());
+    }, "API Core - Update priority level of an order");
   }
 }
