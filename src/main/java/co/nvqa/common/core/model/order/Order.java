@@ -128,8 +128,8 @@ public class Order extends DataEntity<Order> implements Serializable {
   private String trackingId;
   private List<Transaction> transactions;
   private String type;
-  @JsonIgnore
   private Date createdAt;
+  @JsonIgnore
   private String updatedAt; // 2017-11-21T09:30:52Z
   private Integer volume;
   private List<JsonNode> warehouseSweeps;
