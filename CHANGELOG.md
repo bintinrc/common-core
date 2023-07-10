@@ -2,6 +2,18 @@
 
 <hr>
 
+## [1.3.14] 2023-07-10
+
+### Added
+
+- API Core - Update priority level of an order:
+
+### Deleted
+
+- DB Core - get order id of incomplete orders for legacy shipper id {string}
+
+<hr>
+
 ## [1.3.13] 2023-06-30
 
 ### Added

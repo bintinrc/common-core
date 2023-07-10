@@ -86,11 +86,9 @@ public class OrderDao extends DbBase {
   }
 
   public List<Orders> getIncompleteOrderListByShipperId(Long shipperId) {
-    String query = "FROM Orders WHERE shipperId = :shipperId AND status != 'Completed'";
-    var results = findAll(session ->
+    String query = "FROM Orders WHERE shipperId = :shipperId AND status <> 'Completed' AND granularStatus <> 'Completed'";
+    return findAll(session ->
         session.createQuery(query, Orders.class)
             .setParameter("shipperId", shipperId));
-    return results;
   }
-
 }
