@@ -12,7 +12,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.common.collect.Iterables;
-import io.cucumber.java.mk_latn.No;
 import java.io.IOException;
 import java.io.Serializable;
 import java.time.LocalTime;
@@ -28,7 +27,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
-import org.checkerframework.checker.units.qual.Area;
 
 import static org.apache.commons.lang3.StringUtils.joinWith;
 import static org.apache.commons.lang3.StringUtils.normalizeSpace;
@@ -520,6 +518,50 @@ public class Order extends DataEntity<Order> implements Serializable {
 
     public Dimension(Map<String, ?> data) {
       super(data);
+    }
+
+    @Getter
+    public enum Size {
+      XSMALL("XSMALL", "XS", 5),
+      SMALL("SMALL", "S", 0),
+      MEDIUM("MEDIUM", "M", 1),
+      LARGE("LARGE", "L", 2),
+      EXTRALARGE("EXTRALARGE", "XL", 3),
+      XXLARGE("XXLARGE", "XXL", 4),
+      UNKNOWN("UNKNOWN", "UNKNOWN", -1);
+
+      private String regular;
+      private String shorter;
+      private int sizeId;
+
+      Size(String regular, String shorter, int sizeId) {
+        this.regular = regular;
+        this.shorter = shorter;
+        this.sizeId = sizeId;
+      }
+
+      public static Dimension.Size fromString(String input) {
+        for (Dimension.Size val : values()) {
+          if (val.getRegular().equalsIgnoreCase(input)) {
+            return val;
+          }
+
+          if (val.getShorter().equalsIgnoreCase(input)) {
+            return val;
+          }
+        }
+        return UNKNOWN;
+      }
+
+
+      public static Dimension.Size fromInt(int input) {
+        for (Dimension.Size val : values()) {
+          if (val.getSizeId() == input) {
+            return val;
+          }
+        }
+        return UNKNOWN;
+      }
     }
   }
 
