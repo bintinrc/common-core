@@ -16,6 +16,7 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.response.Response;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.inject.Inject;
@@ -371,5 +372,23 @@ public class ApiOrderSteps extends CoreStandardSteps {
     doWithRetry(() -> {
       getOrderClient().updatePriorityLevelOfTransaction(orderId, priorityLevel.intValue());
     }, "API Core - Update priority level of an order");
+  }
+
+  @Given("API Core -  Wait for following order state:")
+  public void apiOperatorWaitForOrderStatus(Map<String, String> dataTableRaw) {
+    final Map<String, String> dataTable = resolveKeyValues(dataTableRaw);
+    Order expectedState = new Order();
+    expectedState.fromMap(dataTable);
+    int timeout = Integer.parseInt(dataTable.getOrDefault("timeout", "30"));
+    Assertions.assertThat(getOrderClient().waitUntilOrderState(expectedState, timeout, 1000))
+        .as("Order " + expectedState.getTrackingId() + " didn't get expected state " + dataTable)
+        .isTrue();
+  }
+
+  @Given("API Core - Verifies order state:")
+  public void apiOperatorVerifiesOrderState(Map<String, String> dataTableRaw) {
+  Map<String, String> dataTable = new HashMap<>(dataTableRaw);
+  dataTable.put("timeout", "1");
+  apiOperatorWaitForOrderStatus(dataTable);
   }
 }
