@@ -235,11 +235,8 @@ public class DbCoreSteps extends CoreStandardSteps {
     RouteMonitoringData expected = new RouteMonitoringData(resolvedData);
 
     doWithRetry(() -> {
-      RouteMonitoringData actual = null;
-      if (expected.getWaypointId() != null) {
-        actual = routeMonitoringDataDao.getRouteMonitoringDataByWaypointId(
-            expected.getWaypointId());
-      }
+      RouteMonitoringData actual = routeMonitoringDataDao.getRouteMonitoringDataByWaypointId(
+          expected.getWaypointId());
       Assertions.assertThat(actual)
           .withFailMessage("route_monitoring_data record was not found: " + data).isNotNull();
       expected.compareWithActual(actual, resolvedData);
