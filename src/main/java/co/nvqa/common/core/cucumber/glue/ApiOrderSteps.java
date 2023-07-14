@@ -372,4 +372,10 @@ public class ApiOrderSteps extends CoreStandardSteps {
       getOrderClient().updatePriorityLevelOfTransaction(orderId, priorityLevel.intValue());
     }, "API Core - Update priority level of an order");
   }
+
+  @Given("API Core - wait for order state:")
+  public void waitForOrderState(Map<String, String> data) {
+    var expected = new Order(resolveKeyValues(data));
+    orderClient.waitUntilOrderState(expected, 5 * 60, 5000);
+  }
 }
