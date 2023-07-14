@@ -387,8 +387,14 @@ public class ApiOrderSteps extends CoreStandardSteps {
 
   @Given("API Core - Verifies order state:")
   public void apiOperatorVerifiesOrderState(Map<String, String> dataTableRaw) {
-  Map<String, String> dataTable = new HashMap<>(dataTableRaw);
-  dataTable.put("timeout", "1");
-  apiOperatorWaitForOrderStatus(dataTable);
+    Map<String, String> dataTable = new HashMap<>(dataTableRaw);
+    dataTable.put("timeout", "1");
+    apiOperatorWaitForOrderStatus(dataTable);
+  }
+
+  @Given("API Core - wait for order state:")
+  public void waitForOrderState(Map<String, String> data) {
+    var expected = new Order(resolveKeyValues(data));
+    orderClient.waitUntilOrderState(expected, 5 * 60, 5000);
   }
 }
