@@ -2,9 +2,9 @@ package co.nvqa.common.core.cucumber.glue;
 
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.hibernate.RouteDbDao;
-import co.nvqa.common.core.model.persisted_class.route.JobWaypoint;
 import co.nvqa.common.core.model.persisted_class.route.AreaVariation;
 import co.nvqa.common.core.model.persisted_class.route.Coverage;
+import co.nvqa.common.core.model.persisted_class.route.JobWaypoint;
 import co.nvqa.common.core.model.persisted_class.route.Keyword;
 import co.nvqa.common.core.model.persisted_class.route.RouteGroup;
 import co.nvqa.common.core.model.persisted_class.route.RouteGroupReferences;
@@ -32,6 +32,11 @@ public class DbRouteSteps extends CoreStandardSteps {
   @When("DB Route - verify route_groups_references record:")
   public void verifyRouteGroupsReference(Map<String, String> data) {
     RouteGroupReferences expected = new RouteGroupReferences(resolveKeyValues(data));
+
+    Assertions.assertThat(expected.getRouteGroupId())
+        .withFailMessage("routeGroupId should not be null")
+        .isNotNull();
+
     doWithRetry(() -> {
       List<RouteGroupReferences> actual = routeDbDao.getRouteGroupReferences(
           expected.getRouteGroupId());
@@ -43,6 +48,11 @@ public class DbRouteSteps extends CoreStandardSteps {
   public void verifyRouteGroups(Map<String, String> data) {
     Map<String, String> resolvedData = resolveKeyValues(data);
     RouteGroup expected = new RouteGroup(resolvedData);
+
+    Assertions.assertThat(expected.getId())
+        .withFailMessage("id should not be null")
+        .isNotNull();
+
     doWithRetry(() -> {
       RouteGroup actual = routeDbDao.getRouteGroup(expected.getId());
       Assertions.assertThat(actual)
@@ -56,12 +66,18 @@ public class DbRouteSteps extends CoreStandardSteps {
   public void verifyWaypoints(Map<String, String> data) {
     Map<String, String> resolvedData = resolveKeyValues(data);
     Waypoints expected = new Waypoints(resolvedData);
+
+    Assertions.assertThat(expected.getLegacyId())
+        .withFailMessage("waypoint legacyId should not be null")
+        .isNotNull();
+
     doWithRetry(() -> {
       Waypoints actual = routeDbDao.getWaypointsDetails(expected.getLegacyId());
       Assertions.assertThat(actual)
           .withFailMessage("waypoints record was not found: " + resolvedData)
           .isNotNull();
       expected.compareWithActual(actual, resolvedData);
+
       if (resolvedData.containsKey("seqNo")) {
         if (resolvedData.get("seqNo").equalsIgnoreCase("null")) {
           Assertions.assertThat(actual.getSeqNo())

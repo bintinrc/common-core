@@ -178,6 +178,10 @@ public class DbCoreSteps extends CoreStandardSteps {
     Map<String, String> resolvedData = resolveKeyValues(data);
     Waypoints expected = new Waypoints(resolvedData);
 
+    Assertions.assertThat(expected.getId())
+        .withFailMessage("waypoint id should not be null")
+        .isNotNull();
+
     doWithRetry(() -> {
       Waypoints actual = waypointsDao.getWaypointsDetails(expected.getId());
       Assertions.assertThat(actual)
