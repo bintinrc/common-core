@@ -9,6 +9,7 @@
 - API Core - Wait for following order state:
 - API Core - Verifies order state:
 - API Core - wait for order state:
+- API Core - Operator post Lazada 3PL using data below:
 
 <hr>
 
