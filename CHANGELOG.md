@@ -2,6 +2,16 @@
 
 <hr>
 
+## [1.3.15] 2023-07-17
+
+### Added
+
+- API Core - Wait for following order state:
+- API Core - Verifies order state:
+- API Core - wait for order state:
+
+<hr>
+
 ## [1.3.14] 2023-07-10
 
 ### Added
