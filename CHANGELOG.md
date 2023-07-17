@@ -7,6 +7,7 @@
 ### Added
 
 - API Core - Update priority level of an order:
+- API Core - Operator post Lazada 3PL using data below:
 
 ### Deleted
 
