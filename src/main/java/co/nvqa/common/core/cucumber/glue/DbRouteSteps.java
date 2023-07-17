@@ -34,7 +34,7 @@ public class DbRouteSteps extends CoreStandardSteps {
     RouteGroupReferences expected = new RouteGroupReferences(resolveKeyValues(data));
 
     Assertions.assertThat(expected.getRouteGroupId())
-        .withFailMessage("routeGroupId should not be null")
+        .as("routeGroupId should not be null")
         .isNotNull();
 
     doWithRetry(() -> {
@@ -50,13 +50,13 @@ public class DbRouteSteps extends CoreStandardSteps {
     RouteGroup expected = new RouteGroup(resolvedData);
 
     Assertions.assertThat(expected.getId())
-        .withFailMessage("id should not be null")
+        .as("id should not be null")
         .isNotNull();
 
     doWithRetry(() -> {
       RouteGroup actual = routeDbDao.getRouteGroup(expected.getId());
       Assertions.assertThat(actual)
-          .withFailMessage("Route group was not found: " + resolvedData)
+          .as("Route group was not found: " + resolvedData)
           .isNotNull();
       expected.compareWithActual(actual, resolvedData);
     }, "verify route_groups");
@@ -68,13 +68,13 @@ public class DbRouteSteps extends CoreStandardSteps {
     Waypoints expected = new Waypoints(resolvedData);
 
     Assertions.assertThat(expected.getLegacyId())
-        .withFailMessage("waypoint legacyId should not be null")
+        .as("waypoint legacyId should not be null")
         .isNotNull();
 
     doWithRetry(() -> {
       Waypoints actual = routeDbDao.getWaypointsDetails(expected.getLegacyId());
       Assertions.assertThat(actual)
-          .withFailMessage("waypoints record was not found: " + resolvedData)
+          .as("waypoints record was not found: " + resolvedData)
           .isNotNull();
       expected.compareWithActual(actual, resolvedData);
 
@@ -123,7 +123,7 @@ public class DbRouteSteps extends CoreStandardSteps {
       List<AreaVariation> actual = routeDbDao.getAreaVariations(expected.getArea());
       if (!actual.isEmpty()) {
         Assertions.assertThat(actual.stream().noneMatch(expected::matchedTo))
-            .withFailMessage("Unexpected route_qa_gl/sr_area_variations record found: " + expected)
+            .as("Unexpected route_qa_gl/sr_area_variations record found: " + expected)
             .isTrue();
       }
     }, "verify sr_area_variations");
@@ -147,7 +147,7 @@ public class DbRouteSteps extends CoreStandardSteps {
       List<Coverage> actual = routeDbDao.getCoverageByArea(expected.getArea());
       if (!actual.isEmpty()) {
         Assertions.assertThat(actual.stream().noneMatch(expected::matchedTo))
-            .withFailMessage("Unexpected route_qa_gl/sr_coverages record found: " + expected)
+            .as("Unexpected route_qa_gl/sr_coverages record found: " + expected)
             .isTrue();
       }
     }, "verify sr_coverages");
@@ -175,7 +175,7 @@ public class DbRouteSteps extends CoreStandardSteps {
     doWithRetry(() -> {
       RouteLogs actual = routeDbDao.getRouteLogs(expected.getLegacyId());
       Assertions.assertThat(actual)
-          .withFailMessage("Route logs was not found: " + resolvedData)
+          .as("Route logs was not found: " + resolvedData)
           .isNotNull();
       expected.compareWithActual(actual, resolvedData);
     }, f("verify route_logs records"), 10_000, 5);
@@ -186,7 +186,7 @@ public class DbRouteSteps extends CoreStandardSteps {
     doWithRetry(() -> {
       RouteLogs actual = routeDbDao.getRouteLogsByDriverId(Long.valueOf(resolveValue(driverId)));
       Assertions.assertThat(actual)
-          .withFailMessage("Route logs was not found")
+          .as("Route logs was not found")
           .isNotNull();
       putInList(KEY_LIST_OF_CREATED_ROUTES, actual);
     }, f("get route_logs record"), 10_000, 5);
