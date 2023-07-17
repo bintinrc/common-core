@@ -178,10 +178,14 @@ public class DbCoreSteps extends CoreStandardSteps {
     Map<String, String> resolvedData = resolveKeyValues(data);
     Waypoints expected = new Waypoints(resolvedData);
 
+    Assertions.assertThat(expected.getId())
+        .as("waypoint id should not be null")
+        .isNotNull();
+
     doWithRetry(() -> {
       Waypoints actual = waypointsDao.getWaypointsDetails(expected.getId());
       Assertions.assertThat(actual)
-          .withFailMessage("waypoints record was not found: " + resolvedData).isNotNull();
+          .as("waypoints record was not found: " + resolvedData).isNotNull();
       expected.compareWithActual(actual, resolvedData);
 
       if (resolvedData.containsKey("seqNo")) {
@@ -214,7 +218,7 @@ public class DbCoreSteps extends CoreStandardSteps {
             expected.getReservationId());
       }
       Assertions.assertThat(actual)
-          .withFailMessage("shipper_pickup_search record was not found: " + data).isNotNull();
+          .as("shipper_pickup_search record was not found: " + data).isNotNull();
       expected.compareWithActual(actual, resolvedData);
       if (resolvedData.containsKey("serviceTime")) {
         Assertions.assertThat(actual.getServiceEndTime())
@@ -235,13 +239,10 @@ public class DbCoreSteps extends CoreStandardSteps {
     RouteMonitoringData expected = new RouteMonitoringData(resolvedData);
 
     doWithRetry(() -> {
-      RouteMonitoringData actual = null;
-      if (expected.getWaypointId() != null) {
-        actual = routeMonitoringDataDao.getRouteMonitoringDataByWaypointId(
-            expected.getWaypointId());
-      }
+      RouteMonitoringData actual = routeMonitoringDataDao.getRouteMonitoringDataByWaypointId(
+          expected.getWaypointId());
       Assertions.assertThat(actual)
-          .withFailMessage("route_monitoring_data record was not found: " + data).isNotNull();
+          .as("route_monitoring_data record was not found: " + data).isNotNull();
       expected.compareWithActual(actual, resolvedData);
     }, "verify route_monitoring_data records", 10_000, 3);
   }
@@ -275,7 +276,7 @@ public class DbCoreSteps extends CoreStandardSteps {
     doWithRetry(() -> {
       Transactions actual = transactionsDao.getSingleTransaction(expected.getId());
       Assertions.assertThat(actual)
-          .withFailMessage("transactions record was not found: " + resolvedData).isNotNull();
+          .as("transactions record was not found: " + resolvedData).isNotNull();
       expected.compareWithActual(actual, resolvedData);
       if (data.containsKey("distributionPointId") && data.get("distributionPointId")
           .equalsIgnoreCase("null")) {
@@ -410,7 +411,7 @@ public class DbCoreSteps extends CoreStandardSteps {
       OrderJaroScoresV2 actual = orderJaroScoresV2Dao.getSingleOjs(expected.getWaypointId(),
           expected.getArchived());
       Assertions.assertThat(actual)
-          .withFailMessage("order_jaro_scores_v2 record was not found: " + resolvedData)
+          .as("order_jaro_scores_v2 record was not found: " + resolvedData)
           .isNotNull();
       expected.compareWithActual(actual, resolvedData);
     }, "verify order_jaro_scores_v2 records", 10_000, 3);
@@ -453,7 +454,7 @@ public class DbCoreSteps extends CoreStandardSteps {
         actual = outboundScansDao.getOutboundScansByOrderId(expected.getOrderId());
       }
       Assertions.assertThat(actual)
-          .withFailMessage("outbound_scans record was not found: " + dataTableRaw).isNotNull();
+          .as("outbound_scans record was not found: " + dataTableRaw).isNotNull();
       expected.compareWithActual(actual, resolvedData);
     }, "Verify record in outbound_scans table", 2000, 10);
   }
@@ -468,7 +469,7 @@ public class DbCoreSteps extends CoreStandardSteps {
         actual = codInboundsDao.getCodInboundsByRouteId(expected.getRouteId());
       }
       Assertions.assertThat(actual)
-          .withFailMessage("cod_inbounds record was not found: " + dataTableRaw).isNotNull();
+          .as("cod_inbounds record was not found: " + dataTableRaw).isNotNull();
       expected.compareWithActual(actual, resolvedData);
     }, "Verify records in cod_inbounds table");
   }
@@ -483,7 +484,7 @@ public class DbCoreSteps extends CoreStandardSteps {
         actual = codInboundsDao.getDeletedCodInboundsByRouteId(expected.getRouteId());
       }
       Assertions.assertThat(actual.getDeletedAt())
-          .withFailMessage("cod_inbounds record was not deleted: " + dataTableRaw)
+          .as("cod_inbounds record was not deleted: " + dataTableRaw)
           .isNotNull();
     }, "Operator verify the COD for created route is soft deleted");
   }
@@ -558,7 +559,7 @@ public class DbCoreSteps extends CoreStandardSteps {
               List<RouteWaypoint> actual = routeWaypointDao.getRouteWaypointsByWaypointId(
                   Long.parseLong(e));
               Assertions.assertThat(actual)
-                  .withFailMessage("Unexpected route_waypoint records were found: %s", actual)
+                  .as("Unexpected route_waypoint records were found: %s", actual)
                   .isNullOrEmpty();
             })
         , "verify route_waypoint records", 10_000, 3);
@@ -570,7 +571,7 @@ public class DbCoreSteps extends CoreStandardSteps {
     doWithRetry(() -> {
       Orders orders = orderDao.getSingleOrderDetailsByTrackingId(resolvedTrackingNumber);
       Assertions.assertThat(orders)
-          .withFailMessage("Unexpected order not found with tracking number: %s", trackingNumber)
+          .as("Unexpected order not found with tracking number: %s", trackingNumber)
           .isNotNull();
       put(KEY_LIST_OF_CREATED_ORDERS, orders);
     }, "get order record", 10_000, 3);

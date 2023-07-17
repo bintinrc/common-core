@@ -47,7 +47,11 @@ public class OrderDao extends DbBase {
         session.createQuery(query, Orders.class)
             .setParameter("orderId", orderId));
     Orders order = CollectionUtils.isEmpty(result) ? null : result.get(0);
-    return JsonUtils.fromJsonCamelCase(order.getData(), Dimension.class);
+    if (order != null) {
+      return JsonUtils.fromJsonCamelCase(order.getData(), Dimension.class);
+    } else {
+      throw new NvTestRuntimeException("order record is not found for order " + orderId);
+    }
   }
 
   public Dimension getOrderDimensions(Long orderId) {
@@ -56,7 +60,11 @@ public class OrderDao extends DbBase {
         session.createQuery(query, Orders.class)
             .setParameter("orderId", orderId));
     Orders order = CollectionUtils.isEmpty(result) ? null : result.get(0);
-    return JsonUtils.fromJsonSnakeCase(order.getDimensions(), Dimension.class);
+    if (order != null) {
+      return JsonUtils.fromJsonSnakeCase(order.getDimensions(), Dimension.class);
+    } else {
+      throw new NvTestRuntimeException("order record is not found for order " + orderId);
+    }
   }
 
   public Dimension getOrderManualDimensions(Long orderId) {
