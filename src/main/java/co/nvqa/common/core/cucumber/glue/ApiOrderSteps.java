@@ -388,7 +388,7 @@ public class ApiOrderSteps extends CoreStandardSteps {
     dataTableAsMap = resolveKeyValues(dataTableAsMap);
     String trackingId = dataTableAsMap.get("trackingId");
     String comment = dataTableAsMap.get("comment");
-    put(KEY_LAZADA_3PL_COMMENT, comment);
+    put(KEY_CORE_LAZADA_3PL_COMMENT, comment);
     doWithRetry(() -> {
       getLazada3PLClient().postLazada3PL(
           Lazada3PL.builder().comment(comment).trackingId(trackingId).build());
