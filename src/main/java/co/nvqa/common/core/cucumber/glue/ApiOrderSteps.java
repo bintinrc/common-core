@@ -1,8 +1,10 @@
 package co.nvqa.common.core.cucumber.glue;
 
+import co.nvqa.common.core.client.Lazada3PLClient;
 import co.nvqa.common.core.client.OrderClient;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.model.EditDeliveryOrderRequest;
+import co.nvqa.common.core.model.Lazada3PL;
 import co.nvqa.common.core.model.order.Order;
 import co.nvqa.common.core.model.order.Order.Dimension;
 import co.nvqa.common.core.model.order.RescheduleOrderRequest;
@@ -11,11 +13,13 @@ import co.nvqa.common.core.model.order.RtsOrderRequest;
 import co.nvqa.common.utils.JsonUtils;
 import co.nvqa.common.utils.NvTestRuntimeException;
 import io.cucumber.guice.ScenarioScoped;
+import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.response.Response;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.inject.Inject;
@@ -34,6 +38,9 @@ public class ApiOrderSteps extends CoreStandardSteps {
   @Inject
   @Getter
   private OrderClient orderClient;
+  @Inject
+  @Getter
+  private Lazada3PLClient lazada3PLClient;
 
   @Override
   public void init() {
@@ -371,5 +378,45 @@ public class ApiOrderSteps extends CoreStandardSteps {
     doWithRetry(() -> {
       getOrderClient().updatePriorityLevelOfTransaction(orderId, priorityLevel.intValue());
     }, "API Core - Update priority level of an order");
+  }
+
+  /**
+   * @param dataTableAsMap <br><b>trackingId:</b>
+   *                     {KEY_LIST_OF_CREATED_TRACKING_IDS[1]}<br><b>comment:</b> test comment
+   */
+  @And("API Core - Operator post Lazada 3PL using data below:")
+  public void apiCoreOperatorPostLazada3PL(Map<String, String> dataTableAsMap) {
+    dataTableAsMap = resolveKeyValues(dataTableAsMap);
+    String trackingId = dataTableAsMap.get("trackingId");
+    String comment = dataTableAsMap.get("comment");
+    put(KEY_CORE_LAZADA_3PL_COMMENT, comment);
+    doWithRetry(() -> {
+      getLazada3PLClient().postLazada3PL(
+          Lazada3PL.builder().comment(comment).trackingId(trackingId).build());
+    }, "API Core - Operator post Lazada 3PL");
+  }
+
+  @Given("API Core -  Wait for following order state:")
+  public void apiOperatorWaitForOrderStatus(Map<String, String> dataTableRaw) {
+    final Map<String, String> dataTable = resolveKeyValues(dataTableRaw);
+    Order expectedState = new Order();
+    expectedState.fromMap(dataTable);
+    int timeout = Integer.parseInt(dataTable.getOrDefault("timeout", "30"));
+    Assertions.assertThat(getOrderClient().waitUntilOrderState(expectedState, timeout, 1000))
+        .as("Order " + expectedState.getTrackingId() + " didn't get expected state " + dataTable)
+        .isTrue();
+  }
+
+  @Given("API Core - Verifies order state:")
+  public void apiOperatorVerifiesOrderState(Map<String, String> dataTableRaw) {
+    Map<String, String> dataTable = new HashMap<>(dataTableRaw);
+    dataTable.put("timeout", "1");
+    apiOperatorWaitForOrderStatus(dataTable);
+  }
+
+  @Given("API Core - wait for order state:")
+  public void waitForOrderState(Map<String, String> data) {
+    var expected = new Order(resolveKeyValues(data));
+    orderClient.waitUntilOrderState(expected, 5 * 60, 5000);
   }
 }
