@@ -379,13 +379,13 @@ public class ApiOrderSteps extends CoreStandardSteps {
       getOrderClient().updatePriorityLevelOfTransaction(orderId, priorityLevel.intValue());
     }, "API Core - Update priority level of an order");
   }
-  
+
   /**
    * @param dataTableAsMap <br><b>trackingId:</b>
    *                     {KEY_LIST_OF_CREATED_TRACKING_IDS[1]}<br><b>comment:</b> test comment
    */
   @And("API Core - Operator post Lazada 3PL using data below:")
-  public void apiCoreOpratorPostLazada3PL(Map<String, String> dataTableAsMap) {
+  public void apiCoreOperatorPostLazada3PL(Map<String, String> dataTableAsMap) {
     dataTableAsMap = resolveKeyValues(dataTableAsMap);
     String trackingId = dataTableAsMap.get("trackingId");
     String comment = dataTableAsMap.get("comment");
