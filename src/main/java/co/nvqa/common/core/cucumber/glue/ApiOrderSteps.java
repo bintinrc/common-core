@@ -38,7 +38,6 @@ public class ApiOrderSteps extends CoreStandardSteps {
   @Inject
   @Getter
   private OrderClient orderClient;
-
   @Inject
   @Getter
   private Lazada3PLClient lazada3PLClient;
@@ -381,6 +380,22 @@ public class ApiOrderSteps extends CoreStandardSteps {
     }, "API Core - Update priority level of an order");
   }
 
+  /**
+   * @param dataTableAsMap <br><b>trackingId:</b>
+   *                     {KEY_LIST_OF_CREATED_TRACKING_IDS[1]}<br><b>comment:</b> test comment
+   */
+  @And("API Core - Operator post Lazada 3PL using data below:")
+  public void apiCoreOperatorPostLazada3PL(Map<String, String> dataTableAsMap) {
+    dataTableAsMap = resolveKeyValues(dataTableAsMap);
+    String trackingId = dataTableAsMap.get("trackingId");
+    String comment = dataTableAsMap.get("comment");
+    put(KEY_CORE_LAZADA_3PL_COMMENT, comment);
+    doWithRetry(() -> {
+      getLazada3PLClient().postLazada3PL(
+          Lazada3PL.builder().comment(comment).trackingId(trackingId).build());
+    }, "API Core - Operator post Lazada 3PL");
+  }
+
   @Given("API Core -  Wait for following order state:")
   public void apiOperatorWaitForOrderStatus(Map<String, String> dataTableRaw) {
     final Map<String, String> dataTable = resolveKeyValues(dataTableRaw);
@@ -403,21 +418,5 @@ public class ApiOrderSteps extends CoreStandardSteps {
   public void waitForOrderState(Map<String, String> data) {
     var expected = new Order(resolveKeyValues(data));
     orderClient.waitUntilOrderState(expected, 5 * 60, 5000);
-  }
-
-  /**
-   * @param dataTableAsMap <br><b>trackingId:</b>
-   *                       {KEY_LIST_OF_CREATED_TRACKING_IDS[1]}<br><b>comment:</b> test comment
-   */
-  @And("API Core - Operator post Lazada 3PL using data below:")
-  public void apiCoreOpratorPostLazada3PL(Map<String, String> dataTableAsMap) {
-    dataTableAsMap = resolveKeyValues(dataTableAsMap);
-    String trackingId = dataTableAsMap.get("trackingId");
-    String comment = dataTableAsMap.get("comment");
-    put(KEY_CORE_LAZADA_3PL_COMMENT, comment);
-    doWithRetry(() -> {
-      getLazada3PLClient().postLazada3PL(
-          Lazada3PL.builder().comment(comment).trackingId(trackingId).build());
-    }, "API Core - Operator post Lazada 3PL");
   }
 }
