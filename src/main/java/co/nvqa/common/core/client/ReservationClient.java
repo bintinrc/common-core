@@ -156,4 +156,14 @@ public class ReservationClient extends SimpleApiClient {
     Response response = doPost("Operator Portal - Update Reservation", requestSpecification, url);
     response.then().assertThat().statusCode(HttpConstants.RESPONSE_200_SUCCESS);
   }
+  public void successReservation(long reservationId) {
+    String url = "/reservation/2.0/reservations/{reservationId}/update-status";
+
+    RequestSpecification requestSpecification = createAuthenticatedRequest()
+            .pathParam("reservationId", reservationId)
+            .body("{\"status_value\": 1}");
+
+    Response response = doPost("Operator Portal - Update Reservation", requestSpecification, url);
+    response.then().assertThat().statusCode(HttpConstants.RESPONSE_200_SUCCESS);
+  }
 }
