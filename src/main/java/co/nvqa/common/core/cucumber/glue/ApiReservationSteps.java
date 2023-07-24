@@ -170,7 +170,7 @@ public class ApiReservationSteps extends CoreStandardSteps {
     final long reservationId = Long.parseLong(resolveValue(id));
     doWithRetry(
             () -> getReservationClient().successReservation(reservationId),
-            "cancel reservation");
+            "Success Reservation");
   }
 
 }
