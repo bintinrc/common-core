@@ -382,7 +382,7 @@ public class ApiOrderSteps extends CoreStandardSteps {
 
   /**
    * @param dataTableAsMap <br><b>trackingId:</b>
-   *                     {KEY_LIST_OF_CREATED_TRACKING_IDS[1]}<br><b>comment:</b> test comment
+   *                       {KEY_LIST_OF_CREATED_TRACKING_IDS[1]}<br><b>comment:</b> test comment
    */
   @And("API Core - Operator post Lazada 3PL using data below:")
   public void apiCoreOperatorPostLazada3PL(Map<String, String> dataTableAsMap) {
@@ -418,5 +418,11 @@ public class ApiOrderSteps extends CoreStandardSteps {
   public void waitForOrderState(Map<String, String> data) {
     var expected = new Order(resolveKeyValues(data));
     orderClient.waitUntilOrderState(expected, 5 * 60, 5000);
+  }
+
+  @Given("API Core - Operator delete order with order id {string}")
+  public void apiDeleteOrderWithOrderId(String orderIdStr) {
+    doWithRetry(() -> orderClient.deleteOrder(Long.parseLong(resolveValue(orderIdStr))),
+        "API Core - Operator delete order with order id");
   }
 }
