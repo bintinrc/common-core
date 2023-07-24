@@ -165,12 +165,22 @@ public class ApiReservationSteps extends CoreStandardSteps {
         () -> getReservationClient().cancelReservation(reservationId),
         "cancel reservation");
   }
+
   @Given("API Core - Operator success reservation for id {string}")
   public void apiOperatorsuccessReservationUsingDataBelow(String id) {
     final long reservationId = Long.parseLong(resolveValue(id));
     doWithRetry(
-            () -> getReservationClient().successReservation(reservationId),
-            "Success Reservation");
+        () -> getReservationClient().successReservation(reservationId),
+        "Success Reservation");
+  }
+
+  @Given("API Core - Operator update reservation using data below:")
+  public void apiOperatorUpdateReservationUsingDataBelow(Map<String, String> dataTableAsMap) {
+    long reservationId = Long.parseLong(resolveValue(dataTableAsMap.get("reservationId")));
+    long statusValue = Long.parseLong(resolveValue(dataTableAsMap.get("statusValue")));
+    doWithRetry(
+        () -> getReservationClient().updateReservation(reservationId, statusValue),
+        "update Reservation");
   }
 
 }
