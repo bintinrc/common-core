@@ -162,7 +162,7 @@ public class ApiReservationSteps extends CoreStandardSteps {
   public void apiOperatorCreateV2ReservationUsingDataBelow(String id) {
     final long reservationId = Long.parseLong(resolveValue(id));
     doWithRetry(
-        () -> getReservationClient().cancelReservation(reservationId),
+        () -> getReservationClient().updateReservation(reservationId,4),
         "cancel reservation");
   }
 
@@ -170,7 +170,7 @@ public class ApiReservationSteps extends CoreStandardSteps {
   public void apiOperatorsuccessReservationUsingDataBelow(String id) {
     final long reservationId = Long.parseLong(resolveValue(id));
     doWithRetry(
-        () -> getReservationClient().successReservation(reservationId),
+        () -> getReservationClient().updateReservation(reservationId,1),
         "Success Reservation");
   }
 
