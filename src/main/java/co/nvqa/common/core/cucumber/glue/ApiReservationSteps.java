@@ -174,6 +174,16 @@ public class ApiReservationSteps extends CoreStandardSteps {
         "Success Reservation");
   }
 
+  /**
+   * Sample:<p>
+   * <p>
+   * API Core - Operator update reservation using data below:<p> |  reservationId |
+   * {KEY_LIST_OF_CREATED_RESERVATIONS[1].id} |<p> | statusValue | 4/1                  |<p>
+   * <p>
+   * <p>
+   *
+   * @param dataTableAsMap Map of data from feature file.
+   */
   @Given("API Core - Operator update reservation using data below:")
   public void apiOperatorUpdateReservationUsingDataBelow(Map<String, String> dataTableAsMap) {
     long reservationId = Long.parseLong(resolveValue(dataTableAsMap.get("reservationId")));
