@@ -77,7 +77,7 @@ public class HookSteps extends CoreStandardSteps {
     if (!Objects.isNull(reservations) && !reservations.isEmpty()) {
       reservations.forEach(r -> {
         try {
-          getReservationClient().updateReservation(r.getId(),4);
+          getReservationClient().updateReservation(r.getId(), 4);
           LOGGER.debug("Reservation ID = {} cancelled successfully", r.getId());
         } catch (Throwable t) {
           LOGGER.warn("error to cancel reservation: " + t.getMessage());
@@ -88,7 +88,7 @@ public class HookSteps extends CoreStandardSteps {
     if (!Objects.isNull(reservationResponses) && !reservationResponses.isEmpty()) {
       reservationResponses.forEach(r -> {
         try {
-          getReservationClient().cancelReservation(r.getId());
+          getReservationClient().updateReservation(r.getId(), 4);
           LOGGER.debug("Reservation ID = {} cancelled successfully", r.getId());
         } catch (Throwable t) {
           LOGGER.warn("error to cancel reservation: " + t.getMessage());
