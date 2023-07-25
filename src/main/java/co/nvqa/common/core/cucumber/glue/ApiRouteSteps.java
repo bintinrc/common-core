@@ -586,11 +586,10 @@ public class ApiRouteSteps extends CoreStandardSteps {
   @And("API Route - Operator create new coverage:")
   public void createNewCoverage(Map<String, String> data) {
     CreateCoverageRequest request = new CreateCoverageRequest(resolveKeyValues(data));
-    CreateCoverageResponse response = getRouteClient().createCoverage(request);
-    doWithRetry(
-        () -> getRouteClient().createCoverage(request),
-        "create new coverage");
-    putInList(KEY_LIST_OF_COVERAGE, response.getData());
+    doWithRetry(() -> {
+      final CreateCoverageResponse response = getRouteClient().createCoverage(request);
+      putInList(KEY_LIST_OF_COVERAGE, response.getData());
+    }, "Create new coverage");
   }
 
   /**
