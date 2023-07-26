@@ -228,11 +228,9 @@ public class DbRouteSteps extends CoreStandardSteps {
     Keyword expected = new Keyword(resolveKeyValues(data));
     doWithRetry(() -> {
       List<Keyword> actual = routeDbDao.getKeywords(expected.getCoverageId());
-      if (CollectionUtils.isNotEmpty(actual)) {
         Assertions.assertThat(actual.stream().noneMatch(expected::matchedTo))
             .as("Keyword record was found: ", expected)
             .isTrue();
-      }
     }, "verify sr_keywords");
   }
 
