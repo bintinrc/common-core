@@ -2,6 +2,7 @@ package co.nvqa.common.core.cucumber.glue;
 
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.hibernate.RouteDbDao;
+import co.nvqa.common.core.model.coverage.CreateCoverageResponse.Data;
 import co.nvqa.common.core.model.persisted_class.route.AreaVariation;
 import co.nvqa.common.core.model.persisted_class.route.Coverage;
 import co.nvqa.common.core.model.persisted_class.route.JobWaypoint;
@@ -18,6 +19,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import javax.inject.Inject;
+import org.apache.commons.collections.CollectionUtils;
 import org.assertj.core.api.Assertions;
 
 public class DbRouteSteps extends CoreStandardSteps {
@@ -203,5 +205,39 @@ public class DbRouteSteps extends CoreStandardSteps {
       return result;
     }, "reading job waypoint from job id: " + jobId);
     put(KEY_WAYPOINT_ID, jobWaypoint.getWaypointId());
+  }
+
+  @When("DB Route - verifies that route_qa_gl.sr_keywords record is created:")
+  public void verifyKeywords(Map<String, String> data) {
+    Keyword expected = new Keyword(resolveKeyValues(data));
+    doWithRetry(() -> {
+      List<Keyword> actual = routeDbDao.getKeywords(expected.getCoverageId());
+      Assertions.assertThat(actual).as("List of found keywords").isNotEmpty();
+      actual.stream().filter(expected::matchedTo).findFirst()
+          .orElseThrow(() -> new AssertionError("Keywords was not found: " + expected));
+    }, f("verify sr_keywords records"), 10_000, 5);
+  }
+
+  @Then("DB Route - verifies that route_qa_gl.sr_keywords multiple records are created:")
+  public void verifyKeywords(List<Map<String, String>> data) {
+    data.forEach(this::verifyKeywords);
+  }
+
+  @Then("DB Route - verifies that route_qa_gl.sr_keywords record was deleted:")
+  public void verifyKeywordDeleted(Map<String, String> data) {
+    Keyword expected = new Keyword(resolveKeyValues(data));
+    doWithRetry(() -> {
+      List<Keyword> actual = routeDbDao.getKeywords(expected.getCoverageId());
+      if (CollectionUtils.isNotEmpty(actual)) {
+        Assertions.assertThat(actual.stream().noneMatch(expected::matchedTo))
+            .as("Keyword record was found: ", expected)
+            .isTrue();
+      }
+    }, "verify sr_keywords");
+  }
+
+  @Then("DB Route - verifies that route_qa_gl.sr_keywords multiple records were deleted:")
+  public void verifyKeywordDeleted(List<Map<String, String>> data) {
+    data.forEach(this::verifyKeywordDeleted);
   }
 }
