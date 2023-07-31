@@ -6,7 +6,7 @@
 
 ### Added
 
-- API Core - Operator bulk force success all orders with cod collected {string}
+- API Core - Operator bulk force success below orders with cod collected {string}:
 - API Core - Operator force success waypoint with cod collected as {string} using route manifest:
 
 <hr>
