@@ -2,6 +2,15 @@
 
 <hr>
 
+## [1.3.16] 2023-07-31
+
+### Added
+
+- API Core - Operator bulk force success all orders with cod collected {string}
+- API Core - Operator force success waypoint with cod collected as {string} using route manifest:
+
+<hr>
+
 ## [1.3.15] 2023-07-17
 
 ### Added

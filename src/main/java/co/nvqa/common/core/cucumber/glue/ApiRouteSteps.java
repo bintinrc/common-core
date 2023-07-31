@@ -30,6 +30,8 @@ import io.cucumber.java.en.When;
 import io.restassured.response.Response;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -545,6 +547,36 @@ public class ApiRouteSteps extends CoreStandardSteps {
     doWithRetry(
         () -> getRouteClient().forceSuccessWaypoint(routeId, waypointId),
         "force success route manifest");
+  }
+
+  /**
+   * Sample:<p>
+   * <p>
+   * API Core - Operator force success waypoint with cod collected as {string} using route manifest
+   * |routeId    | {KEY_LIST_OF_CREATED_ROUTES[1].id}                                     |
+   * |waypointId |{KEY_CORE_LIST_OF_RESERVATIONS_DB[1].waypointId}                        |
+   * |orderIds   | {KEY_LIST_OF_CREATED_ORDERS[1].id},{KEY_LIST_OF_CREATED_ORDERS[2].id} |
+   */
+  @Given("API Core - Operator force success waypoint with cod collected as {string} using route manifest:")
+  public void apiOperatorForceSuccessRouteManifest(String codCollected,
+      Map<String, String> dataTableAsMap) {
+    final Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
+    final long routeId = Long.parseLong(resolvedDataTable.get("routeId"));
+    final long waypointId = Long.parseLong(resolvedDataTable.get("waypointId"));
+    final List<Long> orderIds = Arrays.stream(resolvedDataTable.get("orderIds").split(","))
+        .map(Long::parseLong).collect(Collectors.toCollection(ArrayList::new));
+    ;
+    doWithRetry(
+        () -> {
+          if (Boolean.parseBoolean(codCollected)) {
+            getRouteClient().forceSuccessWaypointWithCodCollected(routeId, waypointId, orderIds);
+
+          } else {
+            List<Long> emptyOrderId = new ArrayList<>();
+            getRouteClient().forceSuccessWaypointWithCodCollected(routeId, waypointId,
+                emptyOrderId);
+          }
+        }, "force success route manifest");
   }
 
   /**

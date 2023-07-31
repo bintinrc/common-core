@@ -5,6 +5,7 @@ import co.nvqa.common.core.client.OrderClient;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.model.EditDeliveryOrderRequest;
 import co.nvqa.common.core.model.Lazada3PL;
+import co.nvqa.common.core.model.order.BulkForceSuccessOrderRequest;
 import co.nvqa.common.core.model.order.Order;
 import co.nvqa.common.core.model.order.Order.Dimension;
 import co.nvqa.common.core.model.order.RescheduleOrderRequest;
@@ -18,6 +19,7 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.response.Response;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -188,6 +190,25 @@ public class ApiOrderSteps extends CoreStandardSteps {
     final boolean codCollected = Boolean.parseBoolean(codCollectedString);
     doWithRetry(
         () -> getOrderClient().forceSuccess(orderId, codCollected), "Force success", 3000, 10);
+  }
+
+  /**
+   * API Core - Operator bulk force success all orders with cod collected "false"
+   *
+   * @param codCollected example: false
+   */
+  @When("API Core - Operator bulk force success all orders with cod collected {string}")
+  public void apiOperatorBulkForceSuccessAllOrders(String codCollected) {
+    List<Order> createdOrders = get(KEY_LIST_OF_CREATED_ORDERS);
+    List<BulkForceSuccessOrderRequest> request = new ArrayList<>();
+    createdOrders.stream().distinct().forEach(e -> {
+      BulkForceSuccessOrderRequest forceSuccessRequest = new BulkForceSuccessOrderRequest();
+      forceSuccessRequest.setOrderId(e.getId());
+      forceSuccessRequest.setIsCodCollected(Boolean.valueOf(codCollected));
+      forceSuccessRequest.setReason("QA AUTO TEST BULK FORCE SUCCESS");
+      request.add(forceSuccessRequest);
+    });
+    getOrderClient().bulkForceSuccess(request);
   }
 
   /**
