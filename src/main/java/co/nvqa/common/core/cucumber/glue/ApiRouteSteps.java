@@ -614,6 +614,13 @@ public class ApiRouteSteps extends CoreStandardSteps {
         "run fm routing cronjob");
   }
 
+  @Given("API Route - Operator run FM PAJ auto route cron job for date {string}")
+  public void runFmPajRoutingCronJob(String date) {
+    doWithRetry(
+        () -> getRouteClient().runFmPajAutoRouteCronJob(date),
+        "run fm paj routing cronjob");
+  }
+
   @And("API Route - Operator create new coverage:")
   public void createNewCoverage(Map<String, String> data) {
     CreateCoverageRequest request = new CreateCoverageRequest(resolveKeyValues(data));
