@@ -18,6 +18,7 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.response.Response;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -382,7 +383,7 @@ public class ApiOrderSteps extends CoreStandardSteps {
 
   /**
    * @param dataTableAsMap <br><b>trackingId:</b>
-   *                     {KEY_LIST_OF_CREATED_TRACKING_IDS[1]}<br><b>comment:</b> test comment
+   *                       {KEY_LIST_OF_CREATED_TRACKING_IDS[1]}<br><b>comment:</b> test comment
    */
   @And("API Core - Operator post Lazada 3PL using data below:")
   public void apiCoreOperatorPostLazada3PL(Map<String, String> dataTableAsMap) {
@@ -418,5 +419,31 @@ public class ApiOrderSteps extends CoreStandardSteps {
   public void waitForOrderState(Map<String, String> data) {
     var expected = new Order(resolveKeyValues(data));
     orderClient.waitUntilOrderState(expected, 5 * 60, 5000);
+  }
+
+  @Given("API Core - Operator delete order with order id {string}")
+  public void apiDeleteOrderWithOrderId(String orderIdStr) {
+    doWithRetry(() -> orderClient.deleteOrder(Long.parseLong(resolveValue(orderIdStr))),
+        "API Core - Operator delete order with order id");
+  }
+
+
+  /**
+   * @param dataTable <br><b>orderId:</b>
+   *                  KEY_LIST_OF_CREATED_ORDERS[1].id<br><b>tagId:</b> the id of the tag to be
+   *                  deleted<br>
+   */
+  @Given("API Core - Operator delete tag from order:")
+  public void apiDeleteTagFromOrder(Map<String, String> dataTable) {
+    dataTable = resolveKeyValues(dataTable);
+    Long orderId = Long.valueOf(dataTable.get("orderId"));
+    Integer tagId = Integer.valueOf(dataTable.get("tagId"));
+    List<Integer> tagIdList = new ArrayList<>();
+    tagIdList.add(tagId);
+    Map<String, Object> payLoad = new HashMap<>();
+    payLoad.put("order_id", orderId);
+    payLoad.put("tags", tagIdList);
+    doWithRetry(() -> orderClient.deleteTagFromOrder(payLoad),
+        "API Core - Operator delete tag from order:");
   }
 }

@@ -5,6 +5,7 @@ import co.nvqa.common.core.hibernate.CodCollectionDao;
 import co.nvqa.common.core.hibernate.CodInboundsDao;
 import co.nvqa.common.core.hibernate.InboundScansDao;
 import co.nvqa.common.core.hibernate.OrderDao;
+import co.nvqa.common.core.hibernate.OrderDeliveryVerificationsDao;
 import co.nvqa.common.core.hibernate.OrderDetailsDao;
 import co.nvqa.common.core.hibernate.OrderJaroScoresV2Dao;
 import co.nvqa.common.core.hibernate.OrderTagsDao;
@@ -22,6 +23,7 @@ import co.nvqa.common.core.model.order.Order.Transaction;
 import co.nvqa.common.core.model.persisted_class.core.CodCollections;
 import co.nvqa.common.core.model.persisted_class.core.CodInbounds;
 import co.nvqa.common.core.model.persisted_class.core.InboundScans;
+import co.nvqa.common.core.model.persisted_class.core.OrderDeliveryVerifications;
 import co.nvqa.common.core.model.persisted_class.core.OrderDetails;
 import co.nvqa.common.core.model.persisted_class.core.OrderJaroScoresV2;
 import co.nvqa.common.core.model.persisted_class.core.OrderTags;
@@ -37,6 +39,7 @@ import co.nvqa.common.core.model.persisted_class.core.WarehouseSweeps;
 import co.nvqa.common.core.model.persisted_class.core.Waypoints;
 import co.nvqa.common.model.DataEntity;
 import co.nvqa.common.utils.NvTestRuntimeException;
+import io.cucumber.java.bs.I;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -85,6 +88,8 @@ public class DbCoreSteps extends CoreStandardSteps {
   private CodCollectionDao codCollectionDao;
   @Inject
   private InboundScansDao inboundScansDao;
+  @Inject
+  private OrderDeliveryVerificationsDao orderDeliveryVerificationsDao;
 
   @Inject
   private OrderDao orderDao;
@@ -604,4 +609,42 @@ public class DbCoreSteps extends CoreStandardSteps {
     }, "Fetch InboundScans", 2000, 3);
   }
 
+  @And("DB Core - verify orders records are hard-deleted in transactions table:")
+  public void verifyTransactionsAreHardDeleted(List<String> data) {
+    List<String> resolvedData = resolveValues(data);
+    doWithRetry(() ->
+            resolvedData.forEach(e -> {
+              List<Transactions> actual =  transactionsDao.getMultipleTransactionsByOrderId(Long.parseLong(e));
+              Assertions.assertThat(actual)
+                  .as("Unexpected transactions records were found: %s", actual)
+                  .isNullOrEmpty();
+            })
+        ,"verify transactions records", 10_000, 3);
+  }
+
+  @And("DB Core - verify orders records are hard-deleted in order_details table:")
+  public void verifyOrderDetailsAreHardDeleted(List<String> data) {
+    List<String> resolvedData = resolveValues(data);
+    doWithRetry(() ->
+            resolvedData.forEach(e -> {
+              List<OrderDetails> actual =  orderDetailsDao.getMultipleOrderDetailsByOrderId(Long.parseLong(e));
+              Assertions.assertThat(actual)
+                  .as("Unexpected order_details records were found: %s", actual)
+                  .isNullOrEmpty();
+            })
+        ,"verify order_details records", 10_000, 3);
+  }
+
+  @And("DB Core - verify orders records are hard-deleted in order_delivery_verifications table:")
+  public void verifyOrderDeliveryVerificationsAreHardDeleted(List<String> data) {
+    List<String> resolvedData = resolveValues(data);
+    doWithRetry(() ->
+            resolvedData.forEach(e -> {
+              OrderDeliveryVerifications actual =  orderDeliveryVerificationsDao.getTransactionBlob(Long.parseLong(e));
+              Assertions.assertThat(actual)
+                  .as("Unexpected order_delivery_verifications records were found: %s", actual)
+                  .isNull();
+            })
+        ,"verify order_delivery_verifications records", 10_000, 3);
+  }
 }

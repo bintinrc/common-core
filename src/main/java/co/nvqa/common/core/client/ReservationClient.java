@@ -146,12 +146,12 @@ public class ReservationClient extends SimpleApiClient {
     return doDelete("Cancel Grab Booking - Internal API", spec, url);
   }
 
-  public void cancelReservation(long reservationId) {
+  public void updateReservation(long reservationId, long statusValue) {
     String url = "/reservation/2.0/reservations/{reservationId}/update-status";
 
     RequestSpecification requestSpecification = createAuthenticatedRequest()
         .pathParam("reservationId", reservationId)
-        .body("{\"status_value\": 4}");
+        .body(f("{\"status_value\": %d}", statusValue));
 
     Response response = doPost("Operator Portal - Update Reservation", requestSpecification, url);
     response.then().assertThat().statusCode(HttpConstants.RESPONSE_200_SUCCESS);
