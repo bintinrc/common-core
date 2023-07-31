@@ -718,6 +718,19 @@ public class RouteClient extends SimpleApiClient {
     }
   }
 
+  public void runFmPajAutoRouteCronJob(String date) {
+    String url = "route-v2/debug/pickup-appointment-jobs/auto-routing";
+    String json = f("{ \"date\": \"%s\", \"execute\": true}", date);
+
+    RequestSpecification spec = createAuthenticatedRequest()
+        .body(json);
+
+    Response r = doPost("Route - Run FM PAJ Routing Cron Job", spec, url);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+  }
+
   public void addMultipleWaypointsToRoute(long routeId, List<Long> waypointIds) {
     Response r = addMultipleWaypointsToRouteAndGetRawResponse(routeId, waypointIds);
     if (r.statusCode() != HttpConstants.RESPONSE_204_NO_CONTENT) {
