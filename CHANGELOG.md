@@ -8,6 +8,7 @@
 
 - API Core - Operator bulk force success below orders with cod collected {string}:
 - API Core - Operator force success waypoint with cod collected as {string} using route manifest:
+- API Route - Operator run FM PAJ auto route cron job for date {string}
 
 <hr>
 
