@@ -204,4 +204,84 @@ public class DbRouteSteps extends CoreStandardSteps {
     }, "reading job waypoint from job id: " + jobId);
     put(KEY_WAYPOINT_ID, jobWaypoint.getWaypointId());
   }
+
+  /**
+   * <p>step to check single  sr_keywords record is created in DB route_qa_gl</p>
+   * Sample : <br/>
+   * <pre>
+   * DB Route - verifies that route_qa_gl.sr_keywords record is created:
+   *  | coverageId| {KEY_LIST_OF_COVERAGE[1].id} |
+   *  | value | KEYWORD {gradle-current-date-yyyyMMddHHmmsss}|
+   *
+   * </pre>
+   *
+   * @param data
+   */
+  @When("DB Route - verifies that route_qa_gl.sr_keywords record is created:")
+  public void verifyKeywords(Map<String, String> data) {
+    Keyword expected = new Keyword(resolveKeyValues(data));
+    doWithRetry(() -> {
+      List<Keyword> actual = routeDbDao.getKeywords(expected.getCoverageId());
+      Assertions.assertThat(actual).as("List of found keywords").isNotEmpty();
+      actual.stream().filter(expected::matchedTo).findFirst()
+          .orElseThrow(() -> new AssertionError("Keywords was not found: " + expected));
+    }, f("verify sr_keywords records"), 10_000, 5);
+  }
+
+  /**
+   * <p>step to check multiple  sr_keywords records are created in DB route_qa_gl</p>
+   * Sample : <br/>
+   * <pre>
+   * DB Route - verifies that route_qa_gl.sr_keywords multiple records are deleted:
+   *  | coverageId| value|
+   *  | {KEY_LIST_OF_COVERAGE[1].id}| KEYWORD {gradle-current-date-yyyyMMddHHmmsss}|
+   *
+   * </pre>
+   *
+   * @param data
+   */
+  @Then("DB Route - verifies that route_qa_gl.sr_keywords multiple records are created:")
+  public void verifyKeywords(List<Map<String, String>> data) {
+    data.forEach(this::verifyKeywords);
+  }
+
+  /**
+   * <p>step to check single  sr_keywords records was deleted in DB route_qa_gl</p>
+   * Sample : <br/>
+   * <pre>
+   * DB Route - verifies that route_qa_gl.sr_keywords record was deleted:
+   *  | coverageId| {KEY_LIST_OF_COVERAGE[1].id} |
+   *  | value | KEYWORD {gradle-current-date-yyyyMMddHHmmsss}|
+   *
+   * </pre>
+   *
+   * @param data
+   */
+  @Then("DB Route - verifies that route_qa_gl.sr_keywords record was deleted:")
+  public void verifyKeywordDeleted(Map<String, String> data) {
+    Keyword expected = new Keyword(resolveKeyValues(data));
+    doWithRetry(() -> {
+      List<Keyword> actual = routeDbDao.getKeywords(expected.getCoverageId());
+        Assertions.assertThat(actual.stream().noneMatch(expected::matchedTo))
+            .as("Keyword record was found: ", expected)
+            .isTrue();
+    }, "verify sr_keywords");
+  }
+
+  /**
+   * <p>step to check multiple  sr_keywords records were deleted in DB route_qa_gl</p>
+   * Sample : <br/>
+   * <pre>
+   * DB Route - verifies that route_qa_gl.sr_keywords multiple records were deleted:
+   *  | coverageId| value|
+   *  | {KEY_LIST_OF_COVERAGE[1].id}| KEYWORD {gradle-current-date-yyyyMMddHHmmsss}|
+   *
+   * </pre>
+   *
+   * @param data
+   */
+  @Then("DB Route - verifies that route_qa_gl.sr_keywords multiple records were deleted:")
+  public void verifyKeywordDeleted(List<Map<String, String>> data) {
+    data.forEach(this::verifyKeywordDeleted);
+  }
 }

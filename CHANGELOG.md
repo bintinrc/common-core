@@ -2,12 +2,30 @@
 
 <hr>
 
-## [1.3.16] 2023-07-31
+## [1.3.17] 2023-07-31
 
 ### Added
 
 - API Core - Operator bulk force success all orders with cod collected {string}
 - API Core - Operator force success waypoint with cod collected as {string} using route manifest:
+
+<hr>
+
+## [1.3.16] 2023-07-28
+
+### Added
+
+- API Core - Operator delete order with order id {string}
+- API Core - Operator success reservation for id {string}
+- API Core - Operator update reservation using data below:
+- DB Core - verify orders records are hard-deleted in order_delivery_verifications table:
+- DB Core - verify orders records are hard-deleted in order_details table:
+- DB Core - verify orders records are hard-deleted in orders table:
+- DB Core - verify orders records are hard-deleted in transactions table:
+- DB Route - verifies that route_qa_gl.sr_keywords multiple records are created:
+- DB Route - verifies that route_qa_gl.sr_keywords multiple records were deleted:
+- DB Route - verifies that route_qa_gl.sr_keywords record is created:
+- DB Route - verifies that route_qa_gl.sr_keywords record was deleted:
 
 <hr>
 

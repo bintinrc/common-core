@@ -12,9 +12,11 @@ import co.nvqa.common.core.model.persisted_class.core.OrderDeliveryVerifications
 import co.nvqa.common.core.model.persisted_class.core.Orders;
 import co.nvqa.common.utils.NvTestRuntimeException;
 import co.nvqa.common.utils.StandardTestUtils;
+import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -285,5 +287,18 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
           .isNotNull();
       expected.compareWithActual(actual, resolvedData);
     }, "verify cods records", 10_000, 3);
+  }
+
+  @And("DB Core - verify orders records are hard-deleted in orders table:")
+  public void verifyOrdersAreHardDeleted(List<String> data) {
+    List<String> resolvedData = resolveValues(data);
+    doWithRetry(() ->
+            resolvedData.forEach(e -> {
+              Orders actual =  orderDao.getSingleOrderDetailsById(Long.parseLong(e));
+              Assertions.assertThat(actual)
+                  .as("Unexpected orders records were found: %s", actual)
+                  .isNull();
+            })
+        ,"verify orders records", 10_000, 3);
   }
 }
