@@ -197,9 +197,9 @@ public class ApiOrderSteps extends CoreStandardSteps {
    *
    * @param codCollected example: false
    */
-  @When("API Core - Operator bulk force success all orders with cod collected {string}")
-  public void apiOperatorBulkForceSuccessAllOrders(String codCollected) {
-    List<Order> createdOrders = get(KEY_LIST_OF_CREATED_ORDERS);
+  @When("API Core - Operator bulk force success all orders {string} with cod collected {string}")
+  public void apiOperatorBulkForceSuccessAllOrders(String orders, String codCollected) {
+    List<Order> createdOrders = resolveValue(orders);
     List<BulkForceSuccessOrderRequest> request = new ArrayList<>();
     createdOrders.stream().distinct().forEach(e -> {
       BulkForceSuccessOrderRequest forceSuccessRequest = new BulkForceSuccessOrderRequest();

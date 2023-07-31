@@ -565,7 +565,6 @@ public class ApiRouteSteps extends CoreStandardSteps {
     final long waypointId = Long.parseLong(resolvedDataTable.get("waypointId"));
     final List<Long> orderIds = Arrays.stream(resolvedDataTable.get("orderIds").split(","))
         .map(Long::parseLong).collect(Collectors.toCollection(ArrayList::new));
-    ;
     doWithRetry(
         () -> {
           if (Boolean.parseBoolean(codCollected)) {
