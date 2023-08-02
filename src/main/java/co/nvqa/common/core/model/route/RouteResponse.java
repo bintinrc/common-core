@@ -26,11 +26,13 @@ public class RouteResponse {
   private Long id;
   private Long legacyId;
   private String createdAt;
+  private Hub hub;
   private Driver driver;
   private List<Integer> tags = new ArrayList<>();
 
   private Boolean archived;
   private String comments;
+
   @JsonIgnore
   private Date createdAtAsDate;
   private String deletedAt;
@@ -97,6 +99,30 @@ public class RouteResponse {
     private Boolean active;
     private String type;
     private String details;
+  }
+
+  @Setter
+  @Getter
+  public static class Hub {
+
+    private long id;
+    private String created_at;
+    private String updated_at;
+    private String deleted_at;
+    private String name;
+    private String short_name;
+    private String contact;
+    private String country;
+    private String city;
+    private String postcode;
+    private String address1;
+    private String address2;
+    private Double latitude;
+    private Double longitude;
+    private String region;
+    private String area;
+    private String facility_type;
+    private Boolean active;
   }
 
   @Setter
