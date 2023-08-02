@@ -1,4 +1,10 @@
 # Change log
+<hr>
+
+## [1.3.17-RC3] 2023-08-2
+
+### Added
+- RouteResponse.java - Add Hub to represent the hub associated with the route
 
 <hr>
 
