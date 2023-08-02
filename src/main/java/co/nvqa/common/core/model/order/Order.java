@@ -787,4 +787,24 @@ public class Order extends DataEntity<Order> implements Serializable {
       super(data);
     }
   }
+
+  public String to1LineToAddress() {
+    List<String> listOfAddressData = new ArrayList<>();
+    listOfAddressData.add(toAddress1);
+    listOfAddressData.add(toAddress2);
+    listOfAddressData.add(toPostcode);
+    listOfAddressData.add(toCountry);
+    return listOfAddressData.stream().filter(o -> o != null && !o.isEmpty())
+        .collect(Collectors.joining(" "));
+  }
+
+  public String to1LineFromAddress() {
+    List<String> listOfAddressData = new ArrayList<>();
+    listOfAddressData.add(fromAddress1);
+    listOfAddressData.add(fromAddress2);
+    listOfAddressData.add(fromPostcode);
+    listOfAddressData.add(fromCountry);
+    return listOfAddressData.stream().filter(o -> o != null && !o.isEmpty())
+        .collect(Collectors.joining(" "));
+  }
 }
