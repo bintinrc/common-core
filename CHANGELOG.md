@@ -1,17 +1,10 @@
 # Change log
 <hr>
 
-## [1.3.17-RC3] 2023-08-2
+## [1.3.17] 2023-08-08
 
 ### Added
 - RouteResponse.java - Add Hub to represent the hub associated with the route
-
-<hr>
-
-## [1.3.17-RC1] 2023-07-31
-
-### Added
-
 - API Core - Operator bulk force success below orders with cod collected {string}:
 - API Core - Operator force success waypoint with cod collected as {string} using route manifest:
 - API Route - Operator run FM PAJ auto route cron job for date {string}
