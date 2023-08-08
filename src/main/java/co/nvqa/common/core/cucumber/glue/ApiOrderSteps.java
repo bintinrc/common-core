@@ -1,8 +1,10 @@
 package co.nvqa.common.core.cucumber.glue;
 
+import co.nvqa.common.core.client.CodInboundsClient;
 import co.nvqa.common.core.client.Lazada3PLClient;
 import co.nvqa.common.core.client.OrderClient;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
+import co.nvqa.common.core.model.CodInbound;
 import co.nvqa.common.core.model.EditDeliveryOrderRequest;
 import co.nvqa.common.core.model.Lazada3PL;
 import co.nvqa.common.core.model.order.BulkForceSuccessOrderRequest;
@@ -13,6 +15,7 @@ import co.nvqa.common.core.model.order.RescheduleOrderResponse;
 import co.nvqa.common.core.model.order.RtsOrderRequest;
 import co.nvqa.common.utils.JsonUtils;
 import co.nvqa.common.utils.NvTestRuntimeException;
+import co.nvqa.common.utils.StandardTestUtils;
 import io.cucumber.guice.ScenarioScoped;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
@@ -43,6 +46,9 @@ public class ApiOrderSteps extends CoreStandardSteps {
   @Inject
   @Getter
   private Lazada3PLClient lazada3PLClient;
+  @Inject
+  @Getter
+  private CodInboundsClient codInboundsClient;
 
   @Override
   public void init() {
@@ -56,8 +62,7 @@ public class ApiOrderSteps extends CoreStandardSteps {
    * order with the same tracking id. <br/><br/><b>Note</b>: becareful that you may face unintended
    * order status due to event propagation delay to Core service
    *
-   * @param tracking key that contains order's tracking id, example:
-   *                 KEY_LIST_OF_CREATED_TRACKING_IDS
+   * @param tracking key that contains order's tracking id, example: KEY_LIST_OF_CREATED_TRACKING_IDS
    */
   @When("API Core - Operator get order details for tracking order {string}")
   public void apiOperatorGetOrderDetailsForTrackingOrder(String tracking) {
@@ -82,8 +87,7 @@ public class ApiOrderSteps extends CoreStandardSteps {
    * previous order with the same tracking id. this is intended to check if you have done certain
    * action to same order and you need previous data prior to the action being done
    *
-   * @param tracking key that contains order's tracking id, example:
-   *                 KEY_LIST_OF_CREATED_TRACKING_IDS
+   * @param tracking key that contains order's tracking id, example: KEY_LIST_OF_CREATED_TRACKING_IDS
    */
   @When("API Core - Operator get order details for previous order {string}")
   public void apiOperatorGetOrderDetailsForPreviousOrder(String tracking) {
@@ -465,5 +469,25 @@ public class ApiOrderSteps extends CoreStandardSteps {
     payLoad.put("tags", tagIdList);
     doWithRetry(() -> orderClient.deleteTagFromOrder(payLoad),
         "API Core - Operator delete tag from order:");
+  }
+
+  @When("API Core - Operator create new COD Inbound for created order:")
+  public void operatorCreateNewCod(Map<String, String> data) {
+    Map<String, String> resolvedData = resolveKeyValues(data);
+    final Long routeId = Long.parseLong(resolvedData.get("routeId"));
+    final Double codGoodsAmount = Double.parseDouble(resolvedData.get("codAmount"));
+    Assertions.assertThat(codGoodsAmount).as("COD Goods Amount should not be null.").isNotNull();
+
+    Double amountCollected = codGoodsAmount - (codGoodsAmount.intValue() / 2);
+    String receiptNumber = "#" + routeId + "-" + StandardTestUtils.generateDateUniqueString();
+
+    CodInbound codInbound = new CodInbound();
+    codInbound.setRouteId(routeId);
+    codInbound.setAmountCollected(amountCollected);
+    codInbound.setReceiptNo(receiptNumber);
+
+    getCodInboundsClient().codInbound(codInbound);
+
+    put(KEY_CORE_ROUTE_CASH_INBOUND_COD, codInbound);
   }
 }
