@@ -1,6 +1,13 @@
 # Change log
 <hr>
 
+## [1.3.18-RC1] 2023-08-08
+
+### Added
+- DB Route - fetch coverage id for {value} area
+
+<hr>
+
 ## [1.3.17] 2023-08-08
 
 ### Added

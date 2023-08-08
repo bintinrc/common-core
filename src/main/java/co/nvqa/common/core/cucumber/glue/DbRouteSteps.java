@@ -12,6 +12,7 @@ import co.nvqa.common.core.model.persisted_class.route.RouteLogs;
 import co.nvqa.common.core.model.persisted_class.route.Waypoints;
 import co.nvqa.common.model.DataEntity;
 import co.nvqa.common.utils.NvTestRuntimeException;
+import io.cucumber.java.en.And;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import java.util.Collections;
@@ -262,9 +263,9 @@ public class DbRouteSteps extends CoreStandardSteps {
     Keyword expected = new Keyword(resolveKeyValues(data));
     doWithRetry(() -> {
       List<Keyword> actual = routeDbDao.getKeywords(expected.getCoverageId());
-        Assertions.assertThat(actual.stream().noneMatch(expected::matchedTo))
-            .as("Keyword record was found: ", expected)
-            .isTrue();
+      Assertions.assertThat(actual.stream().noneMatch(expected::matchedTo))
+          .as("Keyword record was found: ", expected)
+          .isTrue();
     }, "verify sr_keywords");
   }
 
@@ -283,5 +284,14 @@ public class DbRouteSteps extends CoreStandardSteps {
   @Then("DB Route - verifies that route_qa_gl.sr_keywords multiple records were deleted:")
   public void verifyKeywordDeleted(List<Map<String, String>> data) {
     data.forEach(this::verifyKeywordDeleted);
+  }
+
+  @And("DB Route - fetch coverage id for {value} area")
+  public void fetchCoverageId(String area) {
+    doWithRetry(() -> {
+      List<Coverage> actual = routeDbDao.getCoverageByArea(area);
+      Assertions.assertThat(actual).as("List of found coverages").isNotEmpty();
+      put(KEY_COVERAGE_ID, actual.get(actual.size() - 1).getId());
+    }, "fetch coverage id");
   }
 }
