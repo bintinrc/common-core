@@ -37,15 +37,11 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
   @Override
   public void init() {
   }
-
-  @Given("DB Core - verify order weight updated to highest weight within range")
+  @Given("DB Core - verify order weight updated correctly")
   public void dbOperatorVerifiesHighestOrderWeight(Map<String, String> source) {
     Map<String, String> expectedData = resolveKeyValues(source);
     final long orderId = Long.parseLong(expectedData.get("order_id"));
     final double expectedWeight = Double.parseDouble(source.get("weight"));
-    if (Boolean.parseBoolean(expectedData.get("use_weight_range"))) {
-      dbOperatorVerifiesOrderWeightRangeUpdated(expectedData);
-    } else {
       doWithRetry(() -> {
         double actualWeight = orderDao.getOrderWeight(orderId);
         Assertions.assertThat(actualWeight).as("orders.weight equals highest weight")
@@ -53,26 +49,6 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
         put(KEY_SAVED_ORDER_WEIGHT, actualWeight);
       }, f("Get orders.weight of id %s ", orderId), 10_000, 3);
     }
-  }
-
-  @Given("DB Core - verify order weight range updated correctly")
-  public void dbOperatorVerifiesOrderWeightRangeUpdated(Map<String, String> source) {
-
-    Map<String, String> expectedData = resolveKeyValues(source);
-    final long orderId = Long.parseLong(expectedData.get("order_id"));
-    final double expectedWeight = Double.parseDouble(source.get("weight"));
-    final Double higherBound = expectedWeight;
-    final Double lowerBound = expectedWeight - 0.5;
-
-    doWithRetry(() -> {
-      double actualWeight = orderDao.getOrderWeight(orderId);
-      Assertions.assertThat(actualWeight >= lowerBound)
-          .as("Order weight should be greater than " + expectedWeight + " - 0.5").isTrue();
-      Assertions.assertThat(actualWeight <= higherBound)
-          .as("Order weight should be lover than " + expectedWeight + " - 0").isTrue();
-      put(KEY_SAVED_ORDER_WEIGHT, actualWeight);
-    }, f("get orders weight of order id %s", orderId), 10_000, 3);
-  }
 
   @Given("DB Core - verify orders.weight and dimensions updated correctly for order id {string}")
   public void dbOperatorVerifiesOrdersWeightDims(String id, Map<String, String> source) {

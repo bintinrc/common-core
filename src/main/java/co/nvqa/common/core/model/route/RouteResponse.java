@@ -3,6 +3,7 @@ package co.nvqa.common.core.model.route;
 import co.nvqa.common.core.model.order.Order.Transaction;
 import co.nvqa.common.model.DataEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -26,11 +27,13 @@ public class RouteResponse {
   private Long id;
   private Long legacyId;
   private String createdAt;
+  private Hub hub;
   private Driver driver;
   private List<Integer> tags = new ArrayList<>();
 
   private Boolean archived;
   private String comments;
+
   @JsonIgnore
   private Date createdAtAsDate;
   private String deletedAt;
@@ -97,6 +100,42 @@ public class RouteResponse {
     private Boolean active;
     private String type;
     private String details;
+  }
+
+  @Setter
+  @Getter
+  public static class Hub {
+
+    private long id;
+    @JsonProperty("created_at")
+    private String createdAt;
+
+    @JsonProperty("updated_at")
+    private String updatedAt;
+
+    @JsonProperty("deleted_at")
+    private String deletedAt;
+
+    private String name;
+
+    @JsonProperty("short_name")
+    private String shortName;
+
+    private String contact;
+    private String country;
+    private String city;
+    private String postcode;
+    private String address1;
+    private String address2;
+    private Double latitude;
+    private Double longitude;
+    private String region;
+    private String area;
+
+    @JsonProperty("facility_type")
+    private String facilityType;
+
+    private Boolean active;
   }
 
   @Setter
