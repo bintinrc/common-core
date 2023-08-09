@@ -139,6 +139,7 @@ public class HookSteps extends CoreStandardSteps {
   public void deleteCoverageV2() {
     final List<CreateCoverageResponse.Data> coveragesResponse = get(KEY_LIST_OF_COVERAGE);
     final List<String> coverages = get(KEY_LIST_OF_CREATED_AREAS);
+    final Long coverageid = get(KEY_COVERAGE_ID);
     if (!Objects.isNull(coveragesResponse) && !coveragesResponse.isEmpty()) {
       coveragesResponse.forEach(r -> {
         try {
@@ -162,6 +163,15 @@ public class HookSteps extends CoreStandardSteps {
           }
         });
       });
+    }
+
+    if (coverageid != null) {
+      try {
+        doWithRetry(() -> getRouteClient().deleteCoverage(coverageid),
+            "After hook: @DeleteCoverageV2");
+      } catch (Throwable ex) {
+        LOGGER.warn("could not delete coverage {}", coverageid, ex);
+      }
     }
   }
 
