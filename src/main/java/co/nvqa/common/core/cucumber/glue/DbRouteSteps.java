@@ -117,6 +117,24 @@ public class DbRouteSteps extends CoreStandardSteps {
     }, "verify sr_area_variations");
   }
 
+  @Then("DB Route - verify that sr_coverages record is not created for {string} area")
+  public void verifyCoverageIsNotCreated(String areaKey) {
+    String area = resolveValue(areaKey);
+    doWithRetry(() -> {
+      List<Coverage> actual = routeDbDao.getCoverageByArea(area);
+      Assertions.assertThat(actual).as("List of found coverages").isEmpty();
+    }, "verify sr_coverages");
+  }
+
+  @Then("DB Route - verify that sr_coverages record is not created for {string} coverageId")
+  public void verifyCoverageWasDeleted(String coverageId) {
+    String coverageIdValue = resolveValue(coverageId);
+    doWithRetry(() -> {
+      Coverage actual = routeDbDao.getCoverageById(Long.valueOf(coverageIdValue));
+      Assertions.assertThat(actual).as("Coverage with id "+coverageIdValue).isNull();
+    }, "verify sr_coverages");
+  }
+
   @Then("DB Route - verify that sr_area_variations record is not created:")
   public void verifyAreaVariationIsNotCreated(Map<String, String> data) {
     AreaVariation expected = new AreaVariation(resolveKeyValues(data));
