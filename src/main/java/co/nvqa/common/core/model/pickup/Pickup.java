@@ -1,7 +1,9 @@
 package co.nvqa.common.core.model.pickup;
 
+import co.nvqa.common.model.DataEntity;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,7 +14,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Pickup {
+public class Pickup extends DataEntity<Pickup> {
 
   private String address1;
   private String address2;
@@ -42,6 +44,7 @@ public class Pickup {
   private String type;
   private Long waypointId;
   private String waypointStatus;
+  private List<Pod> pods;
 
   @Getter
   @Setter
@@ -59,5 +62,9 @@ public class Pickup {
     private Integer hubScansQuantity;
     private List<String> hubScans;
     private String signatureUrl;
+  }
+
+  public Pickup(Map<String, ?> resolvedData) {
+    fromMap(resolvedData);
   }
 }

@@ -791,7 +791,8 @@ public class OrderClient extends SimpleApiClient {
     }
   }
 
-  public boolean waitUntilOrderState(Order expected, int timeoutInSeconds, int pauseInMillis) {
+  public boolean waitUntilOrderState(Order expected, int timeoutInSeconds, int pauseInMillis)
+      throws InterruptedException {
     if (expected == null) {
       throw new IllegalArgumentException("Expected order state must not be null");
     }
@@ -809,11 +810,7 @@ public class OrderClient extends SimpleApiClient {
         match = true;
       } catch (Throwable ex) {
         LOGGER.debug(message);
-        try {
-          Thread.sleep(pauseInMillis);
-        } catch (InterruptedException e) {
-          LOGGER.error(e.getMessage(), e);
-        }
+        Thread.sleep(pauseInMillis);
       }
     } while (!match && new Date().getTime() - start < timeout);
     return match;

@@ -422,7 +422,8 @@ public class ApiOrderSteps extends CoreStandardSteps {
   }
 
   @Given("API Core -  Wait for following order state:")
-  public void apiOperatorWaitForOrderStatus(Map<String, String> dataTableRaw) {
+  public void apiOperatorWaitForOrderStatus(Map<String, String> dataTableRaw)
+      throws InterruptedException {
     final Map<String, String> dataTable = resolveKeyValues(dataTableRaw);
     Order expectedState = new Order();
     expectedState.fromMap(dataTable);
@@ -433,14 +434,15 @@ public class ApiOrderSteps extends CoreStandardSteps {
   }
 
   @Given("API Core - Verifies order state:")
-  public void apiOperatorVerifiesOrderState(Map<String, String> dataTableRaw) {
+  public void apiOperatorVerifiesOrderState(Map<String, String> dataTableRaw)
+      throws InterruptedException {
     Map<String, String> dataTable = new HashMap<>(dataTableRaw);
     dataTable.put("timeout", "1");
     apiOperatorWaitForOrderStatus(dataTable);
   }
 
   @Given("API Core - wait for order state:")
-  public void waitForOrderState(Map<String, String> data) {
+  public void waitForOrderState(Map<String, String> data) throws InterruptedException {
     var expected = new Order(resolveKeyValues(data));
     orderClient.waitUntilOrderState(expected, 5 * 60, 5000);
   }
