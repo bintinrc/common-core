@@ -22,6 +22,8 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.response.Response;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -480,7 +482,11 @@ public class ApiOrderSteps extends CoreStandardSteps {
     final Double codGoodsAmount = Double.parseDouble(resolvedData.get("codAmount"));
     Assertions.assertThat(codGoodsAmount).as("COD Goods Amount should not be null.").isNotNull();
 
-    Double amountCollected = codGoodsAmount - (codGoodsAmount.intValue() / 2);
+    Double amountCollectedNotRounded = codGoodsAmount - (codGoodsAmount / 2);
+    BigDecimal amountCollectedBigDecimal = BigDecimal.valueOf(amountCollectedNotRounded)
+        .setScale(2, RoundingMode.HALF_UP);
+    Double amountCollected = amountCollectedBigDecimal.doubleValue();
+
     String receiptNumber = "#" + routeId + "-" + StandardTestUtils.generateDateUniqueString();
 
     CodInbound codInbound = new CodInbound();
