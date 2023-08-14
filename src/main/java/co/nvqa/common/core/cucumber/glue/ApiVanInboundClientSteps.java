@@ -6,6 +6,7 @@ import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.model.VanInboundRequest;
 import co.nvqa.common.core.model.order.Order;
 import co.nvqa.common.core.model.order.Order.Transaction;
+import co.nvqa.common.core.model.route.StartRouteRequest;
 import io.cucumber.java.en.Given;
 import java.util.List;
 import java.util.Map;
@@ -55,13 +56,31 @@ public class ApiVanInboundClientSteps extends CoreStandardSteps {
 
   @Given("API Core - Operator van inbound and start route using data:")
   public void apiOperatorVanInboundAndStartRoute(Map<String, String> data) {
-    apiOperatorVanInbound(data);
+    Map<String, String> resolvedData = resolveKeyValues(data);
+    apiOperatorVanInbound(resolvedData);
     String routListKey = data.get("routeListKey");
-    Long routeId = get(routListKey);
+    final long routeId = get(routListKey);
+    final long driverId = Long.parseLong(resolvedData.get("driverId"));
+    final StartRouteRequest request = fromJsonSnakeCase(resolvedData.get("request"),
+        StartRouteRequest.class);
     String methodInfo = f("%s - [Route ID = %d]", getCurrentMethodName(), routeId);
-    doWithRetry(() -> getRouteClient().startRoute(routeId),
+    doWithRetry(() -> getRouteClient().startRoute(routeId, driverId, request),
         methodInfo);
   }
+
+  @Given("API Core - Operator start the route with following data:")
+  public void apiOperatorStartTheRoute(Map<String, String> data) {
+    Map<String, String> resolvedData = resolveKeyValues(data);
+    final long routeId = Long.parseLong(resolvedData.get("routeId"));
+    final long driverId = Long.parseLong(resolvedData.get("driverId"));
+    final StartRouteRequest request = fromJsonSnakeCase(resolvedData.get("request"),
+        StartRouteRequest.class);
+    String methodInfo = f("%s - [Route ID = %d]", getCurrentMethodName(), routeId);
+    doWithRetry(
+        () -> getRouteClient().startRoute(routeId, driverId, request),
+        methodInfo);
+  }
+
 
   public void apiOperatorVanInboundParcel(String trackingId, Long deliveryWaypointId,
       Long routeId) {

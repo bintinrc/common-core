@@ -6,11 +6,17 @@ import co.nvqa.common.core.model.pickup.Pickup;
 import io.cucumber.guice.ScenarioScoped;
 import io.cucumber.java.en.When;
 import java.util.List;
+import java.util.Map;
 import javax.inject.Inject;
 import lombok.Getter;
+import org.assertj.core.api.Assertions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ScenarioScoped
 public class ApiPickupSteps extends CoreStandardSteps {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(ApiPickupSteps.class);
 
   @Inject
   @Getter
@@ -37,5 +43,33 @@ public class ApiPickupSteps extends CoreStandardSteps {
           final List<Pickup> pickups = getPickupClient().getPickupById(reservationId);
           put(KEY_LIST_OF_PICKUPS, pickups);
         }, "get pickup details");
+  }
+
+
+  @When("API Core - Operator verify pods in pickup details of reservation id below:")
+  public void getPickupWithPodDetailsFromReservationId(Map<String, String> dataTable) {
+    Map<String, String> resolvedData = resolveKeyValues(dataTable);
+    Pickup expectedPickup = new Pickup(resolvedData);
+
+    doWithRetry(() -> {
+      final Pickup actualPickup = getPickupClient().getPickupWithPod(expectedPickup.getId());
+      Assertions.assertThat(actualPickup.getPods())
+          .as("Pod details not found: " + resolvedData)
+          .isNotNull();
+      LOGGER.info(actualPickup.toString());
+      expectedPickup.compareWithActual(actualPickup);
+    }, "get pickup with pod details");
+  }
+
+  @When("API Core - Operator verify there is no pods assigned to reservation id {string}")
+  public void verifyNoPodDetailsFromReservationId(String reservationIdString) {
+    final long reservationId = Long.parseLong(resolveValue(reservationIdString));
+
+    doWithRetry(() -> {
+      final Pickup pickups = getPickupClient().getPickupWithPod(reservationId);
+      LOGGER.info(pickups.toString());
+      Assertions.assertThat(pickups.getPods().size())
+          .as("there should be no pods assigned to reservation id").isZero();
+    }, "verify there is no pods assigned to reservation id");
   }
 }

@@ -17,6 +17,7 @@ import co.nvqa.common.core.model.route.ParcelRouteTransferRequest;
 import co.nvqa.common.core.model.route.ParcelRouteTransferResponse;
 import co.nvqa.common.core.model.route.RouteRequest;
 import co.nvqa.common.core.model.route.RouteResponse;
+import co.nvqa.common.core.model.route.StartRouteRequest;
 import co.nvqa.common.core.model.waypoint.Waypoint;
 import co.nvqa.common.utils.NvTestHttpException;
 import co.nvqa.common.utils.StandardTestConstants;
@@ -516,20 +517,23 @@ public class RouteClient extends SimpleApiClient {
 
     return doPut("Core - Add Parcel to Route by Tracking Id", spec, url);
   }
-
-  public void startRoute(long routeId) {
-    Response r = startRouteAndGetRawResponse(routeId);
+  public void startRoute(long routeId, long driverId, StartRouteRequest request) {
+    Response r = startRouteAndGetRawResponse(routeId, driverId, request);
     r.then().statusCode(
         isOneOf(HttpConstants.RESPONSE_200_SUCCESS, HttpConstants.RESPONSE_204_NO_CONTENT));
   }
 
-  public Response startRouteAndGetRawResponse(long routeId) {
-    String apiMethod = "core/v2/drivers/1/routes/{routeId}/start";
+  public Response startRouteAndGetRawResponse(long routeId, long driverId,
+      StartRouteRequest request) {
+    String apiMethod = "core/v2/drivers/{driverId}/routes/{routeId}/start";
+    String json = toJsonSnakeCase(request);
 
     RequestSpecification requestSpecification = createAuthenticatedRequest()
-        .pathParam("routeId", routeId);
+        .pathParam("routeId", routeId)
+        .pathParam("driverId", driverId)
+        .body(json);
 
-    return doGet("API Core - Start Route", requestSpecification, apiMethod);
+    return doPost("Core - Start Route", requestSpecification, apiMethod);
   }
 
   public void setRouteTags(long routeId, long tagId) {

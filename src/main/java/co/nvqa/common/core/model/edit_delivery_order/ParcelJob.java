@@ -17,4 +17,5 @@ public class ParcelJob {
   private String deliveryDate;
   private int deliveryTimewindow;
   private Stamp stamp;
+  private double insurance;
 }

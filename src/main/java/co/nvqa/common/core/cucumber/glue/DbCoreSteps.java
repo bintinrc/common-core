@@ -5,6 +5,7 @@ import co.nvqa.common.core.hibernate.CodCollectionDao;
 import co.nvqa.common.core.hibernate.CodInboundsDao;
 import co.nvqa.common.core.hibernate.InboundScansDao;
 import co.nvqa.common.core.hibernate.OrderDao;
+import co.nvqa.common.core.hibernate.OrderDeliveryDetailsDao;
 import co.nvqa.common.core.hibernate.OrderDeliveryVerificationsDao;
 import co.nvqa.common.core.hibernate.OrderDetailsDao;
 import co.nvqa.common.core.hibernate.OrderJaroScoresV2Dao;
@@ -39,7 +40,6 @@ import co.nvqa.common.core.model.persisted_class.core.WarehouseSweeps;
 import co.nvqa.common.core.model.persisted_class.core.Waypoints;
 import co.nvqa.common.model.DataEntity;
 import co.nvqa.common.utils.NvTestRuntimeException;
-import io.cucumber.java.bs.I;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -90,6 +90,8 @@ public class DbCoreSteps extends CoreStandardSteps {
   private InboundScansDao inboundScansDao;
   @Inject
   private OrderDeliveryVerificationsDao orderDeliveryVerificationsDao;
+  @Inject
+  private OrderDeliveryDetailsDao orderDeliveryDetailsDao;
 
   @Inject
   private OrderDao orderDao;
@@ -614,12 +616,13 @@ public class DbCoreSteps extends CoreStandardSteps {
     List<String> resolvedData = resolveValues(data);
     doWithRetry(() ->
             resolvedData.forEach(e -> {
-              List<Transactions> actual =  transactionsDao.getMultipleTransactionsByOrderId(Long.parseLong(e));
+              List<Transactions> actual = transactionsDao.getMultipleTransactionsByOrderId(
+                  Long.parseLong(e));
               Assertions.assertThat(actual)
                   .as("Unexpected transactions records were found: %s", actual)
                   .isNullOrEmpty();
             })
-        ,"verify transactions records", 10_000, 3);
+        , "verify transactions records", 10_000, 3);
   }
 
   @And("DB Core - verify orders records are hard-deleted in order_details table:")
@@ -627,12 +630,13 @@ public class DbCoreSteps extends CoreStandardSteps {
     List<String> resolvedData = resolveValues(data);
     doWithRetry(() ->
             resolvedData.forEach(e -> {
-              List<OrderDetails> actual =  orderDetailsDao.getMultipleOrderDetailsByOrderId(Long.parseLong(e));
+              List<OrderDetails> actual = orderDetailsDao.getMultipleOrderDetailsByOrderId(
+                  Long.parseLong(e));
               Assertions.assertThat(actual)
                   .as("Unexpected order_details records were found: %s", actual)
                   .isNullOrEmpty();
             })
-        ,"verify order_details records", 10_000, 3);
+        , "verify order_details records", 10_000, 3);
   }
 
   @And("DB Core - verify orders records are hard-deleted in order_delivery_verifications table:")
@@ -640,11 +644,20 @@ public class DbCoreSteps extends CoreStandardSteps {
     List<String> resolvedData = resolveValues(data);
     doWithRetry(() ->
             resolvedData.forEach(e -> {
-              OrderDeliveryVerifications actual =  orderDeliveryVerificationsDao.getTransactionBlob(Long.parseLong(e));
+              OrderDeliveryVerifications actual = orderDeliveryVerificationsDao.getTransactionBlob(
+                  Long.parseLong(e));
               Assertions.assertThat(actual)
                   .as("Unexpected order_delivery_verifications records were found: %s", actual)
                   .isNull();
             })
-        ,"verify order_delivery_verifications records", 10_000, 3);
+        , "verify order_delivery_verifications records", 10_000, 3);
+  }
+
+  @And("DB Core - get order_delivery_details record for order {value}")
+  public void getOrderDeliveryDetailsRecord(String orderId) {
+    doWithRetry(() -> {
+      var result = orderDeliveryDetailsDao.getOrderDeliveryDetails(Long.parseLong(orderId));
+      putInList(KEY_CORE_LIST_OF_ORDER_DELIVERY_DETAILS, result);
+    }, "get order_delivery_details record", 10_000, 3);
   }
 }
