@@ -1,9 +1,17 @@
 # Change log
+
 <hr>
 
-## [1.3.18-RC1] 2023-08-08
+## [1.3.18] 2023-08-14
 
 ### Added
+
+- API Core - Operator create new COD Inbound for created order:
+- API Core - Operator verify pods in pickup details of reservation id below:
+- API Core - Operator start the route with following data:
+- DB Core - get order_delivery_details record for order {value}
+- DB Route - verify that sr_coverages record is not created for {string} area
+- DB Route - verify that sr_coverages record is not created for {string} coverageId
 - DB Route - fetch coverage id for {value} area
 
 <hr>
@@ -11,6 +19,7 @@
 ## [1.3.17] 2023-08-08
 
 ### Added
+
 - RouteResponse.java - Add Hub to represent the hub associated with the route
 - API Core - Operator bulk force success below orders with cod collected {string}:
 - API Core - Operator force success waypoint with cod collected as {string} using route manifest:
