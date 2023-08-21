@@ -9,6 +9,7 @@ import co.nvqa.common.core.model.RouteGroup;
 import co.nvqa.common.core.model.coverage.CreateCoverageResponse;
 import co.nvqa.common.core.model.order.Order;
 import co.nvqa.common.core.model.persisted_class.route.Coverage;
+import co.nvqa.common.core.model.persisted_class.route.RouteLogs;
 import co.nvqa.common.core.model.reservation.ReservationResponse;
 import co.nvqa.common.core.model.route.RouteResponse;
 import io.cucumber.guice.ScenarioScoped;
@@ -118,7 +119,7 @@ public class HookSteps extends CoreStandardSteps {
 
   @After("@DeleteRoutes")
   public void deleteRoutes() {
-    final List<RouteResponse> routes = get(KEY_LIST_OF_CREATED_ROUTES);
+    List<Object> routes = get(KEY_LIST_OF_CREATED_ROUTES);
     if (Objects.isNull(routes) || routes.isEmpty()) {
       LOGGER.trace(
           "no routes been created under key \"KEY_LIST_OF_CREATED_ROUTES\", skip the delete routes");
@@ -126,11 +127,12 @@ public class HookSteps extends CoreStandardSteps {
     }
     routes.forEach(r -> {
       try {
-        doWithRetry(() -> getRouteClient().deleteRoute(r.getId()),
+        var id = r instanceof RouteResponse ? ((RouteResponse) r).getId() : ((RouteLogs) r).getId();
+        doWithRetry(() -> getRouteClient().deleteRoute(id),
             "After hook: @DeleteRoutes");
-        LOGGER.debug("Route ID = {} deleted successfully", r.getId());
+        LOGGER.debug("Route ID = {} deleted successfully", id);
       } catch (Throwable t) {
-        LOGGER.warn("error to delete route: " + t.getMessage());
+        LOGGER.warn("error to delete route: {}", t.getMessage());
       }
     });
   }

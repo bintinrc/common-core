@@ -16,7 +16,6 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -37,18 +36,19 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
   @Override
   public void init() {
   }
+
   @Given("DB Core - verify order weight updated correctly")
   public void dbOperatorVerifiesHighestOrderWeight(Map<String, String> source) {
     Map<String, String> expectedData = resolveKeyValues(source);
     final long orderId = Long.parseLong(expectedData.get("order_id"));
     final double expectedWeight = Double.parseDouble(source.get("weight"));
-      doWithRetry(() -> {
-        double actualWeight = orderDao.getOrderWeight(orderId);
-        Assertions.assertThat(actualWeight).as("orders.weight equals highest weight")
-            .isEqualTo(expectedWeight);
-        put(KEY_SAVED_ORDER_WEIGHT, actualWeight);
-      }, f("Get orders.weight of id %s ", orderId), 10_000, 3);
-    }
+    doWithRetry(() -> {
+      double actualWeight = orderDao.getOrderWeight(orderId);
+      Assertions.assertThat(actualWeight).as("orders.weight equals highest weight")
+          .isEqualTo(expectedWeight);
+      put(KEY_SAVED_ORDER_WEIGHT, actualWeight);
+    }, f("Get orders.weight of id %s ", orderId), 10_000, 3);
+  }
 
   @Given("DB Core - verify orders.weight and dimensions updated correctly for order id {string}")
   public void dbOperatorVerifiesOrdersWeightDims(String id, Map<String, String> source) {
@@ -125,6 +125,19 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
         }
       }, "Generate Stamp ID");
     }
+  }
+
+  @Then("DB Core - verify total COD for driver:")
+  public void verifyTotalCod(Map<String, String> data) {
+    data = resolveKeyValues(data);
+    Long driverId = Long.parseLong(data.get("driverId"));
+    String datetimeFrom = data.get("datetimeFrom");
+    String datetimeTo = data.get("datetimeTo");
+    Double totalCod = Double.parseDouble(data.get("totalCod"));
+    var actual = orderDao.getTotalCodForDriver(driverId, datetimeFrom, datetimeTo);
+    Assertions.assertThat(actual)
+        .as("Total COD for driver %s", driverId)
+        .isEqualTo(totalCod);
   }
 
   @Then("DB Core - Operator get order by stamp id {string}")
@@ -270,11 +283,11 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
     List<String> resolvedData = resolveValues(data);
     doWithRetry(() ->
             resolvedData.forEach(e -> {
-              Orders actual =  orderDao.getSingleOrderDetailsById(Long.parseLong(e));
+              Orders actual = orderDao.getSingleOrderDetailsById(Long.parseLong(e));
               Assertions.assertThat(actual)
                   .as("Unexpected orders records were found: %s", actual)
                   .isNull();
             })
-        ,"verify orders records", 10_000, 3);
+        , "verify orders records", 10_000, 3);
   }
 }
