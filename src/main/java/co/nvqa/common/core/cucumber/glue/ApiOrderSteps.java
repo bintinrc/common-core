@@ -8,8 +8,10 @@ import co.nvqa.common.core.model.CodInbound;
 import co.nvqa.common.core.model.EditDeliveryOrderRequest;
 import co.nvqa.common.core.model.Lazada3PL;
 import co.nvqa.common.core.model.order.BulkForceSuccessOrderRequest;
+import co.nvqa.common.core.model.order.DeliveryDetails;
 import co.nvqa.common.core.model.order.Order;
 import co.nvqa.common.core.model.order.Order.Dimension;
+import co.nvqa.common.core.model.order.ParcelJob;
 import co.nvqa.common.core.model.order.RescheduleOrderRequest;
 import co.nvqa.common.core.model.order.RescheduleOrderResponse;
 import co.nvqa.common.core.model.order.RtsOrderRequest;
@@ -171,6 +173,31 @@ public class ApiOrderSteps extends CoreStandardSteps {
     doWithRetry(
         () -> getOrderClient().editDeliveryOrderDetails(request, orderId),
         "update order granular status", 3000, 10);
+  }
+
+
+  /**
+   * API Core - Operator update parcel size:
+   *
+   * @param data <br/> <b>orderId</b>: 123456 <br/> <br/> <b>size</b>: M <br/>
+   */
+  @Given("API Core - Operator update parcel size:")
+  public void apiCoreOperatorUpdateParcelSize(Map<String, String> data) {
+    data = resolveKeyValues(data);
+
+    Dimension dimension = new Dimension();
+    dimension.setParcelSize(data.get("size"));
+
+    ParcelJob parcelJob = new ParcelJob();
+    parcelJob.setDimensions(dimension);
+
+    DeliveryDetails request = new DeliveryDetails();
+    request.setParcelJob(parcelJob);
+
+    Long orderId = Long.parseLong(resolveValue(data.get("orderId")));
+    doWithRetry(
+        () -> getOrderClient().editDeliveryDetails(orderId, request),
+        "edit order details - parcel size", 3000, 10);
   }
 
   /**

@@ -2,6 +2,14 @@
 
 <hr>
 
+## [1.3.19-RC2] 2023-08-22
+
+### Added
+
+- API Core - Operator update parcel size:
+
+<hr>
+
 ## [1.3.18] 2023-08-14
 
 ### Added
