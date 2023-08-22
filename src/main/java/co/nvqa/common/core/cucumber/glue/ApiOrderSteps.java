@@ -177,7 +177,7 @@ public class ApiOrderSteps extends CoreStandardSteps {
 
 
   /**
-   * API Core - Operator Update Delivery Order Details:
+   * API Core - Operator update parcel size:
    *
    * @param data <br/> <b>orderId</b>: 123456 <br/> <br/> <b>size</b>: M <br/>
    */
