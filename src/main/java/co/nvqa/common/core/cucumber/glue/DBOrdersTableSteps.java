@@ -277,4 +277,12 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
             })
         ,"verify orders records", 10_000, 3);
   }
+
+  @When("DB Core - Operator searched {string} Orders with {string} Status and {string} Granular Status")
+  public void dbOperatorSearchedOrdersWithStatusAndGranularStatus(String orderNumberAsString,
+      String orderStatus, String orderGranularStatus) {
+    Integer orderNumber = Integer.parseInt(orderNumberAsString);
+    List<String> trackingIds = orderDao.getTrackingIdByStatusAndGranularStatus(orderNumber, orderStatus, orderGranularStatus);
+    put(KEY_CORE_LIST_OF_DB_TRACKING_IDS, trackingIds);
+  }
 }
