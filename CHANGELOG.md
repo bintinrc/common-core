@@ -5,7 +5,7 @@
 
 ### Added
 
-- DB Core - Operator searched {string} Orders with {string} Status and {string} Granular Status
+- DB Core - Operator search {string} Orders with {string} Status and {string} Granular Status
 
 <hr>
 
