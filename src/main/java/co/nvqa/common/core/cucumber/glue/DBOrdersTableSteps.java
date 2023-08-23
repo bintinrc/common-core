@@ -16,7 +16,6 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -270,19 +269,20 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
     List<String> resolvedData = resolveValues(data);
     doWithRetry(() ->
             resolvedData.forEach(e -> {
-              Orders actual =  orderDao.getSingleOrderDetailsById(Long.parseLong(e));
+              Orders actual = orderDao.getSingleOrderDetailsById(Long.parseLong(e));
               Assertions.assertThat(actual)
                   .as("Unexpected orders records were found: %s", actual)
                   .isNull();
             })
-        ,"verify orders records", 10_000, 3);
+        , "verify orders records", 10_000, 3);
   }
 
-  @When("DB Core - Operator searched {string} Orders with {string} Status and {string} Granular Status")
-  public void dbOperatorSearchedOrdersWithStatusAndGranularStatus(String orderNumberAsString,
+  @When("DB Core - Operator search {string} Orders with {string} Status and {string} Granular Status")
+  public void dbOperatorSearchOrdersWithStatusAndGranularStatus(String orderNumberAsString,
       String orderStatus, String orderGranularStatus) {
     Integer orderNumber = Integer.parseInt(orderNumberAsString);
-    List<String> trackingIds = orderDao.getTrackingIdByStatusAndGranularStatus(orderNumber, orderStatus, orderGranularStatus);
+    List<String> trackingIds = orderDao.getTrackingIdByStatusAndGranularStatus(orderNumber,
+        orderStatus, orderGranularStatus);
     put(KEY_CORE_LIST_OF_DB_TRACKING_IDS, trackingIds);
   }
 }
