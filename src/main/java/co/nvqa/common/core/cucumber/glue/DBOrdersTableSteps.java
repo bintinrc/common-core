@@ -36,18 +36,19 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
   @Override
   public void init() {
   }
+
   @Given("DB Core - verify order weight updated correctly")
   public void dbOperatorVerifiesHighestOrderWeight(Map<String, String> source) {
     Map<String, String> expectedData = resolveKeyValues(source);
     final long orderId = Long.parseLong(expectedData.get("order_id"));
     final double expectedWeight = Double.parseDouble(source.get("weight"));
-      doWithRetry(() -> {
-        double actualWeight = orderDao.getOrderWeight(orderId);
-        Assertions.assertThat(actualWeight).as("orders.weight equals highest weight")
-            .isEqualTo(expectedWeight);
-        put(KEY_SAVED_ORDER_WEIGHT, actualWeight);
-      }, f("Get orders.weight of id %s ", orderId), 10_000, 3);
-    }
+    doWithRetry(() -> {
+      double actualWeight = orderDao.getOrderWeight(orderId);
+      Assertions.assertThat(actualWeight).as("orders.weight equals highest weight")
+          .isEqualTo(expectedWeight);
+      put(KEY_SAVED_ORDER_WEIGHT, actualWeight);
+    }, f("Get orders.weight of id %s ", orderId), 10_000, 3);
+  }
 
   @Given("DB Core - verify orders.weight and dimensions updated correctly for order id {string}")
   public void dbOperatorVerifiesOrdersWeightDims(String id, Map<String, String> source) {
@@ -124,6 +125,19 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
         }
       }, "Generate Stamp ID");
     }
+  }
+
+  @Then("DB Core - verify total COD for driver:")
+  public void verifyTotalCod(Map<String, String> data) {
+    data = resolveKeyValues(data);
+    Long driverId = Long.parseLong(data.get("driverId"));
+    String datetimeFrom = data.get("datetimeFrom");
+    String datetimeTo = data.get("datetimeTo");
+    Double totalCod = Double.parseDouble(data.get("totalCod"));
+    var actual = orderDao.getTotalCodForDriver(driverId, datetimeFrom, datetimeTo);
+    Assertions.assertThat(actual)
+        .as("Total COD for driver %s", driverId)
+        .isEqualTo(totalCod);
   }
 
   @Then("DB Core - Operator get order by stamp id {string}")

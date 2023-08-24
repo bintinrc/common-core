@@ -211,6 +211,17 @@ public class DbRouteSteps extends CoreStandardSteps {
     }, f("get route_logs record"), 10_000, 5);
   }
 
+  @When("DB Route - get route_logs record for driver id {string}")
+  public void getAllRouteLogs(String driverId) {
+    doWithRetry(() -> {
+      var actual = routeDbDao.getAllRouteLogsByDriverId(Long.valueOf(resolveValue(driverId)));
+      Assertions.assertThat(actual)
+          .as("Route logs was not found")
+          .isNotEmpty();
+      putAllInList(KEY_LIST_OF_CREATED_ROUTES, actual);
+    }, f("get route_logs record"), 10_000, 5);
+  }
+
   @When("DB Route - get waypoint id for job id {string}")
   public void getWaypointIdByJobId(String StringJobId) {
     final long jobId = Long.parseLong(resolveValue(StringJobId));
