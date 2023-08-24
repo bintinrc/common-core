@@ -17,7 +17,8 @@ public class OrderDao extends DbBase {
 
   public OrderDao() {
     super(CoreTestConstants.DB_CORE_URL, StandardTestConstants.DB_USER,
-        StandardTestConstants.DB_PASS, true, "co.nvqa.common.core.model.persisted_class.core",
+        StandardTestConstants.DB_PASS, true,
+        "co.nvqa.common.core.model.persisted_class.core",
         "co.nvqa.common.core.model.persisted_class.route.RouteLogs");
   }
 
