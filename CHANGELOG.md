@@ -1,4 +1,19 @@
 # Change log
+<hr>
+
+## [1.3.19-RC3] 2023-08-22
+
+### Added
+
+- DB Core - Operator search {string} Orders with {string} Status and {string} Granular Status
+
+<hr>
+
+## [1.3.19-RC2] 2023-08-22
+
+### Added
+
+- API Core - Operator update parcel size:
 
 <hr>
 

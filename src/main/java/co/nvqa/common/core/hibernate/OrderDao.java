@@ -7,6 +7,7 @@ import co.nvqa.common.database.DbBase;
 import co.nvqa.common.utils.JsonUtils;
 import co.nvqa.common.utils.NvTestRuntimeException;
 import co.nvqa.common.utils.StandardTestConstants;
+import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Singleton;
 import org.apache.commons.collections.CollectionUtils;
@@ -16,7 +17,7 @@ public class OrderDao extends DbBase {
 
   public OrderDao() {
     super(CoreTestConstants.DB_CORE_URL, StandardTestConstants.DB_USER,
-        StandardTestConstants.DB_PASS, "co.nvqa.common.core.model.persisted_class.core",
+        StandardTestConstants.DB_PASS, true, "co.nvqa.common.core.model.persisted_class.core",
         "co.nvqa.common.core.model.persisted_class.route.RouteLogs");
   }
 
@@ -114,5 +115,20 @@ public class OrderDao extends DbBase {
             .setParameter("datetimeTo", datetimeTo)
             .setParameter("driverId", driverId)
     );
+  }
+
+  public List<String> getTrackingIdByStatusAndGranularStatus(int numberOfOrder, String orderStatus,
+      String orderGranularStatus) {
+    String query = "FROM Orders WHERE status = :orderStatus and granular_status = :orderGranularStatus ORDER BY created_at DESC";
+    var result = findAll(session ->
+        session.createQuery(query,Orders.class)
+            .setParameter("orderStatus", orderStatus)
+            .setParameter("orderGranularStatus",orderGranularStatus)
+            .setMaxResults(numberOfOrder));
+    List<String> trackingIds = new ArrayList<>();
+    for (Orders orders : result) {
+      trackingIds.add(orders.getTrackingId());
+    }
+    return trackingIds;
   }
 }
