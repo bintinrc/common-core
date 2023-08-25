@@ -16,6 +16,7 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.inject.Inject;
@@ -23,6 +24,7 @@ import org.assertj.core.api.Assertions;
 
 public class DbRouteSteps extends CoreStandardSteps {
 
+  private static final String SEQ_NO = "seqNo";
   @Inject
   private RouteDbDao routeDbDao;
 
@@ -66,7 +68,9 @@ public class DbRouteSteps extends CoreStandardSteps {
   @When("DB Route - verify waypoints record:")
   public void verifyWaypoints(Map<String, String> data) {
     Map<String, String> resolvedData = resolveKeyValues(data);
-    Waypoints expected = new Waypoints(resolvedData);
+    Map<String, String> withoutSeqNo = new HashMap<>(resolvedData);
+    withoutSeqNo.remove(SEQ_NO);
+    Waypoints expected = new Waypoints(withoutSeqNo);
 
     Assertions.assertThat(expected.getLegacyId())
         .as("waypoint legacyId should not be null")
@@ -79,8 +83,8 @@ public class DbRouteSteps extends CoreStandardSteps {
           .isNotNull();
       expected.compareWithActual(actual, resolvedData);
 
-      if (resolvedData.containsKey("seqNo")) {
-        if (resolvedData.get("seqNo").equalsIgnoreCase("null")) {
+      if (resolvedData.containsKey(SEQ_NO)) {
+        if (resolvedData.get(SEQ_NO).equalsIgnoreCase("null")) {
           Assertions.assertThat(actual.getSeqNo())
               .as("seq_no is null")
               .isNull();
