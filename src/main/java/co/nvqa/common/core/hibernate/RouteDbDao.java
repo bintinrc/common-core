@@ -124,6 +124,15 @@ public class RouteDbDao extends DbBase {
     return CollectionUtils.isEmpty(result) ? null : result.get(0);
   }
 
+  public List<RouteLogs> getAllRouteLogsByDriverId(Long driverId) {
+    String query = "FROM RouteLogs WHERE driverId = :driverId AND deletedAt IS NULL AND status = 0 AND systemId = :systemId ORDER BY legacyId DESC";
+    return findAll(session ->
+        session.createQuery(query, RouteLogs.class)
+            .setParameter("driverId", driverId)
+            .setParameter("systemId", StandardTestConstants.NV_SYSTEM_ID)
+            .setMaxResults(1));
+  }
+
   public JobWaypoint getWaypointIdByJobId(Long jobId) {
     List<JobWaypoint> results;
     String query = "FROM JobWaypoint "
