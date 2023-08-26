@@ -349,7 +349,17 @@ public class ApiOrderSteps extends CoreStandardSteps {
     doWithRetry(() -> getOrderClient().addOrderLevelTags(orderId, tags),
         "Operator bulk tags parcel with below tag");
   }
-
+  @When("API Core - Operator check order {string} Tag")
+  public void apiCoreBulkTagsParcelsWithBelowTag(String orderId,List<String>expectedTagList) {
+    String resolvedOrderId = resolveValue(orderId);
+    final List<String> responseTagList = getOrderClient().getOrderLevelTags(
+        Long.parseLong(resolvedOrderId));
+    for (String expectedTag : expectedTagList) {
+      boolean contains = responseTagList.contains(expectedTag);
+      Assertions.assertThat(contains).as(f("Tags %s not exist in order %d", expectedTag, orderId))
+          .isTrue();
+    }
+  }
 
   /**
    * @param dataTableRaw <br/> <b>orderId</b>: {KEY_LIST_OF_CREATED_ORDERS[1].id} <br>
