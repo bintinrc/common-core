@@ -381,7 +381,7 @@ public class ApiOrderSteps extends CoreStandardSteps {
    * @param orderId  <br/>orderId: {KEY_LIST_OF_CREATED_ORDERS[1].id}
    * @param expectedTagList :PRIOR
    */
-  @When("API Core - Operator check order {string} have the following Tag:")
+  @When("API Core - Operator check order {string} have the following Tags:")
   public void apiCoreBulkTagsParcelsWithBelowTag(String orderId, List<String> expectedTagList) {
     String resolvedOrderId = resolveValue(orderId);
     final List<String> responseTagList = getOrderClient().getOrderLevelTags(
