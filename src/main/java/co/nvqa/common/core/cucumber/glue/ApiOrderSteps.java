@@ -376,8 +376,13 @@ public class ApiOrderSteps extends CoreStandardSteps {
     doWithRetry(() -> getOrderClient().addOrderLevelTags(orderId, tags),
         "Operator bulk tags parcel with below tag");
   }
-  @When("API Core - Operator check order {string} Tag:")
-  public void apiCoreBulkTagsParcelsWithBelowTag(String orderId,List<String>expectedTagList) {
+
+  /**
+   * @param orderId  <br/>orderId: {KEY_LIST_OF_CREATED_ORDERS[1].id}
+   * @param expectedTagList :PRIOR
+   */
+  @When("API Core - Operator check order {string} have the following Tag:")
+  public void apiCoreBulkTagsParcelsWithBelowTag(String orderId, List<String> expectedTagList) {
     String resolvedOrderId = resolveValue(orderId);
     final List<String> responseTagList = getOrderClient().getOrderLevelTags(
         Long.parseLong(resolvedOrderId));
