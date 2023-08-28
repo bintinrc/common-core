@@ -139,12 +139,14 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
     String datetimeFrom = data.get("datetimeFrom");
     String datetimeTo = data.get("datetimeTo");
     Double totalCod = Double.parseDouble(data.get("totalCod"));
-    List<String> routes = routeDbDao.getRoutesForDriver(driverId, datetimeFrom, datetimeTo);
-    String routeIdsParam = routes.stream().collect(Collectors.joining(","));
-    var actual = orderDao.getTotalCodForDriver(routeIdsParam);
-    Assertions.assertThat(actual)
-        .as("Total COD for driver %s", driverId)
-        .isEqualTo(totalCod);
+    doWithRetry(() -> {
+      List<String> routes = routeDbDao.getRoutesForDriver(driverId, datetimeFrom, datetimeTo);
+      String routeIdsParam = routes.stream().collect(Collectors.joining(","));
+      var actual = orderDao.getTotalCodForDriver(routeIdsParam);
+      Assertions.assertThat(actual)
+          .as("Total COD for driver %s", driverId)
+          .isEqualTo(totalCod);
+    }, "verify cod for driver");
   }
 
   @Then("DB Core - Operator get order by stamp id {string}")
