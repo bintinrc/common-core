@@ -19,8 +19,7 @@ public class OrderDao extends DbBase {
     super(CoreTestConstants.DB_CORE_URL,
         StandardTestConstants.DB_USER,
         StandardTestConstants.DB_PASS,
-        "co.nvqa.common.core.model.persisted_class.core",
-        "co.nvqa.common.core.model.persisted_class.route.RouteLogs"
+        "co.nvqa.common.core.model.persisted_class.core"
     );
   }
 
@@ -105,18 +104,15 @@ public class OrderDao extends DbBase {
             .setParameter("shipperId", shipperId));
   }
 
-  public Double getTotalCodForDriver(Long driverId, String datetimeFrom, String datetimeTo) {
+  public Double getTotalCodForDriver(String routeIds) {
     String query =
         "SELECT SUM(c.goodsAmount) AS count "
             + "FROM Transactions AS t INNER JOIN Orders AS o ON t.orderId = o.id LEFT JOIN Cods AS c ON o.codId = c.id "
-            + "WHERE t.routeId IN "
-            + "(SELECT id FROM RouteLogs WHERE driverId = :driverId AND datetime BETWEEN :datetimeFrom and :datetimeTo AND deletedAt IS NULL)";
+            + "WHERE t.routeId IN (:routeIds)";
 
     return findOne(session ->
         session.createQuery(query, Double.class)
-            .setParameter("datetimeFrom", datetimeFrom)
-            .setParameter("datetimeTo", datetimeTo)
-            .setParameter("driverId", driverId)
+            .setParameter("routeIds", routeIds)
     );
   }
 
@@ -124,9 +120,9 @@ public class OrderDao extends DbBase {
       String orderGranularStatus) {
     String query = "FROM Orders WHERE status = :orderStatus and granular_status = :orderGranularStatus ORDER BY created_at DESC";
     var result = findAll(session ->
-        session.createQuery(query,Orders.class)
+        session.createQuery(query, Orders.class)
             .setParameter("orderStatus", orderStatus)
-            .setParameter("orderGranularStatus",orderGranularStatus)
+            .setParameter("orderGranularStatus", orderGranularStatus)
             .setMaxResults(numberOfOrder));
     List<String> trackingIds = new ArrayList<>();
     for (Orders orders : result) {

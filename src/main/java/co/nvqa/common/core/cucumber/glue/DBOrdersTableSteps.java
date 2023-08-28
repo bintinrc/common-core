@@ -4,6 +4,7 @@ import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.hibernate.CodsDao;
 import co.nvqa.common.core.hibernate.OrderDao;
 import co.nvqa.common.core.hibernate.OrderDeliveryVerificationsDao;
+import co.nvqa.common.core.hibernate.RouteDbDao;
 import co.nvqa.common.core.model.order.Order.Data;
 import co.nvqa.common.core.model.order.Order.Dimension;
 import co.nvqa.common.core.model.order.Order.PreviousAddressDetails;
@@ -16,9 +17,11 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
 import javax.inject.Inject;
 import org.assertj.core.api.Assertions;
@@ -32,6 +35,8 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
   private OrderDeliveryVerificationsDao odvDao;
   @Inject
   private CodsDao codsDao;
+  @Inject
+  private RouteDbDao routeDbDao;
 
   @Override
   public void init() {
@@ -134,7 +139,9 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
     String datetimeFrom = data.get("datetimeFrom");
     String datetimeTo = data.get("datetimeTo");
     Double totalCod = Double.parseDouble(data.get("totalCod"));
-    var actual = orderDao.getTotalCodForDriver(driverId, datetimeFrom, datetimeTo);
+    List<String> routes = routeDbDao.getRoutesForDriver(driverId, datetimeFrom, datetimeTo);
+    String routeIdsParam = routes.stream().collect(Collectors.joining(","));
+    var actual = orderDao.getTotalCodForDriver(routeIdsParam);
     Assertions.assertThat(actual)
         .as("Total COD for driver %s", driverId)
         .isEqualTo(totalCod);
