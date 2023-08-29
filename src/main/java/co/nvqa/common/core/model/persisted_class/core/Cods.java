@@ -35,7 +35,7 @@ public class Cods extends DataEntity<Cods> {
   @Column(name = "edited")
   private String edited;
   @Column(name = "goods_amount")
-  private String goodsAmount;
+  private Double goodsAmount;
   @Column(name = "shipping_amount")
   private String shippingAmount;
   @Column(name = "updated_at")
