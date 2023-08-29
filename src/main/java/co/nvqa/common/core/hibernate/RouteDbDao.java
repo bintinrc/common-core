@@ -13,6 +13,7 @@ import co.nvqa.common.core.utils.CoreTestConstants;
 import co.nvqa.common.database.DbBase;
 import co.nvqa.common.utils.StandardTestConstants;
 import com.google.inject.Singleton;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.collections.CollectionUtils;
@@ -144,4 +145,20 @@ public class RouteDbDao extends DbBase {
             .setParameter("systemId", StandardTestConstants.NV_SYSTEM_ID));
     return results.get(0);
   }
+
+  public List<String> getRoutesForDriver(Long driverId, String datetimeFrom, String datetimeTo) {
+    String query = "FROM RouteLogs WHERE driverId = :driverId AND datetime BETWEEN :datetimeFrom and :datetimeTo AND deletedAt IS NULL AND systemId = :systemId";
+    var result = findAll(session ->
+        session.createQuery(query, RouteLogs.class)
+            .setParameter("datetimeFrom", datetimeFrom)
+            .setParameter("datetimeTo", datetimeTo)
+            .setParameter("driverId", driverId)
+            .setParameter("systemId", StandardTestConstants.NV_SYSTEM_ID));
+    List<String> routeIds = new ArrayList<>();
+    for (RouteLogs routes : result) {
+      routeIds.add(String.valueOf(routes.getLegacyId()));
+    }
+    return routeIds;
+  }
+
 }
