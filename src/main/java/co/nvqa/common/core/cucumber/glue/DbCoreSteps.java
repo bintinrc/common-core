@@ -337,6 +337,7 @@ public class DbCoreSteps extends CoreStandardSteps {
       Map<String, String> expectedData = resolveKeyValues(mapOfData);
       List<Transactions> result = transactionsDao.getMultipleTransactionsByOrderId(
           Long.parseLong((expectedData.get("order_id"))));
+      put(KEY_CORE_LIST_OF_TRANSACTIONS, result);
       if (mapOfData.containsKey("number_of_transactions")) {
         Assertions.assertThat(result.size()).as("number of transactions")
             .isEqualTo(Integer.parseInt(expectedData.get("number_of_transactions")));
