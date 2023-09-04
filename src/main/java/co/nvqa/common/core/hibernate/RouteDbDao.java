@@ -1,8 +1,8 @@
 package co.nvqa.common.core.hibernate;
 
-import co.nvqa.common.core.model.persisted_class.route.JobWaypoint;
 import co.nvqa.common.core.model.persisted_class.route.AreaVariation;
 import co.nvqa.common.core.model.persisted_class.route.Coverage;
+import co.nvqa.common.core.model.persisted_class.route.JobWaypoint;
 import co.nvqa.common.core.model.persisted_class.route.Keyword;
 import co.nvqa.common.core.model.persisted_class.route.RouteGroup;
 import co.nvqa.common.core.model.persisted_class.route.RouteGroupReferences;
@@ -159,6 +159,11 @@ public class RouteDbDao extends DbBase {
       routeIds.add(String.valueOf(routes.getLegacyId()));
     }
     return routeIds;
+  }
+
+  public void softDeleteRoute(long routeId) {
+    String query = "UPDATE RouteLogs SET deletedAt = NOW() WHERE id = " + routeId;
+    saveOrUpdate(s -> s.createQuery(query));
   }
 
 }

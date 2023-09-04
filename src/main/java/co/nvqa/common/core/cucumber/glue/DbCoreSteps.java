@@ -13,6 +13,7 @@ import co.nvqa.common.core.hibernate.OrderTagsDao;
 import co.nvqa.common.core.hibernate.OrderTagsSearchDao;
 import co.nvqa.common.core.hibernate.OutboundScansDao;
 import co.nvqa.common.core.hibernate.ReservationsDao;
+import co.nvqa.common.core.hibernate.RouteDbDao;
 import co.nvqa.common.core.hibernate.RouteMonitoringDataDao;
 import co.nvqa.common.core.hibernate.RouteWaypointDao;
 import co.nvqa.common.core.hibernate.ShipperPickupSearchDao;
@@ -84,6 +85,8 @@ public class DbCoreSteps extends CoreStandardSteps {
   private OrderTagsSearchDao orderTagsSearchDao;
   @Inject
   private RouteWaypointDao routeWaypointDao;
+  @Inject
+  private RouteDbDao routeDbDao;
   @Inject
   private CodCollectionDao codCollectionDao;
   @Inject
@@ -660,5 +663,10 @@ public class DbCoreSteps extends CoreStandardSteps {
       var result = orderDeliveryDetailsDao.getOrderDeliveryDetails(Long.parseLong(orderId));
       putInList(KEY_CORE_LIST_OF_ORDER_DELIVERY_DETAILS, result);
     }, "get order_delivery_details record", 10_000, 3);
+  }
+
+  @Given("DB Core - soft delete route {value}")
+  public void dbOperatorSoftDeleteRoute(String routeId) {
+    routeDbDao.softDeleteRoute(resolveValue(routeId));
   }
 }
