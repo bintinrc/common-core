@@ -4,6 +4,7 @@ import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.hibernate.CodsDao;
 import co.nvqa.common.core.hibernate.OrderDao;
 import co.nvqa.common.core.hibernate.OrderDeliveryVerificationsDao;
+import co.nvqa.common.core.hibernate.RouteDbDao;
 import co.nvqa.common.core.model.order.Order.Data;
 import co.nvqa.common.core.model.order.Order.Dimension;
 import co.nvqa.common.core.model.order.Order.PreviousAddressDetails;
@@ -16,10 +17,11 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
 import javax.inject.Inject;
 import org.assertj.core.api.Assertions;
@@ -33,22 +35,25 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
   private OrderDeliveryVerificationsDao odvDao;
   @Inject
   private CodsDao codsDao;
+  @Inject
+  private RouteDbDao routeDbDao;
 
   @Override
   public void init() {
   }
+
   @Given("DB Core - verify order weight updated correctly")
   public void dbOperatorVerifiesHighestOrderWeight(Map<String, String> source) {
     Map<String, String> expectedData = resolveKeyValues(source);
     final long orderId = Long.parseLong(expectedData.get("order_id"));
     final double expectedWeight = Double.parseDouble(source.get("weight"));
-      doWithRetry(() -> {
-        double actualWeight = orderDao.getOrderWeight(orderId);
-        Assertions.assertThat(actualWeight).as("orders.weight equals highest weight")
-            .isEqualTo(expectedWeight);
-        put(KEY_SAVED_ORDER_WEIGHT, actualWeight);
-      }, f("Get orders.weight of id %s ", orderId), 10_000, 3);
-    }
+    doWithRetry(() -> {
+      double actualWeight = orderDao.getOrderWeight(orderId);
+      Assertions.assertThat(actualWeight).as("orders.weight equals highest weight")
+          .isEqualTo(expectedWeight);
+      put(KEY_SAVED_ORDER_WEIGHT, actualWeight);
+    }, f("Get orders.weight of id %s ", orderId), 10_000, 3);
+  }
 
   @Given("DB Core - verify orders.weight and dimensions updated correctly for order id {string}")
   public void dbOperatorVerifiesOrdersWeightDims(String id, Map<String, String> source) {
@@ -125,6 +130,23 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
         }
       }, "Generate Stamp ID");
     }
+  }
+
+  @Then("DB Core - verify total COD for driver:")
+  public void verifyTotalCod(Map<String, String> data) {
+    data = resolveKeyValues(data);
+    Long driverId = Long.parseLong(data.get("driverId"));
+    String datetimeFrom = data.get("datetimeFrom");
+    String datetimeTo = data.get("datetimeTo");
+    Double totalCod = Double.parseDouble(data.get("totalCod"));
+    doWithRetry(() -> {
+      List<String> routes = routeDbDao.getRoutesForDriver(driverId, datetimeFrom, datetimeTo);
+      String routeIdsParam = routes.stream().collect(Collectors.joining(","));
+      var actual = orderDao.getTotalCodForDriver(routeIdsParam);
+      Assertions.assertThat(actual)
+          .as("Total COD for driver %s", driverId)
+          .isEqualTo(totalCod);
+    }, "verify cod for driver");
   }
 
   @Then("DB Core - Operator get order by stamp id {string}")
@@ -270,11 +292,20 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
     List<String> resolvedData = resolveValues(data);
     doWithRetry(() ->
             resolvedData.forEach(e -> {
-              Orders actual =  orderDao.getSingleOrderDetailsById(Long.parseLong(e));
+              Orders actual = orderDao.getSingleOrderDetailsById(Long.parseLong(e));
               Assertions.assertThat(actual)
                   .as("Unexpected orders records were found: %s", actual)
                   .isNull();
             })
-        ,"verify orders records", 10_000, 3);
+        , "verify orders records", 10_000, 3);
+  }
+
+  @When("DB Core - Operator search {string} Orders with {string} Status and {string} Granular Status")
+  public void dbOperatorSearchOrdersWithStatusAndGranularStatus(String orderNumberAsString,
+      String orderStatus, String orderGranularStatus) {
+    Integer orderNumber = Integer.parseInt(orderNumberAsString);
+    List<String> trackingIds = orderDao.getTrackingIdByStatusAndGranularStatus(orderNumber,
+        orderStatus, orderGranularStatus);
+    put(KEY_CORE_LIST_OF_DB_TRACKING_IDS, trackingIds);
   }
 }

@@ -7,6 +7,7 @@ import co.nvqa.common.database.DbBase;
 import co.nvqa.common.utils.JsonUtils;
 import co.nvqa.common.utils.NvTestRuntimeException;
 import co.nvqa.common.utils.StandardTestConstants;
+import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Singleton;
 import org.apache.commons.collections.CollectionUtils;
@@ -15,8 +16,11 @@ import org.apache.commons.collections.CollectionUtils;
 public class OrderDao extends DbBase {
 
   public OrderDao() {
-    super(CoreTestConstants.DB_CORE_URL, StandardTestConstants.DB_USER,
-        StandardTestConstants.DB_PASS, "co.nvqa.common.core.model.persisted_class.core");
+    super(CoreTestConstants.DB_CORE_URL,
+        StandardTestConstants.DB_USER,
+        StandardTestConstants.DB_PASS,
+        "co.nvqa.common.core.model.persisted_class.core"
+    );
   }
 
   public Double getOrderWeight(Long orderId) {
@@ -98,5 +102,32 @@ public class OrderDao extends DbBase {
     return findAll(session ->
         session.createQuery(query, Orders.class)
             .setParameter("shipperId", shipperId));
+  }
+
+  public Double getTotalCodForDriver(String routeIds) {
+    String query =
+        "SELECT SUM(c.goodsAmount) AS count "
+            + "FROM Transactions AS t INNER JOIN Orders AS o ON t.orderId = o.id LEFT JOIN Cods AS c ON o.codId = c.id "
+            + "WHERE t.routeId IN (:routeIds)";
+
+    return findOne(session ->
+        session.createQuery(query, Double.class)
+            .setParameter("routeIds", routeIds)
+    );
+  }
+
+  public List<String> getTrackingIdByStatusAndGranularStatus(int numberOfOrder, String orderStatus,
+      String orderGranularStatus) {
+    String query = "FROM Orders WHERE status = :orderStatus and granular_status = :orderGranularStatus ORDER BY created_at DESC";
+    var result = findAll(session ->
+        session.createQuery(query, Orders.class)
+            .setParameter("orderStatus", orderStatus)
+            .setParameter("orderGranularStatus", orderGranularStatus)
+            .setMaxResults(numberOfOrder));
+    List<String> trackingIds = new ArrayList<>();
+    for (Orders orders : result) {
+      trackingIds.add(orders.getTrackingId());
+    }
+    return trackingIds;
   }
 }

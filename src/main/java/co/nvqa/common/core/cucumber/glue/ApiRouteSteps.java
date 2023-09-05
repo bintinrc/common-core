@@ -713,4 +713,12 @@ public class ApiRouteSteps extends CoreStandardSteps {
       putInList(KEY_LIST_OF_CREATED_ROUTE_GROUPS, response);
     }, "Create route group", 2000, 3);
   }
+
+  @Given("API Route - delete routes:")
+  public void deleteRoutes(List<String> routeIds) {
+    routeIds = resolveValues(routeIds);
+    routeIds.stream()
+        .map(Long::parseLong)
+        .forEach(id -> getRouteClient().deleteRoute(id));
+  }
 }

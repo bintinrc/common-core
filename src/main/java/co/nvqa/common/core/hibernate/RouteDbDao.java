@@ -1,8 +1,8 @@
 package co.nvqa.common.core.hibernate;
 
-import co.nvqa.common.core.model.persisted_class.route.JobWaypoint;
 import co.nvqa.common.core.model.persisted_class.route.AreaVariation;
 import co.nvqa.common.core.model.persisted_class.route.Coverage;
+import co.nvqa.common.core.model.persisted_class.route.JobWaypoint;
 import co.nvqa.common.core.model.persisted_class.route.Keyword;
 import co.nvqa.common.core.model.persisted_class.route.RouteGroup;
 import co.nvqa.common.core.model.persisted_class.route.RouteGroupReferences;
@@ -13,6 +13,7 @@ import co.nvqa.common.core.utils.CoreTestConstants;
 import co.nvqa.common.database.DbBase;
 import co.nvqa.common.utils.StandardTestConstants;
 import com.google.inject.Singleton;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.collections.CollectionUtils;
@@ -124,6 +125,15 @@ public class RouteDbDao extends DbBase {
     return CollectionUtils.isEmpty(result) ? null : result.get(0);
   }
 
+  public List<RouteLogs> getAllRouteLogsByDriverId(Long driverId) {
+    String query = "FROM RouteLogs WHERE driverId = :driverId AND deletedAt IS NULL AND status = 0 AND systemId = :systemId ORDER BY legacyId DESC";
+    return findAll(session ->
+        session.createQuery(query, RouteLogs.class)
+            .setParameter("driverId", driverId)
+            .setParameter("systemId", StandardTestConstants.NV_SYSTEM_ID)
+            .setMaxResults(1));
+  }
+
   public JobWaypoint getWaypointIdByJobId(Long jobId) {
     List<JobWaypoint> results;
     String query = "FROM JobWaypoint "
@@ -135,4 +145,25 @@ public class RouteDbDao extends DbBase {
             .setParameter("systemId", StandardTestConstants.NV_SYSTEM_ID));
     return results.get(0);
   }
+
+  public List<String> getRoutesForDriver(Long driverId, String datetimeFrom, String datetimeTo) {
+    String query = "FROM RouteLogs WHERE driverId = :driverId AND datetime BETWEEN :datetimeFrom and :datetimeTo AND deletedAt IS NULL AND systemId = :systemId";
+    var result = findAll(session ->
+        session.createQuery(query, RouteLogs.class)
+            .setParameter("datetimeFrom", datetimeFrom)
+            .setParameter("datetimeTo", datetimeTo)
+            .setParameter("driverId", driverId)
+            .setParameter("systemId", StandardTestConstants.NV_SYSTEM_ID));
+    List<String> routeIds = new ArrayList<>();
+    for (RouteLogs routes : result) {
+      routeIds.add(String.valueOf(routes.getLegacyId()));
+    }
+    return routeIds;
+  }
+
+  public void softDeleteRoute(long routeId) {
+    String query = "UPDATE RouteLogs SET deletedAt = NOW() WHERE id = " + routeId;
+    saveOrUpdate(s -> s.createQuery(query));
+  }
+
 }

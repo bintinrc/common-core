@@ -39,6 +39,10 @@ public class RouteLogs extends DataEntity<RouteLogs> {
   private Long legacyId;
   @Column(name = "system_id")
   private String systemId;
+  @Column(name = "datetime")
+  private String datetime;
+  @Column(name = "route_comments")
+  private String comments;
 
   public RouteLogs(Map<String, ?> data) {
     super(data);
