@@ -12,7 +12,6 @@
 - API Core - verify driver's total cod:
 - API Route - delete routes:
 - DB Core - Operator search {string} Orders with {string} Status and {string} Granular Status
-- DB Core - Operator search {string} Orders with {string} Status and {string} Granular Status
 - DB Core - soft delete route {value}
 - DB Core - verify total COD for driver:
 - DB Route - get route_logs record for driver id {string}
