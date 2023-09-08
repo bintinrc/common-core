@@ -18,7 +18,7 @@ public class ApiDebugSteps extends CoreStandardSteps {
 
   @Override
   public void init() {
-
+    // This method is empty by design.
   }
 
   @Then("API Core - verify driver's total cod:")

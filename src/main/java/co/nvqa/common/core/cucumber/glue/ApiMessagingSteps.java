@@ -16,7 +16,7 @@ public class ApiMessagingSteps extends CoreStandardSteps {
 
   @Override
   public void init() {
-
+    // This method is empty by design.
   }
 
   /**

@@ -16,6 +16,7 @@ public class DbOrderPickupsSteps extends CoreStandardSteps {
 
   @Override
   public void init() {
+    // This method is empty by design.
   }
 
   /**

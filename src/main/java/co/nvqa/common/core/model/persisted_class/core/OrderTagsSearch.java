@@ -1,12 +1,8 @@
 package co.nvqa.common.core.model.persisted_class.core;
 
 import co.nvqa.common.model.DataEntity;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;

@@ -30,6 +30,7 @@ public class DbRouteSteps extends CoreStandardSteps {
 
   @Override
   public void init() {
+    // This method is empty by design.
   }
 
   @When("DB Route - verify route_groups_references record:")
@@ -135,7 +136,7 @@ public class DbRouteSteps extends CoreStandardSteps {
     String coverageIdValue = resolveValue(coverageId);
     doWithRetry(() -> {
       Coverage actual = routeDbDao.getCoverageById(Long.valueOf(coverageIdValue));
-      Assertions.assertThat(actual).as("Coverage with id "+coverageIdValue).isNull();
+      Assertions.assertThat(actual).as("Coverage with id " + coverageIdValue).isNull();
     }, "verify sr_coverages");
   }
 

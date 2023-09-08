@@ -101,6 +101,7 @@ public class DbCoreSteps extends CoreStandardSteps {
 
   @Override
   public void init() {
+    // This method is empty by design.
   }
 
   @And("DB Core - get Reservation data from reservation id {string}")

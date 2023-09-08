@@ -2,7 +2,6 @@ package co.nvqa.common.core.cucumber.glue;
 
 import co.nvqa.common.core.client.ReservationClient;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
-import co.nvqa.common.core.model.reservation.BulkRouteReservationResponse;
 import co.nvqa.common.core.model.reservation.ReservationFilter;
 import co.nvqa.common.core.model.reservation.ReservationRequest;
 import co.nvqa.common.core.model.reservation.ReservationResponse;
@@ -12,7 +11,6 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import javax.inject.Inject;
@@ -28,7 +26,7 @@ public class ApiReservationSteps extends CoreStandardSteps {
 
   @Override
   public void init() {
-
+    // This method is empty by design.
   }
 
   /**

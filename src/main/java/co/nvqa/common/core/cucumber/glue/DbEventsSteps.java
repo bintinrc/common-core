@@ -17,6 +17,7 @@ public class DbEventsSteps extends CoreStandardSteps {
 
   @Override
   public void init() {
+    // This method is empty by design.
   }
 
   @When("DB Events - verify order_events record:")

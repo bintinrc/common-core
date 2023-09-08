@@ -1,6 +1,5 @@
 package co.nvqa.common.core.model.route;
 
-import com.ctc.wstx.shaded.msv_core.util.LightStack;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

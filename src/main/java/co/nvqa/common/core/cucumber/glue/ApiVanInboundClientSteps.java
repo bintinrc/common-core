@@ -1,7 +1,7 @@
 package co.nvqa.common.core.cucumber.glue;
 
-import co.nvqa.common.core.client.VanInboundClient;
 import co.nvqa.common.core.client.RouteClient;
+import co.nvqa.common.core.client.VanInboundClient;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.model.VanInboundRequest;
 import co.nvqa.common.core.model.order.Order;
@@ -26,7 +26,7 @@ public class ApiVanInboundClientSteps extends CoreStandardSteps {
 
   @Override
   public void init() {
-
+    // This method is empty by design.
   }
 
   /**

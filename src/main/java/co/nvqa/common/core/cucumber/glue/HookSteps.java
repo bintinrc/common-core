@@ -49,7 +49,7 @@ public class HookSteps extends CoreStandardSteps {
 
   @Override
   public void init() {
-
+    // This method is empty by design.
   }
 
   @After("@ArchiveRouteCommonV2")

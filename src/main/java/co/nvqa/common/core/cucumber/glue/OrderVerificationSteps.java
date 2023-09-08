@@ -29,7 +29,7 @@ public class OrderVerificationSteps extends CoreStandardSteps {
 
   @Override
   public void init() {
-
+    // This method is empty by design.
   }
 
   //  type = Pickup|Delivery
