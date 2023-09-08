@@ -1,5 +1,13 @@
 # Change log
+
 <hr>
+
+## [1.3.20] 2023-09-08
+
+### Added
+
+- DB Core - operator get transaction records with:
+-
 
 ## [1.3.19] 2023-09-05
 
