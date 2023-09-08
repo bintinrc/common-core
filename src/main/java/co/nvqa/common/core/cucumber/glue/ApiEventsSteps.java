@@ -24,7 +24,7 @@ public class ApiEventsSteps extends CoreStandardSteps {
 
   @Override
   public void init() {
-
+    // This method is empty by design.
   }
 
   /**
@@ -52,15 +52,13 @@ public class ApiEventsSteps extends CoreStandardSteps {
           final List<Event> eventsData = events.getData();
 
           for (Event eventData : eventsData) {
-            if (eventData.getType().equals(eventName)) {
-              if (eventData.getUserName().equals(userId)) {
-                Assertions.assertThat(eventData.getData().getStatus())
-                    .as("Auto AV order event status is correct").isEqualTo(status);
-                Assertions.assertThat(eventData.getData().getMode())
-                    .as("Auto AV order event mode is correct").isEqualTo(mode);
-                Assertions.assertThat(eventData.getData().getSource())
-                    .as("order event delivery waypoint id is correct").isEqualTo(source);
-              }
+            if (eventData.getType().equals(eventName) && (eventData.getUserName().equals(userId))) {
+              Assertions.assertThat(eventData.getData().getStatus())
+                  .as("Auto AV order event status is correct").isEqualTo(status);
+              Assertions.assertThat(eventData.getData().getMode())
+                  .as("Auto AV order event mode is correct").isEqualTo(mode);
+              Assertions.assertThat(eventData.getData().getSource())
+                  .as("order event delivery waypoint id is correct").isEqualTo(source);
             }
           }
         }, "verify AV event");
@@ -96,11 +94,11 @@ public class ApiEventsSteps extends CoreStandardSteps {
           .collect(Collectors.toList());
 
       Assertions.assertThat(actualOrderEvents).anySatisfy(
-          event -> Assertions.assertThat(event.getType()).withFailMessage(
-              f("Event %s is NOT published for order id: %d", expectedOrderEvent.getType(),
-                  orderId)).isEqualTo(expectedOrderEvent.getType()));
+          event -> Assertions.assertThat(event.getType())
+              .as(f("Event %s published for order id: %d", expectedOrderEvent.getType(), orderId))
+              .isEqualTo(expectedOrderEvent.getType()));
 
-    }, String.format("%s event is published for order id %d", expectedOrderEvent, orderId));
+    }, String.format("Event %s published for order id: %d", expectedOrderEvent.getType(), orderId));
   }
 
 
@@ -124,17 +122,17 @@ public class ApiEventsSteps extends CoreStandardSteps {
           .collect(Collectors.toList());
 
       Assertions.assertThat(actualOrderEvents).anySatisfy(
-          event -> Assertions.assertThat(event.getType()).withFailMessage(
-              f("Event %s is NOT published for order id: %d", expectedEventType, orderId))
+          event -> Assertions.assertThat(event.getType())
+              .as(f("Event %s published for order id: %d", expectedEventType, orderId))
               .isEqualTo(expectedEventType));
 
       Assertions.assertThat(actualOrderEvents).anySatisfy(
-          event -> Assertions.assertThat(event.getData()).withFailMessage(
-              f("Actual data:\n %s \ndoes not match expected data:\n %s", toJson(event.getData()),
+          event -> Assertions.assertThat(event.getData())
+              .as(f("Actual data:\n %s \n matched expected data:\n %s", toJson(event.getData()),
                   toJson(expectedEventDetail))).usingRecursiveComparison()
               .ignoringExpectedNullFields().isEqualTo(expectedEventDetail));
 
-    }, String.format("%s event is published for order id %d with expected details %s",
+    }, String.format("Event %s is published for order id %d with expected details %s",
         expectedEventType, orderId, toJson(expectedEventDetail)));
   }
 }
