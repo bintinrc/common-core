@@ -7,7 +7,8 @@
 ### Added
 
 - DB Core - operator get transaction records with:
--
+
+<hr>
 
 ## [1.3.19] 2023-09-05
 
