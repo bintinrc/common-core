@@ -37,10 +37,6 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
   @Inject
   private RouteDbDao routeDbDao;
 
-  @Override
-  public void init() {
-    // This method is empty by design.
-  }
 
   @Given("DB Core - verify order weight updated correctly")
   public void dbOperatorVerifiesHighestOrderWeight(Map<String, String> source) {

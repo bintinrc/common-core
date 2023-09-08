@@ -48,10 +48,6 @@ public class ApiRouteSteps extends CoreStandardSteps {
   @Getter
   private RouteClient routeClient;
 
-  @Override
-  public void init() {
-    // This method is empty by design.
-  }
 
   /**
    * Sample:
@@ -184,7 +180,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
 
   @Given("API Core - Operator remove pickup job id {string} from route")
   public void apiOperatorRemovePickupJobFromRouteUsingDataBelow(String paJobId) {
-    final Long jobId = Long.parseLong(resolveValue(paJobId));
+    final long jobId = Long.parseLong(resolveValue(paJobId));
     doWithRetry(
         () -> getRouteClient().removePAJobFromRoute(jobId),
         "remove pa job from route");
@@ -480,8 +476,8 @@ public class ApiRouteSteps extends CoreStandardSteps {
   @Given("API Core - Operator new add parcel to DP holding route:")
   public void operatorAddToDpHoldingRoute(Map<String, String> data) {
     data = resolveKeyValues(data);
-    final Long routeId = Long.parseLong(data.get("routeId"));
-    final Long orderId = Long.parseLong(data.get("orderId"));
+    final long routeId = Long.parseLong(data.get("routeId"));
+    final long orderId = Long.parseLong(data.get("orderId"));
     doWithRetry(
         () -> getRouteClient().addToRouteDp(orderId, routeId),
         "Add to route dp order");

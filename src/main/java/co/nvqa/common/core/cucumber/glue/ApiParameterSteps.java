@@ -22,10 +22,6 @@ public class ApiParameterSteps extends CoreStandardSteps {
   @Getter
   private ParameterClient parameterClient;
 
-  @Override
-  public void init() {
-    // This method is empty by design.
-  }
 
   @When("API Core - set system parameter:")
   public void getPickupFromReservationId(Map<String, String> data) {

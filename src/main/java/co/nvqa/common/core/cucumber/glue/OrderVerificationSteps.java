@@ -27,10 +27,6 @@ public class OrderVerificationSteps extends CoreStandardSteps {
   @Getter
   private OrderClient orderClient;
 
-  @Override
-  public void init() {
-    // This method is empty by design.
-  }
 
   //  type = Pickup|Delivery
   @Given("API Core - Operator verifies {string} transactions of following orders have same waypoint id:")

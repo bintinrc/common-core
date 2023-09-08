@@ -22,11 +22,6 @@ public class ApiPickupSteps extends CoreStandardSteps {
   @Getter
   private PickupClient pickupClient;
 
-  @Override
-  public void init() {
-    // This method is empty by design.
-  }
-
   /**
    * <br/><b>Output key</b>: <ul><li>KEY_LIST_OF_PICKUPS: list of pickups</li></ul>
    * <p>

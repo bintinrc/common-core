@@ -24,10 +24,6 @@ public class ApiVanInboundClientSteps extends CoreStandardSteps {
   @Getter
   private RouteClient routeClient;
 
-  @Override
-  public void init() {
-    // This method is empty by design.
-  }
 
   /**
    * Example: And API Core - Operator van inbound orders |ordersListKey|{KEY_LIST_OF_CREATED_ORDERS[1]}|

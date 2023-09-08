@@ -28,10 +28,6 @@ public class DbRouteSteps extends CoreStandardSteps {
   @Inject
   private RouteDbDao routeDbDao;
 
-  @Override
-  public void init() {
-    // This method is empty by design.
-  }
 
   @When("DB Route - verify route_groups_references record:")
   public void verifyRouteGroupsReference(Map<String, String> data) {
@@ -228,8 +224,8 @@ public class DbRouteSteps extends CoreStandardSteps {
   }
 
   @When("DB Route - get waypoint id for job id {string}")
-  public void getWaypointIdByJobId(String StringJobId) {
-    final long jobId = Long.parseLong(resolveValue(StringJobId));
+  public void getWaypointIdByJobId(String stringJobId) {
+    final long jobId = Long.parseLong(resolveValue(stringJobId));
     final JobWaypoint jobWaypoint = doWithRetry(() -> {
       final JobWaypoint result = routeDbDao.getWaypointIdByJobId(jobId);
       if (result == null) {

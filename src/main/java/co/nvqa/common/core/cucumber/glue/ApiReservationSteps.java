@@ -24,11 +24,6 @@ public class ApiReservationSteps extends CoreStandardSteps {
   @Getter
   private ReservationClient reservationClient;
 
-  @Override
-  public void init() {
-    // This method is empty by design.
-  }
-
   /**
    * Sample:
    * <p>

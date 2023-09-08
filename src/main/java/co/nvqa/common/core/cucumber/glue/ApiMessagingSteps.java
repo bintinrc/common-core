@@ -14,10 +14,6 @@ public class ApiMessagingSteps extends CoreStandardSteps {
   @Getter
   private MessagingClient messagingClient;
 
-  @Override
-  public void init() {
-    // This method is empty by design.
-  }
 
   /**
    * <br/> <b>trackingId</b>: order ID of the order/parcel<br/>

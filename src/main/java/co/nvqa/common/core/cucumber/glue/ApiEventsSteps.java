@@ -22,10 +22,6 @@ public class ApiEventsSteps extends CoreStandardSteps {
   @Getter
   private EventClient eventClient;
 
-  @Override
-  public void init() {
-    // This method is empty by design.
-  }
 
   /**
    * @param dataTableRaw <br/> <b>orderId</b>: order ID of the order/parcel<br/>

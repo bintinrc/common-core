@@ -14,10 +14,6 @@ public class ApiOutboundSteps extends CoreStandardSteps {
   @Getter
   private OutboundClient outboundClient;
 
-  @Override
-  public void init() {
-    // This method is empty by design.
-  }
 
   @Given("API Core - Operator Outbound Scan parcel using data below:")
   public void apiOperatorOutboundScanParcel(Map<String, String> dataTableAsMap) {

@@ -14,10 +14,6 @@ public class DbOrderPickupsSteps extends CoreStandardSteps {
   @Inject
   private OrderPickupsDao orderPickupsDao;
 
-  @Override
-  public void init() {
-    // This method is empty by design.
-  }
 
   /**
    * This method enforce the pickup to be non NULL in order_pickups table
