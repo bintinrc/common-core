@@ -48,10 +48,6 @@ public class ApiRouteSteps extends CoreStandardSteps {
   @Getter
   private RouteClient routeClient;
 
-  @Override
-  public void init() {
-
-  }
 
   /**
    * Sample:
@@ -184,7 +180,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
 
   @Given("API Core - Operator remove pickup job id {string} from route")
   public void apiOperatorRemovePickupJobFromRouteUsingDataBelow(String paJobId) {
-    final Long jobId = Long.parseLong(resolveValue(paJobId));
+    final long jobId = Long.parseLong(resolveValue(paJobId));
     doWithRetry(
         () -> getRouteClient().removePAJobFromRoute(jobId),
         "remove pa job from route");
@@ -329,11 +325,11 @@ public class ApiRouteSteps extends CoreStandardSteps {
           reservationId, overwrite);
 
       Assertions.assertThat(r.statusCode())
-          .withFailMessage("unexpected http status: " + r.statusCode())
+          .as("expected http status: " + r.statusCode())
           .isEqualTo(expectedStatusCode);
 
       Assertions.assertThat(r.getBody().asString())
-          .withFailMessage("unexpected error message: " + r.getBody().asString())
+          .as("expected error message: " + r.getBody().asString())
           .isEqualTo(expectedErrorMessage);
     }, "(expected) failed add reservation to route");
   }
@@ -365,11 +361,11 @@ public class ApiRouteSteps extends CoreStandardSteps {
           reservationResultId);
 
       Assertions.assertThat(r.statusCode())
-          .withFailMessage("unexpected http status: " + r.statusCode())
+          .as("expected http status: " + r.statusCode())
           .isEqualTo(expectedStatusCode);
 
       Assertions.assertThat(r.getBody().asString())
-          .withFailMessage("unexpected error message: " + r.getBody().asString())
+          .as("expected error message: " + r.getBody().asString())
           .isEqualTo(expectedErrorMessage);
     }, "(expected) failed add reservation to route");
   }
@@ -463,10 +459,10 @@ public class ApiRouteSteps extends CoreStandardSteps {
     List<Data> actual =
         fromJson(resolvedDataTable.get("actualResponse"), MergeWaypointsResponse.class).getData();
     Assertions.assertThat(actual)
-        .withFailMessage("merge waypoints response is null")
+        .as("merge waypoints response is not null")
         .isNotNull();
     Assertions.assertThat(actual.size())
-        .withFailMessage("merge waypoints response size doesnt match")
+        .as("merge waypoints response size match")
         .isEqualTo(expected.size());
     expected.forEach(o -> DataEntity.assertListContains(actual, o, "merged waypoints list"));
   }
@@ -480,8 +476,8 @@ public class ApiRouteSteps extends CoreStandardSteps {
   @Given("API Core - Operator new add parcel to DP holding route:")
   public void operatorAddToDpHoldingRoute(Map<String, String> data) {
     data = resolveKeyValues(data);
-    final Long routeId = Long.parseLong(data.get("routeId"));
-    final Long orderId = Long.parseLong(data.get("orderId"));
+    final long routeId = Long.parseLong(data.get("routeId"));
+    final long orderId = Long.parseLong(data.get("orderId"));
     doWithRetry(
         () -> getRouteClient().addToRouteDp(orderId, routeId),
         "Add to route dp order");

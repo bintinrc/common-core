@@ -54,10 +54,6 @@ public class ApiOrderSteps extends CoreStandardSteps {
   @Getter
   private CodInboundsClient codInboundsClient;
 
-  @Override
-  public void init() {
-    // This method is empty by design.
-  }
 
   /**
    * <br/><b>Output key</b>: <ul><li>KEY_LIST_OF_CREATED_ORDERS: list of orders</li></ul>

@@ -16,13 +16,10 @@ import lombok.Getter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @ScenarioScoped
 public class OrderVerificationSteps extends CoreStandardSteps {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ApiOrderSteps.class);
   public static final String TRANSACTION_TYPE_PICKUP = "PICKUP";
   public static final String TRANSACTION_TYPE_DELIVERY = "DELIVERY";
 
@@ -30,10 +27,6 @@ public class OrderVerificationSteps extends CoreStandardSteps {
   @Getter
   private OrderClient orderClient;
 
-  @Override
-  public void init() {
-
-  }
 
   //  type = Pickup|Delivery
   @Given("API Core - Operator verifies {string} transactions of following orders have same waypoint id:")

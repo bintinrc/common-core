@@ -17,11 +17,6 @@ public class ApiDpSteps extends CoreStandardSteps {
   @Getter
   private CoreDpClient coreDpClient;
 
-  @Override
-  public void init() {
-
-  }
-
   /**
    * API Core - Operator perform dp drop off with order id "{string}"
    *

@@ -25,6 +25,7 @@ import co.nvqa.common.core.model.order.SearchOrderTagResponse;
 import co.nvqa.common.core.model.order.Tag;
 import co.nvqa.common.core.model.order.UserDetails;
 import co.nvqa.common.utils.NvTestHttpException;
+import co.nvqa.common.utils.NvTestRuntimeException;
 import co.nvqa.common.utils.StandardTestConstants;
 import co.nvqa.commonauth.utils.TokenUtils;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -787,7 +788,7 @@ public class OrderClient extends SimpleApiClient {
 
       return order;
     } catch (Exception ex) {
-      throw new RuntimeException(ex);
+      throw new NvTestRuntimeException(ex);
     }
   }
 

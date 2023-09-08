@@ -7,21 +7,13 @@ import io.cucumber.java.en.Given;
 import java.util.Map;
 import javax.inject.Inject;
 import lombok.Getter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ApiOutboundSteps extends CoreStandardSteps {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(ApiOutboundSteps.class);
-
+  
   @Inject
   @Getter
   private OutboundClient outboundClient;
 
-  @Override
-  public void init() {
-    // This method is empty by design.
-  }
 
   @Given("API Core - Operator Outbound Scan parcel using data below:")
   public void apiOperatorOutboundScanParcel(Map<String, String> dataTableAsMap) {

@@ -1,7 +1,6 @@
 package co.nvqa.common.core.model.persisted_class.events;
 
 import co.nvqa.common.model.DataEntity;
-import java.util.Date;
 import java.util.Map;
 import javax.persistence.Column;
 import javax.persistence.Entity;

@@ -99,9 +99,6 @@ public class DbCoreSteps extends CoreStandardSteps {
   @Inject
   private OrderDao orderDao;
 
-  @Override
-  public void init() {
-  }
 
   @And("DB Core - get Reservation data from reservation id {string}")
   public void coreGetReservationDataFromReservationId(String reservationId) {
@@ -569,7 +566,9 @@ public class DbCoreSteps extends CoreStandardSteps {
               String.class);
           List<String> expectedTags = fromJsonToList(f("[%s]", resolvedDataTable.get("tagIds")),
               String.class);
-          Assertions.assertThat(actualTags.containsAll(expectedTags));
+          Assertions.assertThat(actualTags)
+              .as("Actual tags contains the expected tags: {}", expectedTags)
+              .containsAll(expectedTags);
         }, "verify order_tags_search");
   }
 
