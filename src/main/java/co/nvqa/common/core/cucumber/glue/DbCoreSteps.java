@@ -279,6 +279,17 @@ public class DbCoreSteps extends CoreStandardSteps {
         }, "get order details");
   }
 
+  @When("DB Core - operator get transaction records with:")
+  public void getOrderDetailsByOrderId(Map<String, String> data) {
+    Map<String, String> resolvedData = resolveKeyValues(data);
+    doWithRetry(
+        () -> {
+          List<Transactions> result = transactionsDao.findTransactionByOrderIdAndType(
+              Long.parseLong((resolvedData.get("order_id"))), resolvedData.get("type"));
+          put(KEY_CORE_LIST_OF_TRANSACTIONS, result);
+        }, "get transaction records");
+  }
+
   @When("DB Core - verify transactions record:")
   public void verifyTransaction(Map<String, String> data) {
     Map<String, String> resolvedData = resolveKeyValues(data);
