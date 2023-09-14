@@ -23,6 +23,7 @@ import co.nvqa.common.core.model.waypoint.Waypoint;
 import co.nvqa.common.core.utils.CoreTestUtils;
 import co.nvqa.common.model.DataEntity;
 import co.nvqa.common.utils.StandardTestUtils;
+import com.mysql.cj.util.TestUtils;
 import io.cucumber.guice.ScenarioScoped;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
@@ -39,6 +40,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import lombok.Getter;
+import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
 
 @ScenarioScoped
@@ -701,9 +703,22 @@ public class ApiRouteSteps extends CoreStandardSteps {
         finalData.get("requestBody")), "add references to Route Group", 2000, 3);
   }
 
+  /**
+   * Sample:
+   * <p>
+   * API Route - create route group:
+   * |name|ARG-{uniqueString} |
+   * |description|This Route Group is created by automation test from Operator V2.|
+   *
+   * @param data Map of data from feature file.
+   */
   @Given("API Route - create route group:")
   public void apiOperatorCreateNewRouteGroup(Map<String, String> data) {
     RouteGroup routeGroup = new RouteGroup(resolveKeyValues(data));
+    String uniqueString = CoreTestUtils.generateUniqueId();
+    if (StringUtils.endsWithIgnoreCase(routeGroup.getName(), "{uniqueString}")) {
+      routeGroup.setName(routeGroup.getName().replace("{uniqueString}", uniqueString));
+    }
     doWithRetry(() -> {
       var response = getRouteClient().createRouteGroup(routeGroup);
       putInList(KEY_LIST_OF_CREATED_ROUTE_GROUPS, response);
