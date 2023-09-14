@@ -23,7 +23,6 @@ import co.nvqa.common.core.model.waypoint.Waypoint;
 import co.nvqa.common.core.utils.CoreTestUtils;
 import co.nvqa.common.model.DataEntity;
 import co.nvqa.common.utils.StandardTestUtils;
-import com.mysql.cj.util.TestUtils;
 import io.cucumber.guice.ScenarioScoped;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
