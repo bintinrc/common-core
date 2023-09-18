@@ -19,7 +19,7 @@ public class SalesClient extends SimpleApiClient {
   }
 
   public SalesPerson createSalesPerson(SalesPerson salesPerson) {
-    String apiMethod = "/core/1.0/sales";
+    String apiMethod = "core/1.0/sales";
 
     RequestSpecification requestSpecification = createAuthenticatedRequest()
         .body(salesPerson);
@@ -29,6 +29,18 @@ public class SalesClient extends SimpleApiClient {
       throw new NvTestHttpException("unexpected http status: " + r.statusCode());
     }
     return r.getBody().as(SalesPerson.class);
+  }
+
+  public void deleteSalesPerson(long id) {
+    String apiMethod = "core/1.0/sales/{salesId}";
+
+    RequestSpecification requestSpecification = createAuthenticatedRequest()
+        .pathParam("salesId", id);
+
+    Response r = doDelete("Sales Client - Delete Sales Person", requestSpecification, apiMethod);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
   }
 
 }
