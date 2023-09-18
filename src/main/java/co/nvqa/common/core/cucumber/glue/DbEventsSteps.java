@@ -15,10 +15,6 @@ public class DbEventsSteps extends CoreStandardSteps {
   @Inject
   private EventsDao eventsDao;
 
-  @Override
-  public void init() {
-  }
-
   @When("DB Events - verify order_events record:")
   public void verifyOrderEvent(Map<String, String> data) {
     OrderEvents expected = new OrderEvents(resolveKeyValues(data));

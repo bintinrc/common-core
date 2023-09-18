@@ -47,10 +47,6 @@ public class HookSteps extends CoreStandardSteps {
   @Getter
   private RouteDbDao routeDbDao;
 
-  @Override
-  public void init() {
-
-  }
 
   @After("@ArchiveRouteCommonV2")
   public void archiveRoute() {
@@ -66,7 +62,7 @@ public class HookSteps extends CoreStandardSteps {
             "After hook: @ArchiveRouteCommonV2");
         LOGGER.debug("Route ID = {} archived successfully", r.getId());
       } catch (Throwable t) {
-        LOGGER.warn("error to archive route: " + t.getMessage());
+        LOGGER.warn("error to archive route: {}", t.getMessage());
       }
     });
   }
@@ -81,7 +77,7 @@ public class HookSteps extends CoreStandardSteps {
           getReservationClient().updateReservation(r.getId(), 4);
           LOGGER.debug("Reservation ID = {} cancelled successfully", r.getId());
         } catch (Throwable t) {
-          LOGGER.warn("error to cancel reservation: " + t.getMessage());
+          LOGGER.warn("error to cancel reservation: {}", t.getMessage());
         }
       });
     }
@@ -92,7 +88,7 @@ public class HookSteps extends CoreStandardSteps {
           getReservationClient().updateReservation(r.getId(), 4);
           LOGGER.debug("Reservation ID = {} cancelled successfully", r.getId());
         } catch (Throwable t) {
-          LOGGER.warn("error to cancel reservation: " + t.getMessage());
+          LOGGER.warn("error to cancel reservation: {}", t.getMessage());
         }
       });
     }
@@ -112,7 +108,7 @@ public class HookSteps extends CoreStandardSteps {
             "After hook: @ForceSuccessCommonV2");
         LOGGER.debug("Order ID = {} force successfully", o.getId());
       } catch (Throwable t) {
-        LOGGER.warn("Error to force success: " + t.getMessage());
+        LOGGER.warn("Error to force success: {}", t.getMessage());
       }
     });
   }
@@ -148,7 +144,7 @@ public class HookSteps extends CoreStandardSteps {
           getRouteClient().deleteCoverage(r.getId());
           LOGGER.debug("Coverages ID = {} delete successfully", r.getId());
         } catch (Throwable t) {
-          LOGGER.warn("error to delete coveraged: " + t.getMessage());
+          LOGGER.warn("error to delete coveraged: {}", t.getMessage());
         }
       });
     }

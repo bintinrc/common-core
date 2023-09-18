@@ -21,12 +21,7 @@ public class ParameterClient extends SimpleApiClient {
     String url = "core/parameter";
     RequestSpecification spec = createAuthenticatedRequest()
         .body(body);
-
     return doPut("Set Paramenter", spec, url);
-    String uniqueString = CoreTestUtils.generateUniqueId();
-    if (StringUtils.endsWithIgnoreCase(routeGroup.getName(), "{uniqueString}")) {
-      routeGroup.setName(routeGroup.getName().replace("{uniqueString}", uniqueString));
-    }
   }
 
 }

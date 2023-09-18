@@ -4,6 +4,7 @@ import co.nvqa.common.core.client.CoreDpClient;
 import co.nvqa.common.core.client.SalesClient;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.model.miscellanous.SalesPerson;
+import co.nvqa.common.core.utils.CoreTestUtils;
 import io.cucumber.java.en.Given;
 import java.util.Map;
 import javax.inject.Inject;
@@ -16,10 +17,10 @@ public class ApiSalesSteps extends CoreStandardSteps {
   @Getter
   private SalesClient salesClient;
 
-  @Given("API Operator create sales person:")
+  @Given("API Core - Operator create sales person:")
   public void apiOperatorCreateSalesPerson(Map<String, String> data) {
     SalesPerson salesPerson = new SalesPerson(resolveKeyValues(data));
-    String uniqueString = generateDateUniqueString();
+    String uniqueString = CoreTestUtils.generateUniqueId();
     if (StringUtils.endsWithIgnoreCase(salesPerson.getName(), "{uniqueString}")) {
       salesPerson.setName(salesPerson.getName().replace("{uniqueString}", uniqueString));
     }

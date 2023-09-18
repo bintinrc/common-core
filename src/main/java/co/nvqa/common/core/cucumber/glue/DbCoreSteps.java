@@ -13,6 +13,7 @@ import co.nvqa.common.core.hibernate.OrderTagsDao;
 import co.nvqa.common.core.hibernate.OrderTagsSearchDao;
 import co.nvqa.common.core.hibernate.OutboundScansDao;
 import co.nvqa.common.core.hibernate.ReservationsDao;
+import co.nvqa.common.core.hibernate.RouteDbDao;
 import co.nvqa.common.core.hibernate.RouteMonitoringDataDao;
 import co.nvqa.common.core.hibernate.RouteWaypointDao;
 import co.nvqa.common.core.hibernate.ShipperPickupSearchDao;
@@ -85,6 +86,8 @@ public class DbCoreSteps extends CoreStandardSteps {
   @Inject
   private RouteWaypointDao routeWaypointDao;
   @Inject
+  private RouteDbDao routeDbDao;
+  @Inject
   private CodCollectionDao codCollectionDao;
   @Inject
   private InboundScansDao inboundScansDao;
@@ -96,9 +99,6 @@ public class DbCoreSteps extends CoreStandardSteps {
   @Inject
   private OrderDao orderDao;
 
-  @Override
-  public void init() {
-  }
 
   @And("DB Core - get Reservation data from reservation id {string}")
   public void coreGetReservationDataFromReservationId(String reservationId) {
@@ -274,6 +274,17 @@ public class DbCoreSteps extends CoreStandardSteps {
           OrderDetails orderDetails = orderDetailsDao.getOrderDetailsByOrderId(resolvedOrderId);
           putInList(KEY_CORE_LIST_OF_ORDER_DETAILS, orderDetails);
         }, "get order details");
+  }
+
+  @When("DB Core - operator get transaction records with:")
+  public void getOrderDetailsByOrderId(Map<String, String> data) {
+    Map<String, String> resolvedData = resolveKeyValues(data);
+    doWithRetry(
+        () -> {
+          List<Transactions> result = transactionsDao.findTransactionByOrderIdAndType(
+              Long.parseLong((resolvedData.get("order_id"))), resolvedData.get("type"));
+          put(KEY_CORE_LIST_OF_TRANSACTIONS, result);
+        }, "get transaction records");
   }
 
   @When("DB Core - verify transactions record:")
@@ -555,7 +566,9 @@ public class DbCoreSteps extends CoreStandardSteps {
               String.class);
           List<String> expectedTags = fromJsonToList(f("[%s]", resolvedDataTable.get("tagIds")),
               String.class);
-          Assertions.assertThat(actualTags.containsAll(expectedTags));
+          Assertions.assertThat(actualTags)
+              .as("Actual tags contains the expected tags: {}", expectedTags)
+              .containsAll(expectedTags);
         }, "verify order_tags_search");
   }
 
@@ -660,5 +673,10 @@ public class DbCoreSteps extends CoreStandardSteps {
       var result = orderDeliveryDetailsDao.getOrderDeliveryDetails(Long.parseLong(orderId));
       putInList(KEY_CORE_LIST_OF_ORDER_DELIVERY_DETAILS, result);
     }, "get order_delivery_details record", 10_000, 3);
+  }
+
+  @Given("DB Core - soft delete route {value}")
+  public void dbOperatorSoftDeleteRoute(String routeId) {
+    routeDbDao.softDeleteRoute(resolveValue(routeId));
   }
 }

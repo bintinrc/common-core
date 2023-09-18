@@ -1,6 +1,5 @@
 package co.nvqa.common.core.model.reservation;
 
-import co.nvqa.common.model.DataEntity;
 import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;

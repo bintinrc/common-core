@@ -17,7 +17,6 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -38,9 +37,6 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
   @Inject
   private RouteDbDao routeDbDao;
 
-  @Override
-  public void init() {
-  }
 
   @Given("DB Core - verify order weight updated correctly")
   public void dbOperatorVerifiesHighestOrderWeight(Map<String, String> source) {
@@ -166,8 +162,7 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
     Dimension expected = new Dimension(resolvedData);
     doWithRetry(() -> {
       Dimension actual = orderDao.getOrderDimensions(orderId);
-      Assertions.assertThat(actual)
-          .withFailMessage("orders record was not found: " + resolvedData)
+      Assertions.assertThat(actual).as("orders record found: " + resolvedData)
           .isNotNull();
       expected.compareWithActual(actual, resolvedData);
     }, "verify orders.dimensions records", 10_000, 3);
@@ -180,8 +175,7 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
     Dimension expected = new Dimension(resolvedData);
     doWithRetry(() -> {
       Dimension actual = orderDao.getOrderManualDimensions(orderId);
-      Assertions.assertThat(actual)
-          .withFailMessage("orders record was not found: " + resolvedData)
+      Assertions.assertThat(actual).as("orders record found: " + resolvedData)
           .isNotNull();
       expected.compareWithActual(actual, resolvedData);
     }, "verify orders.data.manual_dimensions records", 10_000, 3);
@@ -194,8 +188,7 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
     Dimension expected = new Dimension(resolvedData);
     doWithRetry(() -> {
       Dimension actual = orderDao.getOrderBeltDimensions(orderId);
-      Assertions.assertThat(actual)
-          .withFailMessage("orders record was not found: " + resolvedData)
+      Assertions.assertThat(actual).as("orders record found: " + resolvedData)
           .isNotNull();
       expected.compareWithActual(actual, resolvedData);
     }, "verify orders.data.belt_dimensions records", 10_000, 3);
@@ -211,8 +204,7 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
           .getPreviousDeliveryDetails();
       PreviousAddressDetails actual = previousAddressDetails.get(previousAddressDetails.size() - 1);
       PreviousAddressDetails expected = new PreviousAddressDetails(resolvedMap);
-      Assertions.assertThat(actual)
-          .withFailMessage("previous address details not found")
+      Assertions.assertThat(actual).as("previous address details found")
           .isNotNull();
       expected.compareWithActual(actual, resolvedMap);
     }, "verify previousDeliveryDetails", 10_000, 3);
@@ -228,8 +220,7 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
           .getPreviousPickupDetails();
       PreviousAddressDetails actual = previousAddressDetails.get(previousAddressDetails.size() - 1);
       PreviousAddressDetails expected = new PreviousAddressDetails(resolvedMap);
-      Assertions.assertThat(actual)
-          .withFailMessage("previous address details not found")
+      Assertions.assertThat(actual).as("previous address details found")
           .isNotNull();
       expected.compareWithActual(actual, resolvedMap);
     }, "verify previousPickupDetails", 10_000, 3);
@@ -241,8 +232,7 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
     Orders expected = new Orders(resolvedData);
     doWithRetry(() -> {
       Orders actual = orderDao.getSingleOrderDetailsById(expected.getId());
-      Assertions.assertThat(actual)
-          .withFailMessage("orders record was not found: " + resolvedData)
+      Assertions.assertThat(actual).as("orders record was found: " + resolvedData)
           .isNotNull();
       expected.compareWithActual(actual, resolvedData);
     }, "verify orders records", 10_000, 3);
@@ -256,7 +246,7 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
     doWithRetry(() -> {
       Orders orders = orderDao.getSingleOrderDetailsByStampId(stampId);
       Assertions.assertThat(orders.getTrackingId())
-          .as(f("Order trackingId is not matched to trackingId with %s stampId", stampId))
+          .as(f("Order trackingId matched to trackingId with %s stampId", stampId))
           .isEqualTo(trackingId);
     }, "verify order stamp id");
   }
@@ -268,7 +258,7 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
     doWithRetry(() -> {
       OrderDeliveryVerifications actual = odvDao.getTransactionBlob(expected.getOrderId());
       Assertions.assertThat(actual)
-          .withFailMessage("order_delivery_verifications record was not found: " + resolvedData)
+          .as("order_delivery_verifications record was found: " + resolvedData)
           .isNotNull();
       expected.compareWithActual(actual, resolvedData);
     }, "verify order_delivery_verifications records", 10_000, 3);
@@ -280,8 +270,7 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
     Cods expected = new Cods(resolvedData);
     doWithRetry(() -> {
       Cods actual = codsDao.getCodsById(expected.getId());
-      Assertions.assertThat(actual)
-          .withFailMessage("cods record was not found: " + resolvedData)
+      Assertions.assertThat(actual).as("cods record found: " + resolvedData)
           .isNotNull();
       expected.compareWithActual(actual, resolvedData);
     }, "verify cods records", 10_000, 3);
@@ -294,7 +283,7 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
             resolvedData.forEach(e -> {
               Orders actual = orderDao.getSingleOrderDetailsById(Long.parseLong(e));
               Assertions.assertThat(actual)
-                  .as("Unexpected orders records were found: %s", actual)
+                  .as("orders records were hard-deleted: %s", actual)
                   .isNull();
             })
         , "verify orders records", 10_000, 3);
