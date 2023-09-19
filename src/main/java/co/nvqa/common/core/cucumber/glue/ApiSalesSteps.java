@@ -1,6 +1,5 @@
 package co.nvqa.common.core.cucumber.glue;
 
-import co.nvqa.common.core.client.CoreDpClient;
 import co.nvqa.common.core.client.SalesClient;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.model.miscellanous.SalesPerson;
@@ -28,7 +27,7 @@ public class ApiSalesSteps extends CoreStandardSteps {
       salesPerson.setCode(salesPerson.getCode().replace("{uniqueString}", uniqueString));
     }
     salesPerson = getSalesClient().createSalesPerson(salesPerson);
-    putInList(KEY_LIST_OF_SALES_PERSON, salesPerson);
+    putInList(KEY_CORE_LIST_OF_SALES_PERSON, salesPerson);
   }
 
 }

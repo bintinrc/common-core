@@ -207,7 +207,7 @@ public class HookSteps extends CoreStandardSteps {
 
   @After("@DeleteCreatedSalesPerson")
   public void deleteSalesPerson() {
-    final List<SalesPerson> salesPersons = get(KEY_LIST_OF_SALES_PERSON);
+    final List<SalesPerson> salesPersons = get(KEY_CORE_LIST_OF_SALES_PERSON);
     if (Objects.isNull(salesPersons) || salesPersons.isEmpty()) {
       LOGGER.trace(
           "no sales person has been created under key \"KEY_LIST_OF_SALES_PERSON\", skip the delete sales person");
