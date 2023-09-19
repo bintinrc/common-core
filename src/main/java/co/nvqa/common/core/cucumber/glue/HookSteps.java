@@ -215,7 +215,10 @@ public class HookSteps extends CoreStandardSteps {
     }
     salesPersons.forEach(o -> {
       try {
-        getSalesClient().deleteSalesPerson(o.getId());
+        doWithRetry(() -> {
+          getSalesClient().deleteSalesPerson(o.getId());
+          LOGGER.debug("Sales Person ID = {} delete successfully", o.getId());
+        }, "After hook: @DeleteCreatedSalesPerson");
       } catch (Throwable t) {
         LOGGER.warn("Error to delete sales person: {}", t.getMessage());
       }
