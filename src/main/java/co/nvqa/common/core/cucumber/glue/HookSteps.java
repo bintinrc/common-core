@@ -3,10 +3,12 @@ package co.nvqa.common.core.cucumber.glue;
 import co.nvqa.common.core.client.OrderClient;
 import co.nvqa.common.core.client.ReservationClient;
 import co.nvqa.common.core.client.RouteClient;
+import co.nvqa.common.core.client.SalesClient;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.hibernate.RouteDbDao;
 import co.nvqa.common.core.model.RouteGroup;
 import co.nvqa.common.core.model.coverage.CreateCoverageResponse;
+import co.nvqa.common.core.model.miscellanous.SalesPerson;
 import co.nvqa.common.core.model.order.Order;
 import co.nvqa.common.core.model.persisted_class.route.Coverage;
 import co.nvqa.common.core.model.persisted_class.route.RouteLogs;
@@ -42,6 +44,10 @@ public class HookSteps extends CoreStandardSteps {
   @Inject
   @Getter
   private ReservationClient reservationClient;
+
+  @Inject
+  @Getter
+  private SalesClient salesClient;
 
   @Inject
   @Getter
@@ -197,5 +203,25 @@ public class HookSteps extends CoreStandardSteps {
         }
       });
     }
+  }
+
+  @After("@DeleteCreatedSalesPerson")
+  public void deleteSalesPerson() {
+    final List<SalesPerson> salesPersons = get(KEY_CORE_LIST_OF_SALES_PERSON);
+    if (Objects.isNull(salesPersons) || salesPersons.isEmpty()) {
+      LOGGER.trace(
+          "no sales person has been created under key \"KEY_LIST_OF_SALES_PERSON\", skip the delete sales person");
+      return;
+    }
+    salesPersons.forEach(o -> {
+      try {
+        doWithRetry(() -> {
+          getSalesClient().deleteSalesPerson(o.getId());
+          LOGGER.debug("Sales Person ID = {} delete successfully", o.getId());
+        }, "After hook: @DeleteCreatedSalesPerson");
+      } catch (Throwable t) {
+        LOGGER.warn("Error to delete sales person: {}", t.getMessage());
+      }
+    });
   }
 }
