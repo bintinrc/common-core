@@ -42,7 +42,10 @@ public class ApiParameterSteps extends CoreStandardSteps {
     );
     params.forEach(data -> {
       try {
-        parameterClient.setParameters(JsonUtils.toJson(data.toString()));
+        doWithRetry(() -> {
+              parameterClient.setParameters(JsonUtils.toJson(data));
+            },
+            "Running hook @RestoreSystemParams");
       } catch (Exception ex) {
         LOGGER.warn("Could not set system parameter: {}", data, ex);
       }
