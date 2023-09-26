@@ -8,6 +8,7 @@ import co.nvqa.common.core.model.coverage.CreateCoverageRequest;
 import co.nvqa.common.core.model.coverage.CreateCoverageResponse;
 import co.nvqa.common.core.model.other.CoreExceptionResponse;
 import co.nvqa.common.core.model.other.CoreExceptionResponse.Error;
+import co.nvqa.common.core.model.pickup.MilkRunGroup;
 import co.nvqa.common.core.model.reservation.BulkRouteReservationResponse;
 import co.nvqa.common.core.model.route.AddParcelToRouteRequest;
 import co.nvqa.common.core.model.route.AddPickupJobToRouteRequest;
@@ -33,6 +34,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -705,9 +707,8 @@ public class ApiRouteSteps extends CoreStandardSteps {
   /**
    * Sample:
    * <p>
-   * API Route - create route group:
-   * |name|ARG-{uniqueString} |
-   * |description|This Route Group is created by automation test from Operator V2.|
+   * API Route - create route group: |name|ARG-{uniqueString} | |description|This Route Group is
+   * created by automation test from Operator V2.|
    *
    * @param data Map of data from feature file.
    */
@@ -730,5 +731,20 @@ public class ApiRouteSteps extends CoreStandardSteps {
     routeIds.stream()
         .map(Long::parseLong)
         .forEach(id -> getRouteClient().deleteRoute(id));
+  }
+
+  @And("API Route - Operator get created Reservation Group params:")
+  public void apiOperatorGetCreatedReservationGroupParams(Map<String, String> dataTableAsMap) {
+    Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
+    final String reservationGroupName = resolvedDataTable.get("reservationGroupName");
+    doWithRetry(() -> {
+      List<MilkRunGroup> milkrunGroups = getRouteClient().getMilkrunGroups(new Date());
+
+      MilkRunGroup group = milkrunGroups.stream().filter(
+              milkrunGroup -> StringUtils.equals(milkrunGroup.getName(), reservationGroupName))
+          .findFirst().orElseThrow(() -> new RuntimeException(
+              "Could not find milkrun group with name [" + reservationGroupName + "]"));
+      put(KEY_CORE_CREATED_RESERVATION_GROUP_ID, group.getId());
+    }, "Operator get created Reservation Group params");
   }
 }
