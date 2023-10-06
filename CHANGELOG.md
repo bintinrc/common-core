@@ -7,7 +7,7 @@
 ### Added
 
 - DB Core - operator get transaction records with:
-- API Core - Add order tracking id: {string} to 3PL
+- API Core - Add order tracking id to 3PL with the following info:
 
 <hr>
 

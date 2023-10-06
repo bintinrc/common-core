@@ -464,14 +464,18 @@ public class ApiOrderSteps extends CoreStandardSteps {
 
   /**
    * <p>Add tracking id : {KEY_LIST_OF_DASH_ORDERS[1].trackingId} for the created order to 3PL</p>
-   * <p>Usage: API Core - Add order tracking id: "{KEY_LIST_OF_DASH_ORDERS[1].trackingId}" to 3PL</p>
-   * @param trackingId
+   * <p>Usage:   And API Core - Add order tracking id to 3PL with the following info:
+   *       | trackingId           | {KEY_LIST_OF_DASH_ORDERS[1].trackingId} |
+   *       | thirdPartyTrackingId | {third-party-tracking-id}               |
+   *       | thirdPartyShipperId  | {third-party-shipper-id}                |</p>
+   * @param dataTableRaw
    */
-  @When("API Core - Add order tracking id: {string} to 3PL")
-  public void apiCoreAddOrderTrackingIdTo3PL(String trackingId) {
-    String resolvedTrackingId = resolveValue(trackingId);
-    orderClient.addOrderTo3pl(resolvedTrackingId, CoreTestConstants.THIRD_PARTY_DEFAULT_TRACKING_ID,
-        CoreTestConstants.THIRD_PARTY_SHIPPER_ID);
+  @When("API Core - Add order tracking id to 3PL with the following info:")
+  public void apiCoreAddOrderTrackingIdTo3PLWithTheFollowingInfo(Map<String, String> dataTableRaw) {
+    String trackingId = resolveValue(dataTableRaw.get("trackingId"));
+    String thirdPartyTrackingId = resolveValue(dataTableRaw.get("thirdPartyTrackingId"));
+    Long thirdPartyShipperId = Long.parseLong(resolveValue(dataTableRaw.get("thirdPartyShipperId")));
+    orderClient.addOrderTo3pl(trackingId, thirdPartyTrackingId, thirdPartyShipperId);
   }
 
   @Given("API Core -  Wait for following order state:")
