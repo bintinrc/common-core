@@ -9,7 +9,6 @@ public class CoreTestConstants extends PropertiesReader {
   public static String DB_CORE_URL;
   public static String DB_EVENTS_URL;
   public static String DB_ROUTE_URL;
-
   static {
     loadProperties();
   }

@@ -641,10 +641,12 @@ public class RouteClient extends SimpleApiClient {
   public List<MilkRunGroup> getMilkrunGroups(Date date) {
     String apiMethod = "route/1.0/milkrun-groups";
     String dateStr = new SimpleDateFormat("yyyyMMdd").format(date);
+
     RequestSpecification requestSpecification = createAuthenticatedRequest()
         .queryParam("date", dateStr);
 
     Response r = doGet("API Route - Get Milkrun Groups", requestSpecification, apiMethod);
+
     if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
       throw new NvTestHttpException("unexpected http status: " + r.statusCode());
     }
