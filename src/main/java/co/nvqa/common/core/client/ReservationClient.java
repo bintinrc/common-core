@@ -2,9 +2,9 @@ package co.nvqa.common.core.client;
 
 import co.nvqa.common.client.SimpleApiClient;
 import co.nvqa.common.constants.HttpConstants;
+import co.nvqa.common.core.model.reservation.ReservationFilter;
 import co.nvqa.common.core.model.reservation.ReservationRequest;
 import co.nvqa.common.core.model.reservation.ReservationResponse;
-import co.nvqa.common.core.model.reservation.ReservationFilter;
 import co.nvqa.common.core.model.reservation.ReservationWrapper;
 import co.nvqa.common.utils.NvTestHttpException;
 import co.nvqa.common.utils.StandardTestConstants;
@@ -58,6 +58,22 @@ public class ReservationClient extends SimpleApiClient {
 
     ReservationWrapper wrapper = fromJsonSnakeCase(r.body().asString(), ReservationWrapper.class);
     return wrapper.getData().get(0);
+  }
+
+  public List<ReservationResponse> getListOfReservations(ReservationFilter filter) {
+    String url = "reservation/2.0/reservations";
+
+    RequestSpecification spec = createAuthenticatedRequest()
+        .queryParams(filter.toQueryParam());
+
+    Response r = doGet("Get Reservations V2", spec, url);
+    r.then().contentType(ContentType.JSON);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+
+    ReservationWrapper wrapper = fromJsonSnakeCase(r.body().asString(), ReservationWrapper.class);
+    return wrapper.getData();
   }
 
   public void deleteReservation(long reservationId, long shipperId) {
