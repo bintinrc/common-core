@@ -15,6 +15,7 @@ import co.nvqa.common.core.model.order.ParcelJob;
 import co.nvqa.common.core.model.order.RescheduleOrderRequest;
 import co.nvqa.common.core.model.order.RescheduleOrderResponse;
 import co.nvqa.common.core.model.order.RtsOrderRequest;
+import co.nvqa.common.core.utils.CoreTestConstants;
 import co.nvqa.common.utils.JsonUtils;
 import co.nvqa.common.utils.NvTestRuntimeException;
 import co.nvqa.common.utils.StandardTestUtils;
@@ -459,6 +460,18 @@ public class ApiOrderSteps extends CoreStandardSteps {
       getLazada3PLClient().postLazada3PL(
           Lazada3PL.builder().comment(comment).trackingId(trackingId).build())
         , "API Core - Operator post Lazada 3PL");
+  }
+
+  /**
+   * <p>Add tracking id : {KEY_LIST_OF_DASH_ORDERS[1].trackingId} for the created order to 3PL</p>
+   * <p>Usage: API Core - Add order tracking id: "{KEY_LIST_OF_DASH_ORDERS[1].trackingId}" to 3PL</p>
+   * @param trackingId
+   */
+  @When("API Core - Add order tracking id: {string} to 3PL")
+  public void apiCoreAddOrderTrackingIdTo3PL(String trackingId) {
+    String resolvedTrackingId = resolveValue(trackingId);
+    orderClient.addOrderTo3pl(resolvedTrackingId, CoreTestConstants.THIRD_PARTY_DEFAULT_TRACKING_ID,
+        CoreTestConstants.THIRD_PARTY_SHIPPER_ID);
   }
 
   @Given("API Core -  Wait for following order state:")

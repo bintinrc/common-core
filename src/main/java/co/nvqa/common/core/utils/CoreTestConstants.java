@@ -9,7 +9,8 @@ public class CoreTestConstants extends PropertiesReader {
   public static String DB_CORE_URL;
   public static String DB_EVENTS_URL;
   public static String DB_ROUTE_URL;
-
+  public static Long THIRD_PARTY_SHIPPER_ID;
+  public static String THIRD_PARTY_DEFAULT_TRACKING_ID;
   static {
     loadProperties();
   }
@@ -30,6 +31,8 @@ public class CoreTestConstants extends PropertiesReader {
         StandardTestConstants.NV_DATABASE_PORT,
         StringUtils.lowerCase(StandardTestConstants.NV_DATABASE_ENVIRONMENT),
         "gl");
+    THIRD_PARTY_DEFAULT_TRACKING_ID = getString("third-party-tracking-id");
+    THIRD_PARTY_SHIPPER_ID = getLong("third-party-shipper-id");
   }
 
 }
