@@ -130,8 +130,7 @@ public class RouteDbDao extends DbBase {
     return findAll(session ->
         session.createQuery(query, RouteLogs.class)
             .setParameter("driverId", driverId)
-            .setParameter("systemId", StandardTestConstants.NV_SYSTEM_ID)
-            .setMaxResults(1));
+            .setParameter("systemId", StandardTestConstants.NV_SYSTEM_ID));
   }
 
   public JobWaypoint getWaypointIdByJobId(Long jobId) {
