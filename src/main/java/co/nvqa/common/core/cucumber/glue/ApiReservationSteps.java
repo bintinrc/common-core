@@ -11,6 +11,7 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import javax.inject.Inject;
@@ -52,7 +53,6 @@ public class ApiReservationSteps extends CoreStandardSteps {
 
   @When("API Core - Operator get reservation from reservation id {string}")
   public void apiOperatorGetReservationForId(String reservationIdString) {
-
     final long reservationId = Long.parseLong(resolveValue(reservationIdString));
     final ReservationFilter filter = ReservationFilter.builder()
         .reservationId(reservationId)
@@ -62,6 +62,17 @@ public class ApiReservationSteps extends CoreStandardSteps {
           final ReservationResponse responses = getReservationClient().getReservations(filter);
           putInList(KEY_LIST_OF_RESERVATIONS, responses);
         }, "get reservation details");
+  }
+
+  @When("API Core - Operator get reservation using filter with data below:")
+  public void apiOperatorGetReservationFromAddressId(Map<String, String> data) {
+    final Map<String, String> resolvedData = resolveKeyValues(data);
+    final ReservationFilter filter = fromMapCamelCase(resolvedData, ReservationFilter.class);
+    doWithRetry(() -> {
+      final List<ReservationResponse> reservations = getReservationClient().getListOfReservations(
+          filter);
+      putAllInList(KEY_LIST_OF_RESERVATIONS, reservations);
+    }, "get reservation from address id");
   }
 
   private ReservationResponse apiOperatorCreateV2Reservation(
@@ -154,16 +165,14 @@ public class ApiReservationSteps extends CoreStandardSteps {
   @Given("API Core - Operator cancel reservation for id {string}")
   public void apiOperatorCreateV2ReservationUsingDataBelow(String id) {
     final long reservationId = Long.parseLong(resolveValue(id));
-    doWithRetry(
-        () -> getReservationClient().updateReservation(reservationId,4),
+    doWithRetry(() -> getReservationClient().updateReservation(reservationId, 4),
         "cancel reservation");
   }
 
   @Given("API Core - Operator success reservation for id {string}")
   public void apiOperatorsuccessReservationUsingDataBelow(String id) {
     final long reservationId = Long.parseLong(resolveValue(id));
-    doWithRetry(
-        () -> getReservationClient().updateReservation(reservationId,1),
+    doWithRetry(() -> getReservationClient().updateReservation(reservationId, 1),
         "Success Reservation");
   }
 
