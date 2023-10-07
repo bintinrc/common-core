@@ -11,7 +11,6 @@
 - API Core - Operator get reservation using filter with data below:
 - API Route - Operator get created Reservation Group params:
 - DB Core - operator get transaction records with:
-- DB Core - operator get transaction records with:
 - Migrated SalesClient.java
 - New CoreTestUtils method: generateUniqueId()
 - New hook @DeleteCreatedSalesPerson
