@@ -54,10 +54,6 @@ public class ApiOrderSteps extends CoreStandardSteps {
   @Getter
   private CodInboundsClient codInboundsClient;
 
-  @Override
-  public void init() {
-    // This method is empty by design.
-  }
 
   /**
    * <br/><b>Output key</b>: <ul><li>KEY_LIST_OF_CREATED_ORDERS: list of orders</li></ul>
@@ -463,6 +459,24 @@ public class ApiOrderSteps extends CoreStandardSteps {
       getLazada3PLClient().postLazada3PL(
           Lazada3PL.builder().comment(comment).trackingId(trackingId).build())
         , "API Core - Operator post Lazada 3PL");
+  }
+
+  /**
+   * <p>Add tracking id : {KEY_LIST_OF_DASH_ORDERS[1].trackingId} for the created order to 3PL</p>
+   * <p>Usage:   And API Core - Add order tracking id to 3PL with the following info:
+   * | trackingId           | {KEY_LIST_OF_DASH_ORDERS[1].trackingId} | | thirdPartyTrackingId |
+   * {third-party-tracking-id}               | | thirdPartyShipperId  | {third-party-shipper-id}
+   * |</p>
+   *
+   * @param dataTableRaw
+   */
+  @When("API Core - Add order tracking id to 3PL with the following info:")
+  public void apiCoreAddOrderTrackingIdTo3PLWithTheFollowingInfo(Map<String, String> dataTableRaw) {
+    String trackingId = resolveValue(dataTableRaw.get("trackingId"));
+    String thirdPartyTrackingId = resolveValue(dataTableRaw.get("thirdPartyTrackingId"));
+    Long thirdPartyShipperId = Long.parseLong(
+        resolveValue(dataTableRaw.get("thirdPartyShipperId")));
+    orderClient.addOrderTo3pl(trackingId, thirdPartyTrackingId, thirdPartyShipperId);
   }
 
   @Given("API Core -  Wait for following order state:")

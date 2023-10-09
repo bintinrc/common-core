@@ -1,4 +1,21 @@
 # Change log
+
+<hr>
+
+## [1.3.20] 2023-10-07
+
+### Added
+
+- API Core - Add order tracking id to 3PL with the following info:
+- API Core - Operator create sales person:
+- API Core - Operator get reservation using filter with data below:
+- API Route - Operator get created Reservation Group params:
+- DB Core - operator get transaction records with:
+- Migrated SalesClient.java
+- New CoreTestUtils method: generateUniqueId()
+- New hook @DeleteCreatedSalesPerson
+- Removed unused test suite
+
 <hr>
 
 ## [1.3.19] 2023-09-05

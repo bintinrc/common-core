@@ -12,7 +12,7 @@ import lombok.Setter;
 @JsonDeserialize(using = EventDetailDeserializer.class)
 @Getter
 @Setter
-public class EventDetail extends DataEntity {
+public class EventDetail extends DataEntity<EventDetail> {
 
   private Long shipmentId;
   private Long currHubId;
@@ -21,7 +21,7 @@ public class EventDetail extends DataEntity {
   private Long destinationHubId; // from AV events
   private String destHubCountry;
   private Long origHubId;
-  private String OrigHubCountry;
+  private String origHubCountry;
   private Long driverId;
   //get old_value & new_value of driver_id
   private EventValue driverIdValue;
