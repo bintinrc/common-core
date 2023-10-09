@@ -6,7 +6,6 @@ import co.nvqa.common.core.model.dp.CustomerCollectRequest;
 import co.nvqa.common.core.model.dp.DpTagging;
 import co.nvqa.common.core.model.dp.DpUntagging;
 import co.nvqa.common.core.model.dp.LodgeInRequest;
-import co.nvqa.common.core.model.event.Events;
 import co.nvqa.common.utils.NvTestHttpException;
 import co.nvqa.common.utils.StandardTestConstants;
 import co.nvqa.commonauth.utils.TokenUtils;

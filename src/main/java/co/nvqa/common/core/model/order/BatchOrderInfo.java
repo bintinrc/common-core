@@ -15,7 +15,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class BatchOrderInfo extends DataEntity<BatchOrderInfo> {
 
-  private Long batch_id;
+  private Long batchId;
   private List<Order> orders;
 
 }

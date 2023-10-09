@@ -464,16 +464,18 @@ public class ApiOrderSteps extends CoreStandardSteps {
   /**
    * <p>Add tracking id : {KEY_LIST_OF_DASH_ORDERS[1].trackingId} for the created order to 3PL</p>
    * <p>Usage:   And API Core - Add order tracking id to 3PL with the following info:
-   *       | trackingId           | {KEY_LIST_OF_DASH_ORDERS[1].trackingId} |
-   *       | thirdPartyTrackingId | {third-party-tracking-id}               |
-   *       | thirdPartyShipperId  | {third-party-shipper-id}                |</p>
+   * | trackingId           | {KEY_LIST_OF_DASH_ORDERS[1].trackingId} | | thirdPartyTrackingId |
+   * {third-party-tracking-id}               | | thirdPartyShipperId  | {third-party-shipper-id}
+   * |</p>
+   *
    * @param dataTableRaw
    */
   @When("API Core - Add order tracking id to 3PL with the following info:")
   public void apiCoreAddOrderTrackingIdTo3PLWithTheFollowingInfo(Map<String, String> dataTableRaw) {
     String trackingId = resolveValue(dataTableRaw.get("trackingId"));
     String thirdPartyTrackingId = resolveValue(dataTableRaw.get("thirdPartyTrackingId"));
-    Long thirdPartyShipperId = Long.parseLong(resolveValue(dataTableRaw.get("thirdPartyShipperId")));
+    Long thirdPartyShipperId = Long.parseLong(
+        resolveValue(dataTableRaw.get("thirdPartyShipperId")));
     orderClient.addOrderTo3pl(trackingId, thirdPartyTrackingId, thirdPartyShipperId);
   }
 

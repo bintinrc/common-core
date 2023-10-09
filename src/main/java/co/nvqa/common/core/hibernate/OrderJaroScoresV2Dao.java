@@ -1,12 +1,10 @@
 package co.nvqa.common.core.hibernate;
 
 import co.nvqa.common.core.model.persisted_class.core.OrderJaroScoresV2;
-import co.nvqa.common.core.model.persisted_class.core.Transactions;
 import co.nvqa.common.core.utils.CoreTestConstants;
 import co.nvqa.common.database.DbBase;
 import co.nvqa.common.utils.StandardTestConstants;
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.inject.Singleton;
 import org.apache.commons.collections.CollectionUtils;
 
