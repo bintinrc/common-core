@@ -4,6 +4,7 @@ import co.nvqa.common.core.client.CodInboundsClient;
 import co.nvqa.common.core.client.Lazada3PLClient;
 import co.nvqa.common.core.client.OrderClient;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
+import co.nvqa.common.core.exception.NvTestCoreOrderKafkaLagException;
 import co.nvqa.common.core.model.CodInbound;
 import co.nvqa.common.core.model.EditDeliveryOrderRequest;
 import co.nvqa.common.core.model.Lazada3PL;
@@ -62,7 +63,8 @@ public class ApiOrderSteps extends CoreStandardSteps {
    * order with the same tracking id. <br/><br/><b>Note</b>: becareful that you may face unintended
    * order status due to event propagation delay to Core service
    *
-   * @param tracking key that contains order's tracking id, example: KEY_LIST_OF_CREATED_TRACKING_IDS
+   * @param tracking key that contains order's tracking id, example:
+   *                 KEY_LIST_OF_CREATED_TRACKING_IDS
    */
   @When("API Core - Operator get order details for tracking order {string}")
   public void apiOperatorGetOrderDetailsForTrackingOrder(String tracking) {
@@ -87,7 +89,8 @@ public class ApiOrderSteps extends CoreStandardSteps {
    * previous order with the same tracking id. this is intended to check if you have done certain
    * action to same order and you need previous data prior to the action being done
    *
-   * @param tracking key that contains order's tracking id, example: KEY_LIST_OF_CREATED_TRACKING_IDS
+   * @param tracking key that contains order's tracking id, example:
+   *                 KEY_LIST_OF_CREATED_TRACKING_IDS
    */
   @When("API Core - Operator get order details for previous order {string}")
   public void apiOperatorGetOrderDetailsForPreviousOrder(String tracking) {
@@ -374,7 +377,7 @@ public class ApiOrderSteps extends CoreStandardSteps {
   }
 
   /**
-   * @param orderId  <br/>orderId: {KEY_LIST_OF_CREATED_ORDERS[1].id}
+   * @param orderId         <br/>orderId: {KEY_LIST_OF_CREATED_ORDERS[1].id}
    * @param expectedTagList :PRIOR
    */
   @When("API Core - Operator check order {string} have the following Tags:")
@@ -456,8 +459,8 @@ public class ApiOrderSteps extends CoreStandardSteps {
     String comment = dataTableAsMap.get("comment");
     put(KEY_CORE_LAZADA_3PL_COMMENT, comment);
     doWithRetry(() ->
-      getLazada3PLClient().postLazada3PL(
-          Lazada3PL.builder().comment(comment).trackingId(trackingId).build())
+            getLazada3PLClient().postLazada3PL(
+                Lazada3PL.builder().comment(comment).trackingId(trackingId).build())
         , "API Core - Operator post Lazada 3PL");
   }
 
@@ -480,20 +483,23 @@ public class ApiOrderSteps extends CoreStandardSteps {
   }
 
   @Given("API Core -  Wait for following order state:")
-  public void apiOperatorWaitForOrderStatus(Map<String, String> dataTableRaw)
-      throws InterruptedException {
-    final Map<String, String> dataTable = resolveKeyValues(dataTableRaw);
-    Order expectedState = new Order();
-    expectedState.fromMap(dataTable);
-    int timeout = Integer.parseInt(dataTable.getOrDefault("timeout", "30"));
-    Assertions.assertThat(getOrderClient().waitUntilOrderState(expectedState, timeout, 1000))
-        .as("Order " + expectedState.getTrackingId() + " didn't get expected state " + dataTable)
-        .isTrue();
+  public void apiOperatorWaitForOrderStatus(Map<String, String> dataTableRaw) {
+    try {
+      final Map<String, String> dataTable = resolveKeyValues(dataTableRaw);
+      Order expectedState = new Order();
+      expectedState.fromMap(dataTable);
+      int timeout = Integer.parseInt(dataTable.getOrDefault("timeout", "30"));
+      Assertions.assertThat(getOrderClient().waitUntilOrderState(expectedState, timeout, 1000))
+          .as("Order " + expectedState.getTrackingId() + " didn't get expected state " + dataTable)
+          .isTrue();
+    } catch (Throwable t) {
+      throw new NvTestCoreOrderKafkaLagException(
+          "order state not updated yet because of Kafka lag ");
+    }
   }
 
   @Given("API Core - Verifies order state:")
-  public void apiOperatorVerifiesOrderState(Map<String, String> dataTableRaw)
-      throws InterruptedException {
+  public void apiOperatorVerifiesOrderState(Map<String, String> dataTableRaw) {
     Map<String, String> dataTable = new HashMap<>(dataTableRaw);
     dataTable.put("timeout", "1");
     apiOperatorWaitForOrderStatus(dataTable);

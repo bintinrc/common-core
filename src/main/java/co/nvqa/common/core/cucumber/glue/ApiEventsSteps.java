@@ -5,6 +5,7 @@ import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.model.event.Event;
 import co.nvqa.common.core.model.event.EventDetail;
 import co.nvqa.common.core.model.event.Events;
+import co.nvqa.common.core.exception.NvTestCoreOrderKafkaLagException;
 import io.cucumber.guice.ScenarioScoped;
 import io.cucumber.java.en.Then;
 import java.util.List;
@@ -85,14 +86,19 @@ public class ApiEventsSteps extends CoreStandardSteps {
     final long orderId = Long.parseLong(resolveValue(createdOrderId));
 
     doWithRetry(() -> {
-      final List<Event> actualOrderEvents = getEventClient().getOrderEventsByOrderId(orderId)
-          .getData().stream().filter(e -> Objects.equals(e.getType(), expectedOrderEvent.getType()))
-          .collect(Collectors.toList());
+      try {
+        final List<Event> actualOrderEvents = getEventClient().getOrderEventsByOrderId(orderId)
+            .getData().stream()
+            .filter(e -> Objects.equals(e.getType(), expectedOrderEvent.getType()))
+            .collect(Collectors.toList());
 
-      Assertions.assertThat(actualOrderEvents).anySatisfy(
-          event -> Assertions.assertThat(event.getType())
-              .as(f("Event %s published for order id: %d", expectedOrderEvent.getType(), orderId))
-              .isEqualTo(expectedOrderEvent.getType()));
+        Assertions.assertThat(actualOrderEvents).anySatisfy(
+            event -> Assertions.assertThat(event.getType())
+                .as(f("Event %s published for order id: %d", expectedOrderEvent.getType(), orderId))
+                .isEqualTo(expectedOrderEvent.getType()));
+      } catch (Throwable t) {
+        throw new NvTestCoreOrderKafkaLagException("Order event not updated yet because of Kafka lag");
+      }
 
     }, String.format("Event %s published for order id: %d", expectedOrderEvent.getType(), orderId));
   }
@@ -113,20 +119,25 @@ public class ApiEventsSteps extends CoreStandardSteps {
     final EventDetail expectedEventDetail = fromJsonSnakeCase(expectedEventData, EventDetail.class);
 
     doWithRetry(() -> {
-      final List<Event> actualOrderEvents = getEventClient().getOrderEventsByOrderId(orderId)
-          .getData().stream().filter(e -> Objects.equals(e.getType(), expectedEventType))
-          .collect(Collectors.toList());
+      try {
+        final List<Event> actualOrderEvents = getEventClient().getOrderEventsByOrderId(orderId)
+            .getData().stream().filter(e -> Objects.equals(e.getType(), expectedEventType))
+            .collect(Collectors.toList());
 
-      Assertions.assertThat(actualOrderEvents).anySatisfy(
-          event -> Assertions.assertThat(event.getType())
-              .as(f("Event %s published for order id: %d", expectedEventType, orderId))
-              .isEqualTo(expectedEventType));
+        Assertions.assertThat(actualOrderEvents).anySatisfy(
+            event -> Assertions.assertThat(event.getType())
+                .as(f("Event %s published for order id: %d", expectedEventType, orderId))
+                .isEqualTo(expectedEventType));
 
-      Assertions.assertThat(actualOrderEvents).anySatisfy(
-          event -> Assertions.assertThat(event.getData())
-              .as(f("Actual data:\n %s \n matched expected data:\n %s", toJson(event.getData()),
-                  toJson(expectedEventDetail))).usingRecursiveComparison()
-              .ignoringExpectedNullFields().isEqualTo(expectedEventDetail));
+        Assertions.assertThat(actualOrderEvents).anySatisfy(
+            event -> Assertions.assertThat(event.getData())
+                .as(f("Actual data:\n %s \n matched expected data:\n %s", toJson(event.getData()),
+                    toJson(expectedEventDetail))).usingRecursiveComparison()
+                .ignoringExpectedNullFields().isEqualTo(expectedEventDetail));
+      } catch (Throwable t) {
+        throw new NvTestCoreOrderKafkaLagException(
+            "Order event not published yet because of Kafka lag");
+      }
 
     }, String.format("Event %s is published for order id %d with expected details %s",
         expectedEventType, orderId, toJson(expectedEventDetail)));
