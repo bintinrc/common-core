@@ -130,9 +130,8 @@ public class ApiOrderSteps extends CoreStandardSteps {
 
       putInList(KEY_LIST_OF_CREATED_ORDERS, order,
           (o1, o2) -> StringUtils.equalsAnyIgnoreCase(o1.getTrackingId(), o2.getTrackingId()));
-    } catch (NvTestRuntimeException ex) {
-      LOGGER.warn("failed to get the order with the expected granular status! cause: {}",
-          ex.getMessage());
+    } catch (Throwable t) {
+      throw new NvTestCoreOrderKafkaLagException("Granular status not updated yet because of Kafka lag");
     }
   }
 
