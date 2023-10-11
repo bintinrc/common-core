@@ -297,4 +297,23 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
         orderStatus, orderGranularStatus);
     put(KEY_CORE_LIST_OF_DB_TRACKING_IDS, trackingIds);
   }
+
+  /**
+   * Sample:<p>
+   * Then DB Core - verifies service_type in orders table<p>
+   * |orderId|{KEY_LIST_OF_CREATED_ORDERS[1].id}|<p>
+   * |serviceType|NEXTDAY|<p>
+   *
+   * Service Type : can be NEXTDAY or STANDARD
+   * @param dataTable
+   */
+  @When("DB Core - verifies service_type in orders table")
+  public void operatorFindOrdersServiceType(Map<String,String> dataTable) {
+    Map<String,String> resolvedData = resolveKeyValues(dataTable);
+    long orderId = Long.parseLong(resolvedData.get("orderId"));
+    String expectedServiceType = resolvedData.get("serviceType");
+    String actualServiceType = orderDao.getOrdersServiceType(orderId);
+    Assertions.assertThat(actualServiceType).as("orders.service_type equal")
+        .isEqualTo(expectedServiceType);
+  }
 }
