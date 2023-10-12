@@ -559,4 +559,20 @@ public class ApiOrderSteps extends CoreStandardSteps {
 
     put(KEY_CORE_ROUTE_CASH_INBOUND_COD, codInbound);
   }
+
+  /**
+   * @param dataTable <br><b>trackingId:</b>
+   *                  {KEY_LIST_OF_CREATED_TRACKING_IDS[1]}<br><b>eventType:</b> Weight Updated
+   */
+  @Given("API Core - Operator recalculate order price:")
+  public void apiOperatorRecalculateOrderPriceWithEvenType(Map<String, String> dataTable) {
+    dataTable = resolveKeyValues(dataTable);
+    String trackingId = dataTable.get("trackingId");
+    String eventType = dataTable.get("eventType");
+
+    doWithRetry(
+        () -> getOrderClient().batchRecalculate(eventType, trackingId),
+        "batch recalculate order", 3000, 10);
+  }
+
 }
