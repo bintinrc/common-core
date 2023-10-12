@@ -386,7 +386,7 @@ public class ApiOrderSteps extends CoreStandardSteps {
         Long.parseLong(resolvedOrderId));
     for (String expectedTag : expectedTagList) {
       boolean contains = responseTagList.contains(expectedTag);
-      Assertions.assertThat(contains).as(f("Tags %s not exist in order %d", expectedTag, orderId))
+      Assertions.assertThat(contains).as(f("Tags %s exist in order %s", expectedTag, resolvedOrderId))
           .isTrue();
     }
   }
