@@ -49,7 +49,7 @@ public class ApiEventsSteps extends CoreStandardSteps {
           final List<Event> eventsData = events.getData();
 
           for (Event eventData : eventsData) {
-            if (eventData.getType().equals(eventName) && (eventData.getUserName().equals(userId))) {
+            if (eventData.getType().equals(eventName) && (eventData.getUserName().equals(userId)) && (eventData.getData().getSource().equals(source))) {
               Assertions.assertThat(eventData.getData().getStatus())
                   .as("Auto AV order event status is correct").isEqualTo(status);
               Assertions.assertThat(eventData.getData().getMode())
