@@ -41,6 +41,8 @@ public class ApiEventsSteps extends CoreStandardSteps {
     String status = resolvedData.get("status");
     String mode = resolvedData.get("mode");
     String source = resolvedData.get("source");
+    String latitude = resolvedData.get("latitude");
+    String longitude = resolvedData.get("longitude");
 
     pause4s();
     doWithRetry(
@@ -49,13 +51,17 @@ public class ApiEventsSteps extends CoreStandardSteps {
           final List<Event> eventsData = events.getData();
 
           for (Event eventData : eventsData) {
-            if (eventData.getType().equals(eventName) && (eventData.getUserName().equals(userId))) {
+            if (eventData.getType().equals(eventName) && (eventData.getUserName().equals(userId)) && (eventData.getData().getSource().equals(source))) {
               Assertions.assertThat(eventData.getData().getStatus())
                   .as("Auto AV order event status is correct").isEqualTo(status);
               Assertions.assertThat(eventData.getData().getMode())
                   .as("Auto AV order event mode is correct").isEqualTo(mode);
               Assertions.assertThat(eventData.getData().getSource())
-                  .as("order event delivery waypoint id is correct").isEqualTo(source);
+                  .as("Auto AV order event source id is correct").isEqualTo(source);
+              Assertions.assertThat(eventData.getData().getLatitude())
+                  .as("Auto AV order event latitude is correct").isEqualTo(latitude);
+              Assertions.assertThat(eventData.getData().getLongitude())
+                  .as("Auto AV order event longitude is correct").isEqualTo(longitude);
             }
           }
         }, "verify AV event");
