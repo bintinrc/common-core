@@ -586,4 +586,17 @@ public class ApiOrderSteps extends CoreStandardSteps {
         "batch recalculate order", 3000, 10);
   }
 
+  /**
+   * Cancel the Order by passing Tracking ID
+   *
+   * @param orderTrackingId key that contains order's tracking id, example:
+   *                 KEY_LIST_OF_CREATED_TRACKING_IDS
+   */
+  @Given("API Core - cancel order using tracking id {value}")
+  public void apiOperatorCancelCreatedOrderUsingTrackingId(String orderTrackingId) {
+    doWithRetry(() ->
+            getOrderClient().cancelOrderV3(orderTrackingId),
+        "cancel order using tracking id");
+  }
+
 }

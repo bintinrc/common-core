@@ -8,6 +8,7 @@
 - API Core - Operator check order {string} have the following Tags:
 - DB Core - verifies service_level in orders table
 - DB Core - verifies service_type in orders table
+- API Core - cancel order using tracking id {value}
 
 <hr>
 
