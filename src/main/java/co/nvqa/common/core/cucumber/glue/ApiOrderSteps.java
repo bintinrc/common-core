@@ -32,6 +32,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
@@ -382,12 +384,19 @@ public class ApiOrderSteps extends CoreStandardSteps {
   @When("API Core - Operator check order {string} have the following Tags:")
   public void apiCoreBulkTagsParcelsWithBelowTag(String orderId, List<String> expectedTagList) {
     String resolvedOrderId = resolveValue(orderId);
+    List<String> expectedTagsList = expectedTagList.stream()
+        .filter(Objects::nonNull)
+        .collect(Collectors.toList());
     final List<String> responseTagList = getOrderClient().getOrderLevelTags(
         Long.parseLong(resolvedOrderId));
-    for (String expectedTag : expectedTagList) {
-      boolean contains = responseTagList.contains(expectedTag);
-      Assertions.assertThat(contains).as(f("Tags %s not exist in order %d", expectedTag, orderId))
-          .isTrue();
+    if (expectedTagsList.size()!=0){
+      for (String expectedTag : expectedTagsList) {
+        boolean contains = responseTagList.contains(expectedTag);
+        Assertions.assertThat(contains).as(f("Tags %s exist in order %s", expectedTag, resolvedOrderId))
+            .isTrue();
+      }
+    } else {
+      Assertions.assertThat(responseTagList.isEmpty()).as("Tag is empty").isTrue();
     }
   }
 

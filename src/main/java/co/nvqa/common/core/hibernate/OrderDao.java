@@ -118,7 +118,7 @@ public class OrderDao extends DbBase {
 
   public List<String> getTrackingIdByStatusAndGranularStatus(int numberOfOrder, String orderStatus,
       String orderGranularStatus) {
-    String query = "FROM Orders WHERE status = :orderStatus and granular_status = :orderGranularStatus ORDER BY created_at DESC";
+    String query = "FROM Orders WHERE status = :orderStatus and granularStatus = :orderGranularStatus ORDER BY createdAt DESC";
     var result = findAll(session ->
         session.createQuery(query, Orders.class)
             .setParameter("orderStatus", orderStatus)
@@ -129,5 +129,18 @@ public class OrderDao extends DbBase {
       trackingIds.add(orders.getTrackingId());
     }
     return trackingIds;
+  }
+
+  public String getOrdersServiceType(Long orderId) {
+    String query = "FROM Orders WHERE id = :orderId";
+    var result = findAll(session ->
+        session.createQuery(query, Orders.class)
+            .setParameter("orderId", orderId));
+    Orders order = CollectionUtils.isEmpty(result) ? null : result.get(0);
+    if (order != null) {
+      return order.getServiceType();
+    } else {
+      throw new NvTestRuntimeException("order record is not found for order " + orderId);
+    }
   }
 }

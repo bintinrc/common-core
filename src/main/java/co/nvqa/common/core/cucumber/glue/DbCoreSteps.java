@@ -679,4 +679,23 @@ public class DbCoreSteps extends CoreStandardSteps {
   public void dbOperatorSoftDeleteRoute(String routeId) {
     routeDbDao.softDeleteRoute(resolveValue(routeId));
   }
+
+  /**
+   * Sample:<p>
+   * Then DB Core - verifies service_level in orders table<p>
+   * |orderId|{KEY_LIST_OF_CREATED_ORDERS[1].id}|<p>
+   * |serviceLevel|NEXTDAY|<p>
+   *
+   * Service Level : can be NEXTDAY or STANDARD
+   * @param dataTable
+   */
+  @When("DB Core - verifies service_level in orders table")
+  public void operatorFindOrdersServiceLevel(Map<String,String> dataTable) {
+    Map<String,String> resolvedData = resolveKeyValues(dataTable);
+    long orderId = Long.parseLong(resolvedData.get("orderId"));
+    String expectedServiceType = resolvedData.get("serviceLevel");
+    String actualServiceType = orderDetailsDao.getOrdersServiceLevel(orderId);
+    Assertions.assertThat(actualServiceType).as("orders.service_level equal")
+        .isEqualTo(expectedServiceType);
+  }
 }
