@@ -9,7 +9,7 @@ import javax.inject.Inject;
 import lombok.Getter;
 
 public class ApiOutboundSteps extends CoreStandardSteps {
-  
+
   @Inject
   @Getter
   private OutboundClient outboundClient;

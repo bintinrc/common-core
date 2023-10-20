@@ -15,11 +15,12 @@ public class NvTestCoreOrderKafkaLagException extends NvTestEnvironmentException
     super(message, cause);
   }
 
-  public NvTestCoreOrderKafkaLagException(Throwable cause){
+  public NvTestCoreOrderKafkaLagException(Throwable cause) {
     super(cause);
   }
 
-  public NvTestCoreOrderKafkaLagException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace){
+  public NvTestCoreOrderKafkaLagException(String message, Throwable cause,
+      boolean enableSuppression, boolean writableStackTrace) {
     super(message, cause, enableSuppression, writableStackTrace);
   }
 }

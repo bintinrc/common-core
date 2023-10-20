@@ -133,7 +133,8 @@ public class ApiOrderSteps extends CoreStandardSteps {
       putInList(KEY_LIST_OF_CREATED_ORDERS, order,
           (o1, o2) -> StringUtils.equalsAnyIgnoreCase(o1.getTrackingId(), o2.getTrackingId()));
     } catch (Throwable t) {
-      throw new NvTestCoreOrderKafkaLagException("Granular status not updated yet because of Kafka lag");
+      throw new NvTestCoreOrderKafkaLagException(
+          "Granular status not updated yet because of Kafka lag");
     }
   }
 
@@ -389,10 +390,11 @@ public class ApiOrderSteps extends CoreStandardSteps {
         .collect(Collectors.toList());
     final List<String> responseTagList = getOrderClient().getOrderLevelTags(
         Long.parseLong(resolvedOrderId));
-    if (expectedTagsList.size()!=0){
+    if (expectedTagsList.size() != 0) {
       for (String expectedTag : expectedTagsList) {
         boolean contains = responseTagList.contains(expectedTag);
-        Assertions.assertThat(contains).as(f("Tags %s exist in order %s", expectedTag, resolvedOrderId))
+        Assertions.assertThat(contains)
+            .as(f("Tags %s exist in order %s", expectedTag, resolvedOrderId))
             .isTrue();
       }
     } else {

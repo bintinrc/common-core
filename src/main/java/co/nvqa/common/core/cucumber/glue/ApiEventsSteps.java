@@ -2,10 +2,10 @@ package co.nvqa.common.core.cucumber.glue;
 
 import co.nvqa.common.core.client.EventClient;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
+import co.nvqa.common.core.exception.NvTestCoreOrderKafkaLagException;
 import co.nvqa.common.core.model.event.Event;
 import co.nvqa.common.core.model.event.EventDetail;
 import co.nvqa.common.core.model.event.Events;
-import co.nvqa.common.core.exception.NvTestCoreOrderKafkaLagException;
 import io.cucumber.guice.ScenarioScoped;
 import io.cucumber.java.en.Then;
 import java.util.List;
@@ -51,7 +51,8 @@ public class ApiEventsSteps extends CoreStandardSteps {
           final List<Event> eventsData = events.getData();
 
           for (Event eventData : eventsData) {
-            if (eventData.getType().equals(eventName) && (eventData.getUserName().equals(userId)) && (eventData.getData().getSource().equals(source))) {
+            if (eventData.getType().equals(eventName) && (eventData.getUserName().equals(userId))
+                && (eventData.getData().getSource().equals(source))) {
               Assertions.assertThat(eventData.getData().getStatus())
                   .as("Auto AV order event status is correct").isEqualTo(status);
               Assertions.assertThat(eventData.getData().getMode())
@@ -103,7 +104,8 @@ public class ApiEventsSteps extends CoreStandardSteps {
                 .as(f("Event %s published for order id: %d", expectedOrderEvent.getType(), orderId))
                 .isEqualTo(expectedOrderEvent.getType()));
       } catch (Throwable t) {
-        throw new NvTestCoreOrderKafkaLagException("Order event not updated yet because of Kafka lag");
+        throw new NvTestCoreOrderKafkaLagException(
+            "Order event not updated yet because of Kafka lag");
       }
 
     }, String.format("Event %s published for order id: %d", expectedOrderEvent.getType(), orderId));

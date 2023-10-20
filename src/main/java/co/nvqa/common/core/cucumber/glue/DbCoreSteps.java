@@ -681,17 +681,16 @@ public class DbCoreSteps extends CoreStandardSteps {
   }
 
   /**
-   * Sample:<p>
-   * Then DB Core - verifies service_level in orders table<p>
-   * |orderId|{KEY_LIST_OF_CREATED_ORDERS[1].id}|<p>
-   * |serviceLevel|NEXTDAY|<p>
-   *
+   * Sample:<p> Then DB Core - verifies service_level in orders table<p>
+   * |orderId|{KEY_LIST_OF_CREATED_ORDERS[1].id}|<p> |serviceLevel|NEXTDAY|<p>
+   * <p>
    * Service Level : can be NEXTDAY or STANDARD
+   *
    * @param dataTable
    */
   @When("DB Core - verifies service_level in orders table")
-  public void operatorFindOrdersServiceLevel(Map<String,String> dataTable) {
-    Map<String,String> resolvedData = resolveKeyValues(dataTable);
+  public void operatorFindOrdersServiceLevel(Map<String, String> dataTable) {
+    Map<String, String> resolvedData = resolveKeyValues(dataTable);
     long orderId = Long.parseLong(resolvedData.get("orderId"));
     String expectedServiceType = resolvedData.get("serviceLevel");
     String actualServiceType = orderDetailsDao.getOrdersServiceLevel(orderId);
