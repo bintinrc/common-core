@@ -99,9 +99,6 @@ public class DbCoreSteps extends CoreStandardSteps {
   @Inject
   private OrderDao orderDao;
 
-  @Override
-  public void init() {
-  }
 
   @And("DB Core - get Reservation data from reservation id {string}")
   public void coreGetReservationDataFromReservationId(String reservationId) {
@@ -277,6 +274,17 @@ public class DbCoreSteps extends CoreStandardSteps {
           OrderDetails orderDetails = orderDetailsDao.getOrderDetailsByOrderId(resolvedOrderId);
           putInList(KEY_CORE_LIST_OF_ORDER_DETAILS, orderDetails);
         }, "get order details");
+  }
+
+  @When("DB Core - operator get transaction records with:")
+  public void getOrderDetailsByOrderId(Map<String, String> data) {
+    Map<String, String> resolvedData = resolveKeyValues(data);
+    doWithRetry(
+        () -> {
+          List<Transactions> result = transactionsDao.findTransactionByOrderIdAndType(
+              Long.parseLong((resolvedData.get("order_id"))), resolvedData.get("type"));
+          put(KEY_CORE_LIST_OF_TRANSACTIONS, result);
+        }, "get transaction records");
   }
 
   @When("DB Core - verify transactions record:")
@@ -558,7 +566,9 @@ public class DbCoreSteps extends CoreStandardSteps {
               String.class);
           List<String> expectedTags = fromJsonToList(f("[%s]", resolvedDataTable.get("tagIds")),
               String.class);
-          Assertions.assertThat(actualTags.containsAll(expectedTags));
+          Assertions.assertThat(actualTags)
+              .as("Actual tags contains the expected tags: {}", expectedTags)
+              .containsAll(expectedTags);
         }, "verify order_tags_search");
   }
 
@@ -668,5 +678,23 @@ public class DbCoreSteps extends CoreStandardSteps {
   @Given("DB Core - soft delete route {value}")
   public void dbOperatorSoftDeleteRoute(String routeId) {
     routeDbDao.softDeleteRoute(resolveValue(routeId));
+  }
+
+  /**
+   * Sample:<p> Then DB Core - verifies service_level in orders table<p>
+   * |orderId|{KEY_LIST_OF_CREATED_ORDERS[1].id}|<p> |serviceLevel|NEXTDAY|<p>
+   * <p>
+   * Service Level : can be NEXTDAY or STANDARD
+   *
+   * @param dataTable
+   */
+  @When("DB Core - verifies service_level in orders table")
+  public void operatorFindOrdersServiceLevel(Map<String, String> dataTable) {
+    Map<String, String> resolvedData = resolveKeyValues(dataTable);
+    long orderId = Long.parseLong(resolvedData.get("orderId"));
+    String expectedServiceType = resolvedData.get("serviceLevel");
+    String actualServiceType = orderDetailsDao.getOrdersServiceLevel(orderId);
+    Assertions.assertThat(actualServiceType).as("orders.service_level equal")
+        .isEqualTo(expectedServiceType);
   }
 }

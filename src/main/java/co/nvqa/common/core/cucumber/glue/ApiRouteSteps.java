@@ -8,6 +8,7 @@ import co.nvqa.common.core.model.coverage.CreateCoverageRequest;
 import co.nvqa.common.core.model.coverage.CreateCoverageResponse;
 import co.nvqa.common.core.model.other.CoreExceptionResponse;
 import co.nvqa.common.core.model.other.CoreExceptionResponse.Error;
+import co.nvqa.common.core.model.pickup.MilkRunGroup;
 import co.nvqa.common.core.model.reservation.BulkRouteReservationResponse;
 import co.nvqa.common.core.model.route.AddParcelToRouteRequest;
 import co.nvqa.common.core.model.route.AddPickupJobToRouteRequest;
@@ -33,12 +34,14 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import lombok.Getter;
+import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
 
 @ScenarioScoped
@@ -48,10 +51,6 @@ public class ApiRouteSteps extends CoreStandardSteps {
   @Getter
   private RouteClient routeClient;
 
-  @Override
-  public void init() {
-
-  }
 
   /**
    * Sample:
@@ -64,49 +63,9 @@ public class ApiRouteSteps extends CoreStandardSteps {
    */
   @Given("API Core - Operator create new route using data below:")
   public void apiOperatorCreateNewRouteUsingDataBelow(Map<String, String> dataTableAsMap) {
-    String scenarioName = getScenarioManager().getCurrentScenario().getName();
-
-    ZonedDateTime routeDate;
-    if (dataTableAsMap.containsKey("to_use_different_date")) {
-      routeDate = CoreTestUtils.getDateForNextDay();
-    } else {
-      routeDate = CoreTestUtils.getDateForToday();
-    }
-
-    String createdDate = DTF_CREATED_DATE.format(ZonedDateTime.now());
-    String formattedRouteDate = DTF_NORMAL_DATETIME.format(
-        routeDate.withZoneSameInstant(ZoneId.of("UTC")));
-    String formattedRouteDateTime = DTF_ISO_8601_LITE.format(
-        routeDate.withZoneSameInstant(ZoneId.of("UTC")));
-
-    Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
-    String createRouteRequestJson = StandardTestUtils
-        .replaceTokens(resolvedDataTable.get("createRouteRequest"),
-            StandardTestUtils.createDefaultTokens());
-    RouteRequest createRouteRequest = fromJson(createRouteRequestJson, RouteRequest.class);
-
-    if (createRouteRequest.getDate() == null) {
-      createRouteRequest.setDate(formattedRouteDate);
-    }
-
-    if (createRouteRequest.getDateTime() == null) {
-      createRouteRequest.setDateTime(formattedRouteDateTime);
-    }
-
-    if (createRouteRequest.getComments() == null) {
-      String comments = f(
-          "This route is created for testing purpose only. Ignore this route. Created at %s by scenario \"%s\".",
-          createdDate, scenarioName);
-      createRouteRequest.setComments(comments);
-    }
-
-    // to cater for scenario that needs route of hub id same as destination hub of created parcel
-    if (createRouteRequest.getHubId() == null) {
-      createRouteRequest.setHubId(get(KEY_DESTINATION_HUB_ID));
-    }
-
     doWithRetry(() -> {
-      final RouteResponse createRouteResponse = getRouteClient().createRoute(createRouteRequest);
+      final RouteResponse createRouteResponse = getRouteClient()
+          .createRoute(generateRouteRequest(dataTableAsMap));
       putInList(KEY_LIST_OF_CREATED_ROUTES, createRouteResponse);
       putInList(KEY_LIST_OF_CREATED_ROUTE_ID, createRouteResponse.getId());
       put(KEY_CREATED_ROUTE_ID, createRouteResponse.getId());
@@ -117,6 +76,21 @@ public class ApiRouteSteps extends CoreStandardSteps {
   public void apiOperatorCreateNewRouteFromZonalRoutingUsingDataBelow(
       Map<String, String> dataTableAsMap) {
     apiOperatorCreateNewRouteUsingDataBelow(dataTableAsMap);
+  }
+
+  @Given("API Core - Operator fail to create new route from zonal routing using data below:")
+  public void apiOperatorFailCreateRouteFromZonalRouting(
+      Map<String, String> dataTableAsMap) {
+    Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
+    doWithRetry(() -> {
+      final Response createRouteResponse = getRouteClient()
+          .createRouteAndGetRawResponse(generateRouteRequest(dataTableAsMap));
+      Assertions.assertThat(createRouteResponse.getStatusCode()).as("status code")
+          .isEqualTo(HttpConstants.RESPONSE_500_INTERNAL_SERVER_ERROR);
+      Error actual = fromJsonSnakeCase(createRouteResponse.getBody().asString(), Error.class);
+      Error expected = fromJsonSnakeCase(resolvedDataTable.get("errorMessage"), Error.class);
+      expected.compareWithActual(actual, resolvedDataTable);
+    }, "failed to create route");
   }
 
   /**
@@ -184,7 +158,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
 
   @Given("API Core - Operator remove pickup job id {string} from route")
   public void apiOperatorRemovePickupJobFromRouteUsingDataBelow(String paJobId) {
-    final Long jobId = Long.parseLong(resolveValue(paJobId));
+    final long jobId = Long.parseLong(resolveValue(paJobId));
     doWithRetry(
         () -> getRouteClient().removePAJobFromRoute(jobId),
         "remove pa job from route");
@@ -329,11 +303,11 @@ public class ApiRouteSteps extends CoreStandardSteps {
           reservationId, overwrite);
 
       Assertions.assertThat(r.statusCode())
-          .withFailMessage("unexpected http status: " + r.statusCode())
+          .as("expected http status: " + r.statusCode())
           .isEqualTo(expectedStatusCode);
 
       Assertions.assertThat(r.getBody().asString())
-          .withFailMessage("unexpected error message: " + r.getBody().asString())
+          .as("expected error message: " + r.getBody().asString())
           .isEqualTo(expectedErrorMessage);
     }, "(expected) failed add reservation to route");
   }
@@ -365,11 +339,11 @@ public class ApiRouteSteps extends CoreStandardSteps {
           reservationResultId);
 
       Assertions.assertThat(r.statusCode())
-          .withFailMessage("unexpected http status: " + r.statusCode())
+          .as("expected http status: " + r.statusCode())
           .isEqualTo(expectedStatusCode);
 
       Assertions.assertThat(r.getBody().asString())
-          .withFailMessage("unexpected error message: " + r.getBody().asString())
+          .as("expected error message: " + r.getBody().asString())
           .isEqualTo(expectedErrorMessage);
     }, "(expected) failed add reservation to route");
   }
@@ -378,8 +352,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
    * Sample:<p>
    * <p>
    * When API Core - Operator bulk add reservation to route using data below: | request | {"ids":
-   * [{KEY_LIST_OF_CREATED_RESERVATIONS[1].id},
-   * {KEY_LIST_OF_CREATED_RESERVATIONS[2].id}],"new_route_id":{KEY_LIST_OF_CREATED_ROUTES[1].id},"overwrite":true}
+   * [{KEY_LIST_OF_CREATED_RESERVATIONS[1].id}, {KEY_LIST_OF_CREATED_RESERVATIONS[2].id}],"new_route_id":{KEY_LIST_OF_CREATED_ROUTES[1].id},"overwrite":true}
    * |
    * <p>
    *
@@ -403,8 +376,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
    * Sample:<p>
    * <p>
    * When API Core - Operator bulk add reservation to route with partial success: | request |
-   * {"ids": [{KEY_LIST_OF_CREATED_RESERVATIONS[1].id},
-   * {KEY_LIST_OF_CREATED_RESERVATIONS[2].id}],"new_route_id":{KEY_LIST_OF_CREATED_ROUTES[1].id},"overwrite":true}
+   * {"ids": [{KEY_LIST_OF_CREATED_RESERVATIONS[1].id}, {KEY_LIST_OF_CREATED_RESERVATIONS[2].id}],"new_route_id":{KEY_LIST_OF_CREATED_ROUTES[1].id},"overwrite":true}
    * |
    * <p>
    *
@@ -463,10 +435,10 @@ public class ApiRouteSteps extends CoreStandardSteps {
     List<Data> actual =
         fromJson(resolvedDataTable.get("actualResponse"), MergeWaypointsResponse.class).getData();
     Assertions.assertThat(actual)
-        .withFailMessage("merge waypoints response is null")
+        .as("merge waypoints response is not null")
         .isNotNull();
     Assertions.assertThat(actual.size())
-        .withFailMessage("merge waypoints response size doesnt match")
+        .as("merge waypoints response size match")
         .isEqualTo(expected.size());
     expected.forEach(o -> DataEntity.assertListContains(actual, o, "merged waypoints list"));
   }
@@ -480,8 +452,8 @@ public class ApiRouteSteps extends CoreStandardSteps {
   @Given("API Core - Operator new add parcel to DP holding route:")
   public void operatorAddToDpHoldingRoute(Map<String, String> data) {
     data = resolveKeyValues(data);
-    final Long routeId = Long.parseLong(data.get("routeId"));
-    final Long orderId = Long.parseLong(data.get("orderId"));
+    final long routeId = Long.parseLong(data.get("routeId"));
+    final long orderId = Long.parseLong(data.get("orderId"));
     doWithRetry(
         () -> getRouteClient().addToRouteDp(orderId, routeId),
         "Add to route dp order");
@@ -632,8 +604,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
 
   /**
    * Sample: API Core - Operator parcel transfer to a new route: | request |
-   * {{"route_id":null,"route_date":"2021-01-19
-   * 08:25:13","from_driver_id":null,"to_driver_id":2679,"to_driver_hub_id":3,"orders":[{"tracking_id":"NVSGDIMMI000238068","inbound_type":"VAN_FROM_NINJAVAN","hub_id":3}]|
+   * {{"route_id":null,"route_date":"2021-01-19 08:25:13","from_driver_id":null,"to_driver_id":2679,"to_driver_hub_id":3,"orders":[{"tracking_id":"NVSGDIMMI000238068","inbound_type":"VAN_FROM_NINJAVAN","hub_id":3}]|
    *
    * @param dataTableAsMap Map of data from feature file.
    */
@@ -705,9 +676,21 @@ public class ApiRouteSteps extends CoreStandardSteps {
         finalData.get("requestBody")), "add references to Route Group", 2000, 3);
   }
 
+  /**
+   * Sample:
+   * <p>
+   * API Route - create route group: |name|ARG-{uniqueString} | |description|This Route Group is
+   * created by automation test from Operator V2.|
+   *
+   * @param data Map of data from feature file.
+   */
   @Given("API Route - create route group:")
   public void apiOperatorCreateNewRouteGroup(Map<String, String> data) {
     RouteGroup routeGroup = new RouteGroup(resolveKeyValues(data));
+    String uniqueString = CoreTestUtils.generateUniqueId();
+    if (StringUtils.endsWithIgnoreCase(routeGroup.getName(), "{uniqueString}")) {
+      routeGroup.setName(routeGroup.getName().replace("{uniqueString}", uniqueString));
+    }
     doWithRetry(() -> {
       var response = getRouteClient().createRouteGroup(routeGroup);
       putInList(KEY_LIST_OF_CREATED_ROUTE_GROUPS, response);
@@ -720,5 +703,64 @@ public class ApiRouteSteps extends CoreStandardSteps {
     routeIds.stream()
         .map(Long::parseLong)
         .forEach(id -> getRouteClient().deleteRoute(id));
+  }
+
+  @And("API Route - Operator get created Reservation Group params:")
+  public void apiOperatorGetCreatedReservationGroupParams(Map<String, String> dataTableAsMap) {
+    Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
+    final String reservationGroupName = resolvedDataTable.get("reservationGroupName");
+    doWithRetry(() -> {
+      List<MilkRunGroup> milkrunGroups = getRouteClient().getMilkrunGroups(new Date());
+
+      MilkRunGroup group = milkrunGroups.stream().filter(
+              milkrunGroup -> StringUtils.equals(milkrunGroup.getName(), reservationGroupName))
+          .findFirst().orElseThrow(() -> new RuntimeException(
+              "Could not find milkrun group with name [" + reservationGroupName + "]"));
+      put(KEY_CORE_CREATED_RESERVATION_GROUP_ID, group.getId());
+    }, "Operator get created Reservation Group params");
+  }
+
+  private RouteRequest generateRouteRequest(Map<String, String> dataTableAsMap) {
+    String scenarioName = getScenarioManager().getCurrentScenario().getName();
+
+    ZonedDateTime routeDate;
+    if (dataTableAsMap.containsKey("to_use_different_date")) {
+      routeDate = CoreTestUtils.getDateForNextDay();
+    } else {
+      routeDate = CoreTestUtils.getDateForToday();
+    }
+
+    String createdDate = DTF_CREATED_DATE.format(ZonedDateTime.now());
+    String formattedRouteDate = DTF_NORMAL_DATETIME.format(
+        routeDate.withZoneSameInstant(ZoneId.of("UTC")));
+    String formattedRouteDateTime = DTF_ISO_8601_LITE.format(
+        routeDate.withZoneSameInstant(ZoneId.of("UTC")));
+
+    Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
+    String createRouteRequestJson = StandardTestUtils
+        .replaceTokens(resolvedDataTable.get("createRouteRequest"),
+            StandardTestUtils.createDefaultTokens());
+    RouteRequest createRouteRequest = fromJson(createRouteRequestJson, RouteRequest.class);
+
+    if (createRouteRequest.getDate() == null) {
+      createRouteRequest.setDate(formattedRouteDate);
+    }
+
+    if (createRouteRequest.getDateTime() == null) {
+      createRouteRequest.setDateTime(formattedRouteDateTime);
+    }
+
+    if (createRouteRequest.getComments() == null) {
+      String comments = f(
+          "This route is created for testing purpose only. Ignore this route. Created at %s by scenario \"%s\".",
+          createdDate, scenarioName);
+      createRouteRequest.setComments(comments);
+    }
+
+    // to cater for scenario that needs route of hub id same as destination hub of created parcel
+    if (createRouteRequest.getHubId() == null) {
+      createRouteRequest.setHubId(get(KEY_DESTINATION_HUB_ID));
+    }
+    return createRouteRequest;
   }
 }

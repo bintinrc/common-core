@@ -22,10 +22,6 @@ public class ApiParameterSteps extends CoreStandardSteps {
   @Getter
   private ParameterClient parameterClient;
 
-  @Override
-  public void init() {
-
-  }
 
   @When("API Core - set system parameter:")
   public void getPickupFromReservationId(Map<String, String> data) {
@@ -46,7 +42,8 @@ public class ApiParameterSteps extends CoreStandardSteps {
     );
     params.forEach(data -> {
       try {
-        parameterClient.setParameters(JsonUtils.toJson(data.toString()));
+        doWithRetry(() -> parameterClient.setParameters(JsonUtils.toJson(data)),
+            "Running hook @RestoreSystemParams");
       } catch (Exception ex) {
         LOGGER.warn("Could not set system parameter: {}", data, ex);
       }

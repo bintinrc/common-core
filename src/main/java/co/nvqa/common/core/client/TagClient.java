@@ -10,10 +10,10 @@ import co.nvqa.common.utils.NvTestHttpException;
 import co.nvqa.common.utils.StandardTestConstants;
 import co.nvqa.commonauth.utils.TokenUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.google.common.collect.ImmutableList;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import java.util.List;
 import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +33,7 @@ public class TagClient extends SimpleApiClient {
     String apiMethod = "route/1.0/tags";
 
     RequestSpecification requestSpecification = createAuthenticatedRequest()
-        .body(toJson(ImmutableList.of(tag)));
+        .body(toJson(List.of(tag)));
 
     Response r = doPost("Tag Client - Create Tag", requestSpecification, apiMethod);
     if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
@@ -74,7 +74,7 @@ public class TagClient extends SimpleApiClient {
   public void deleteTag(long tagId) {
     String apiMethod = "route/1.0/tags/{tagId}";
 
-    LOGGER.info(f("Deleting tag with ID = '%s'...", tagId));
+    LOGGER.info("Deleting tag with ID = {}", tagId);
 
     RequestSpecification requestSpecification = createAuthenticatedRequest()
         .contentType(ContentType.JSON)
@@ -82,7 +82,7 @@ public class TagClient extends SimpleApiClient {
 
     Response response = doDelete("Route - Delete Tag", requestSpecification, apiMethod);
     response.then().assertThat().statusCode(HttpConstants.RESPONSE_200_SUCCESS);
-    LOGGER.info(f("Deleting tag with ID = '%s' is done.", tagId));
+    LOGGER.info("Deleting tag with ID = {} is done", tagId);
   }
 
   public void deleteTag(String tagName) {

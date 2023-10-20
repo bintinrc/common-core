@@ -1,6 +1,5 @@
 package co.nvqa.common.core.model.batch_update_pods;
 
-import io.cucumber.java.mk_latn.No;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

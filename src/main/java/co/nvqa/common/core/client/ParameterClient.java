@@ -19,7 +19,6 @@ public class ParameterClient extends SimpleApiClient {
     String url = "core/parameter";
     RequestSpecification spec = createAuthenticatedRequest()
         .body(body);
-
     return doPut("Set Paramenter", spec, url);
   }
 

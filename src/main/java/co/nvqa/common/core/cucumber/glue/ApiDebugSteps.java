@@ -16,10 +16,6 @@ public class ApiDebugSteps extends CoreStandardSteps {
   @Getter
   private DebugClient debugClient;
 
-  @Override
-  public void init() {
-
-  }
 
   @Then("API Core - verify driver's total cod:")
   public void verifyTotalCod(Map<String, String> data) {

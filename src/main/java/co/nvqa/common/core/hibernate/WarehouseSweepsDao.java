@@ -1,6 +1,5 @@
 package co.nvqa.common.core.hibernate;
 
-import co.nvqa.common.core.model.persisted_class.core.InboundScans;
 import co.nvqa.common.core.model.persisted_class.core.WarehouseSweeps;
 import co.nvqa.common.core.utils.CoreTestConstants;
 import co.nvqa.common.database.DbBase;
