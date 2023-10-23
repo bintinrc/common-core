@@ -326,7 +326,7 @@ public class ApiOrderSteps extends CoreStandardSteps {
 
   @Given("API Core - cancel order {value}")
   public void apiOperatorCancelCreatedOrder(String orderIdStr) {
-    long orderId = Long.parseLong(orderIdStr);
+    long orderId = Long.parseLong(resolveValue(orderIdStr));
     doWithRetry(() ->
             getOrderClient().cancelOrder(orderId),
         "cancel order");
