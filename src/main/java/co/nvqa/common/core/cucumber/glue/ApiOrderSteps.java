@@ -593,17 +593,17 @@ public class ApiOrderSteps extends CoreStandardSteps {
    * @param orderTrackingId key that contains order's tracking id, example:
    *                 KEY_LIST_OF_CREATED_TRACKING_IDS
    */
-  @Given("API Core - cancel order using tracking id {value}")
-  public void apiOperatorCancelCreatedOrderUsingTrackingId(String orderTrackingId) {
+  @Given("API Core - cancel order using tracking id {value} by using shipper token: {value}")
+  public void apiOperatorCancelCreatedOrderUsingTrackingId(String orderTrackingId, String shipperToken) {
     doWithRetry(() ->
-            getOrderClient().cancelOrderV3(orderTrackingId),
+            new OrderClient(resolveValue(shipperToken)).cancelOrderV3(orderTrackingId),
         "cancel order using tracking id");
   }
 
   @Given("API Core - Login with clientId {string} and clientSecret {string}")
   public void apiShipperLoginWithCredentials(String clientId, String secret) {
     String token = TokenUtils.getShipperToken(clientId, secret);
-    getOrderClient().changeBearerToken(token);
+    put(KEY_CORE_SHIPPER_TOKEN, token);
   }
 
 }
