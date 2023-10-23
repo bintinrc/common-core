@@ -57,6 +57,11 @@ public class OrderClient extends SimpleApiClient {
         DEFAULT_CAMEL_CASE_MAPPER);
   }
 
+  public OrderClient(String shipperToken) {
+    super(StandardTestConstants.API_BASE_URL, shipperToken,
+        DEFAULT_CAMEL_CASE_MAPPER);
+  }
+
   public Order searchOrderByTrackingId(String trackingId) {
     SearchOrderRequest searchOrderRequest = new SearchOrderRequest(trackingId);
     return searchOrder(searchOrderRequest);

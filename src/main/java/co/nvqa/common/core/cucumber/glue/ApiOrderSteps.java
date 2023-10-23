@@ -19,6 +19,7 @@ import co.nvqa.common.core.model.order.RtsOrderRequest;
 import co.nvqa.common.utils.JsonUtils;
 import co.nvqa.common.utils.NvTestRuntimeException;
 import co.nvqa.common.utils.StandardTestUtils;
+import co.nvqa.commonauth.utils.TokenUtils;
 import io.cucumber.guice.ScenarioScoped;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
@@ -325,7 +326,7 @@ public class ApiOrderSteps extends CoreStandardSteps {
 
   @Given("API Core - cancel order {value}")
   public void apiOperatorCancelCreatedOrder(String orderIdStr) {
-    long orderId = Long.parseLong(orderIdStr);
+    long orderId = Long.parseLong(resolveValue(orderIdStr));
     doWithRetry(() ->
             getOrderClient().cancelOrder(orderId),
         "cancel order");
@@ -592,11 +593,17 @@ public class ApiOrderSteps extends CoreStandardSteps {
    * @param orderTrackingId key that contains order's tracking id, example:
    *                 KEY_LIST_OF_CREATED_TRACKING_IDS
    */
-  @Given("API Core - cancel order using tracking id {value}")
-  public void apiOperatorCancelCreatedOrderUsingTrackingId(String orderTrackingId) {
+  @Given("API Core - cancel order using tracking id {value} by using shipper token: {value}")
+  public void apiOperatorCancelCreatedOrderUsingTrackingId(String orderTrackingId, String shipperToken) {
     doWithRetry(() ->
-            getOrderClient().cancelOrderV3(orderTrackingId),
+            new OrderClient(resolveValue(shipperToken)).cancelOrderV3(orderTrackingId),
         "cancel order using tracking id");
+  }
+
+  @Given("API Core - Login with clientId {string} and clientSecret {string}")
+  public void apiShipperLoginWithCredentials(String clientId, String secret) {
+    String token = TokenUtils.getShipperToken(clientId, secret);
+    put(KEY_CORE_SHIPPER_TOKEN, token);
   }
 
 }
