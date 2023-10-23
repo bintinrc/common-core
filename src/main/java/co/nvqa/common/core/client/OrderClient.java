@@ -816,4 +816,9 @@ public class OrderClient extends SimpleApiClient {
     } while (!match && new Date().getTime() - start < timeout);
     return match;
   }
+
+  public void changeBearerToken(String token) {
+    this.setBearerToken(token);
+  }
+
 }

@@ -19,6 +19,7 @@ import co.nvqa.common.core.model.order.RtsOrderRequest;
 import co.nvqa.common.utils.JsonUtils;
 import co.nvqa.common.utils.NvTestRuntimeException;
 import co.nvqa.common.utils.StandardTestUtils;
+import co.nvqa.commonauth.utils.TokenUtils;
 import io.cucumber.guice.ScenarioScoped;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
@@ -597,6 +598,12 @@ public class ApiOrderSteps extends CoreStandardSteps {
     doWithRetry(() ->
             getOrderClient().cancelOrderV3(orderTrackingId),
         "cancel order using tracking id");
+  }
+
+  @Given("API Core - Login with clientId {string} and clientSecret {string}")
+  public void apiShipperLoginWithCredentials(String clientId, String secret) {
+    String token = TokenUtils.getShipperToken(clientId, secret);
+    getOrderClient().changeBearerToken(token);
   }
 
 }
