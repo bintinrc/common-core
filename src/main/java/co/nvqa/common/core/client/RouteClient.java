@@ -536,13 +536,13 @@ public class RouteClient extends SimpleApiClient {
     return doPost("Core - Start Route", requestSpecification, apiMethod);
   }
 
-  public void setRouteTags(long routeId, long tagId) {
+  public void setRouteTags(long routeId, int[] tagIds) {
     String apiMethod = "route/1.0/routes/tags";
 
     RequestSpecification requestSpecification = createAuthenticatedRequest()
-        .body(f("[{\"routeId\":%d,\"tagIds\":[%d]}]", routeId, tagId));
+        .body(f("[{\"routeId\":%d,\"tagIds\":%s}]", routeId, Arrays.toString(tagIds)));
 
-    Response r = doPut("Route - Set Route Tags", requestSpecification, apiMethod);
+    Response r = doPut("Operator Portal - Set Route Tags", requestSpecification, apiMethod);
     r.then().assertThat().contentType(ContentType.JSON);
     r.then().assertThat().statusCode(HttpConstants.RESPONSE_200_SUCCESS);
   }
