@@ -103,6 +103,8 @@ public class Orders extends DataEntity<Orders> {
   private String shipperRefMetadata;
   @Column(name = "cod_id")
   private String codId;
+  @Column(name = "created_at")
+  private String createdAt;
   private String dimensions;
 
   public Orders(Map<String, ?> data) {

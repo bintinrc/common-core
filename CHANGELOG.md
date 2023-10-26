@@ -1,6 +1,16 @@
 # Change log
 
 <hr>
+## [1.3.21] 2023-10-20
+
+### Added/Modify
+
+- API Core - Operator check order {string} have the following Tags:
+- DB Core - verifies service_level in orders table
+- DB Core - verifies service_type in orders table
+- API Core - cancel order using tracking id {value} by using shipper token: {value}
+
+<hr>
 
 ## [1.3.20] 2023-10-07
 

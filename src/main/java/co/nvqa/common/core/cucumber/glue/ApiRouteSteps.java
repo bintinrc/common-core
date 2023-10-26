@@ -713,7 +713,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
       List<MilkRunGroup> milkrunGroups = getRouteClient().getMilkrunGroups(new Date());
 
       MilkRunGroup group = milkrunGroups.stream().filter(
-          milkrunGroup -> StringUtils.equals(milkrunGroup.getName(), reservationGroupName))
+              milkrunGroup -> StringUtils.equals(milkrunGroup.getName(), reservationGroupName))
           .findFirst().orElseThrow(() -> new RuntimeException(
               "Could not find milkrun group with name [" + reservationGroupName + "]"));
       put(KEY_CORE_CREATED_RESERVATION_GROUP_ID, group.getId());
