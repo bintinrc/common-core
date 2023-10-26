@@ -13,6 +13,7 @@ import co.nvqa.common.core.model.order.DeliveryDetails;
 import co.nvqa.common.core.model.order.Order;
 import co.nvqa.common.core.model.order.Order.Dimension;
 import co.nvqa.common.core.model.order.ParcelJob;
+import co.nvqa.common.core.model.order.PricingDetails;
 import co.nvqa.common.core.model.order.RescheduleOrderRequest;
 import co.nvqa.common.core.model.order.RescheduleOrderResponse;
 import co.nvqa.common.core.model.order.RtsOrderRequest;
@@ -131,7 +132,8 @@ public class ApiOrderSteps extends CoreStandardSteps {
       putInList(KEY_LIST_OF_CREATED_ORDERS, order,
           (o1, o2) -> StringUtils.equalsAnyIgnoreCase(o1.getTrackingId(), o2.getTrackingId()));
     } catch (Throwable t) {
-      throw new NvTestCoreOrderKafkaLagException("Granular status not updated yet because of Kafka lag");
+      throw new NvTestCoreOrderKafkaLagException(
+          "Granular status not updated yet because of Kafka lag");
     }
   }
 
@@ -573,6 +575,13 @@ public class ApiOrderSteps extends CoreStandardSteps {
     doWithRetry(
         () -> getOrderClient().batchRecalculate(eventType, trackingId),
         "batch recalculate order", 3000, 10);
+  }
+
+  @Then("API Core - verify order pricing details:")
+  public void apiOperatorVerifyPricingInfo(Map<String, String> data) {
+    PricingDetails expected = new PricingDetails(resolveKeyValues(data));
+    PricingDetails actual = getOrderClient().getPricingDetails(expected.getOrderId());
+    expected.compareWithActual(actual);
   }
 
 }
