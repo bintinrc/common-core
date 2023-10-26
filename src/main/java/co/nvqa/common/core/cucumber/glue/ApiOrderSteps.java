@@ -20,6 +20,7 @@ import co.nvqa.common.core.model.order.RtsOrderRequest;
 import co.nvqa.common.utils.JsonUtils;
 import co.nvqa.common.utils.NvTestRuntimeException;
 import co.nvqa.common.utils.StandardTestUtils;
+import co.nvqa.commonauth.utils.TokenUtils;
 import io.cucumber.guice.ScenarioScoped;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
@@ -33,6 +34,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
@@ -324,7 +327,7 @@ public class ApiOrderSteps extends CoreStandardSteps {
 
   @Given("API Core - cancel order {value}")
   public void apiOperatorCancelCreatedOrder(String orderIdStr) {
-    long orderId = Long.parseLong(orderIdStr);
+    long orderId = Long.parseLong(resolveValue(orderIdStr));
     doWithRetry(() ->
             getOrderClient().cancelOrder(orderId),
         "cancel order");
@@ -384,12 +387,20 @@ public class ApiOrderSteps extends CoreStandardSteps {
   @When("API Core - Operator check order {string} have the following Tags:")
   public void apiCoreBulkTagsParcelsWithBelowTag(String orderId, List<String> expectedTagList) {
     String resolvedOrderId = resolveValue(orderId);
+    List<String> expectedTagsList = expectedTagList.stream()
+        .filter(Objects::nonNull)
+        .collect(Collectors.toList());
     final List<String> responseTagList = getOrderClient().getOrderLevelTags(
         Long.parseLong(resolvedOrderId));
-    for (String expectedTag : expectedTagList) {
-      boolean contains = responseTagList.contains(expectedTag);
-      Assertions.assertThat(contains).as(f("Tags %s not exist in order %d", expectedTag, orderId))
-          .isTrue();
+    if (expectedTagsList.size() != 0) {
+      for (String expectedTag : expectedTagsList) {
+        boolean contains = responseTagList.contains(expectedTag);
+        Assertions.assertThat(contains)
+            .as(f("Tags %s exist in order %s", expectedTag, resolvedOrderId))
+            .isTrue();
+      }
+    } else {
+      Assertions.assertThat(responseTagList.isEmpty()).as("Tag is empty").isTrue();
     }
   }
 
@@ -575,6 +586,26 @@ public class ApiOrderSteps extends CoreStandardSteps {
     doWithRetry(
         () -> getOrderClient().batchRecalculate(eventType, trackingId),
         "batch recalculate order", 3000, 10);
+  }
+
+  /**
+   * Cancel the Order by passing Tracking ID
+   *
+   * @param orderTrackingId key that contains order's tracking id, example:
+   *                        KEY_LIST_OF_CREATED_TRACKING_IDS
+   */
+  @Given("API Core - cancel order using tracking id {value} by using shipper token: {value}")
+  public void apiOperatorCancelCreatedOrderUsingTrackingId(String orderTrackingId,
+      String shipperToken) {
+    doWithRetry(() ->
+            new OrderClient(resolveValue(shipperToken)).cancelOrderV3(orderTrackingId),
+        "cancel order using tracking id");
+  }
+
+  @Given("API Core - Login with clientId {string} and clientSecret {string}")
+  public void apiShipperLoginWithCredentials(String clientId, String secret) {
+    String token = TokenUtils.getShipperToken(clientId, secret);
+    put(KEY_CORE_SHIPPER_TOKEN, token);
   }
 
   @Then("API Core - verify order pricing details:")
