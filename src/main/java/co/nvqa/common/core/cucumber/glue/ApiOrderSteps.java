@@ -13,6 +13,7 @@ import co.nvqa.common.core.model.order.DeliveryDetails;
 import co.nvqa.common.core.model.order.Order;
 import co.nvqa.common.core.model.order.Order.Dimension;
 import co.nvqa.common.core.model.order.ParcelJob;
+import co.nvqa.common.core.model.order.PricingDetails;
 import co.nvqa.common.core.model.order.RescheduleOrderRequest;
 import co.nvqa.common.core.model.order.RescheduleOrderResponse;
 import co.nvqa.common.core.model.order.RtsOrderRequest;
@@ -591,10 +592,11 @@ public class ApiOrderSteps extends CoreStandardSteps {
    * Cancel the Order by passing Tracking ID
    *
    * @param orderTrackingId key that contains order's tracking id, example:
-   *                 KEY_LIST_OF_CREATED_TRACKING_IDS
+   *                        KEY_LIST_OF_CREATED_TRACKING_IDS
    */
   @Given("API Core - cancel order using tracking id {value} by using shipper token: {value}")
-  public void apiOperatorCancelCreatedOrderUsingTrackingId(String orderTrackingId, String shipperToken) {
+  public void apiOperatorCancelCreatedOrderUsingTrackingId(String orderTrackingId,
+      String shipperToken) {
     doWithRetry(() ->
             new OrderClient(resolveValue(shipperToken)).cancelOrderV3(orderTrackingId),
         "cancel order using tracking id");
@@ -604,6 +606,13 @@ public class ApiOrderSteps extends CoreStandardSteps {
   public void apiShipperLoginWithCredentials(String clientId, String secret) {
     String token = TokenUtils.getShipperToken(clientId, secret);
     put(KEY_CORE_SHIPPER_TOKEN, token);
+  }
+
+  @Then("API Core - verify order pricing details:")
+  public void apiOperatorVerifyPricingInfo(Map<String, String> data) {
+    PricingDetails expected = new PricingDetails(resolveKeyValues(data));
+    PricingDetails actual = getOrderClient().getPricingDetails(expected.getOrderId());
+    expected.compareWithActual(actual);
   }
 
 }

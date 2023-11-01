@@ -763,4 +763,15 @@ public class ApiRouteSteps extends CoreStandardSteps {
     }
     return createRouteRequest;
   }
+
+  @Given("API Route - set tags to route:")
+  public void apiOperatorSetTagsOfTheNewCreatedRouteTo(Map<String, String> data) {
+    Map<String, String> finalData = resolveKeyValues(data);
+    doWithRetry(() -> {
+      int[] tagIds = splitAndNormalize(finalData.get("tagIds")).stream()
+          .mapToInt(Integer::parseInt).toArray();
+      long routeId = Long.parseLong(finalData.get("routeId"));
+      getRouteClient().setRouteTags(routeId, tagIds);
+    }, "Set tags to route");
+  }
 }
