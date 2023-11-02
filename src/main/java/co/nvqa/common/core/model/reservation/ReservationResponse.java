@@ -1,5 +1,7 @@
 package co.nvqa.common.core.model.reservation;
 
+import co.nvqa.common.utils.DateUtil;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
@@ -55,5 +57,15 @@ public class ReservationResponse {
     public String country;
     public String postcode;
     public Object activeRouteId;
+  }
+
+  @JsonIgnore
+  public String getLocalizedReadyDatetime() {
+    return DateUtil.getDefaultDateTimeFromUTC(getReadyDatetime());
+  }
+
+  @JsonIgnore
+  public String getLocalizedLatestDatetime() {
+    return DateUtil.getDefaultDateTimeFromUTC(getLatestDatetime());
   }
 }
