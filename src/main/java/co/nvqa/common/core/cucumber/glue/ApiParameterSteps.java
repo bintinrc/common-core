@@ -38,7 +38,10 @@ public class ApiParameterSteps extends CoreStandardSteps {
             "value", 0),
         Map.of(
             "key", "IS_DRIVER_COD_LIMIT_APPLIED",
-            "value", 0)
+            "value", 1),
+        Map.of(
+            "key", "DRIVER_DAILY_COD_LIMIT",
+            "value", 30000000)
     );
     params.forEach(data -> {
       try {
