@@ -4,6 +4,7 @@ import co.nvqa.common.core.client.CodInboundsClient;
 import co.nvqa.common.core.client.Lazada3PLClient;
 import co.nvqa.common.core.client.OrderClient;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
+import co.nvqa.common.core.exception.NvTestCoreOrderKafkaLagException;
 import co.nvqa.common.core.model.CodInbound;
 import co.nvqa.common.core.model.EditDeliveryOrderRequest;
 import co.nvqa.common.core.model.Lazada3PL;
@@ -12,12 +13,14 @@ import co.nvqa.common.core.model.order.DeliveryDetails;
 import co.nvqa.common.core.model.order.Order;
 import co.nvqa.common.core.model.order.Order.Dimension;
 import co.nvqa.common.core.model.order.ParcelJob;
+import co.nvqa.common.core.model.order.PricingDetails;
 import co.nvqa.common.core.model.order.RescheduleOrderRequest;
 import co.nvqa.common.core.model.order.RescheduleOrderResponse;
 import co.nvqa.common.core.model.order.RtsOrderRequest;
 import co.nvqa.common.utils.JsonUtils;
 import co.nvqa.common.utils.NvTestRuntimeException;
 import co.nvqa.common.utils.StandardTestUtils;
+import co.nvqa.commonauth.utils.TokenUtils;
 import io.cucumber.guice.ScenarioScoped;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
@@ -31,6 +34,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
@@ -62,7 +67,8 @@ public class ApiOrderSteps extends CoreStandardSteps {
    * order with the same tracking id. <br/><br/><b>Note</b>: becareful that you may face unintended
    * order status due to event propagation delay to Core service
    *
-   * @param tracking key that contains order's tracking id, example: KEY_LIST_OF_CREATED_TRACKING_IDS
+   * @param tracking key that contains order's tracking id, example:
+   *                 KEY_LIST_OF_CREATED_TRACKING_IDS
    */
   @When("API Core - Operator get order details for tracking order {string}")
   public void apiOperatorGetOrderDetailsForTrackingOrder(String tracking) {
@@ -87,7 +93,8 @@ public class ApiOrderSteps extends CoreStandardSteps {
    * previous order with the same tracking id. this is intended to check if you have done certain
    * action to same order and you need previous data prior to the action being done
    *
-   * @param tracking key that contains order's tracking id, example: KEY_LIST_OF_CREATED_TRACKING_IDS
+   * @param tracking key that contains order's tracking id, example:
+   *                 KEY_LIST_OF_CREATED_TRACKING_IDS
    */
   @When("API Core - Operator get order details for previous order {string}")
   public void apiOperatorGetOrderDetailsForPreviousOrder(String tracking) {
@@ -127,9 +134,9 @@ public class ApiOrderSteps extends CoreStandardSteps {
 
       putInList(KEY_LIST_OF_CREATED_ORDERS, order,
           (o1, o2) -> StringUtils.equalsAnyIgnoreCase(o1.getTrackingId(), o2.getTrackingId()));
-    } catch (NvTestRuntimeException ex) {
-      LOGGER.warn("failed to get the order with the expected granular status! cause: {}",
-          ex.getMessage());
+    } catch (Throwable t) {
+      throw new NvTestCoreOrderKafkaLagException(
+          "Granular status not updated yet because of Kafka lag");
     }
   }
 
@@ -320,7 +327,7 @@ public class ApiOrderSteps extends CoreStandardSteps {
 
   @Given("API Core - cancel order {value}")
   public void apiOperatorCancelCreatedOrder(String orderIdStr) {
-    long orderId = Long.parseLong(orderIdStr);
+    long orderId = Long.parseLong(resolveValue(orderIdStr));
     doWithRetry(() ->
             getOrderClient().cancelOrder(orderId),
         "cancel order");
@@ -374,18 +381,26 @@ public class ApiOrderSteps extends CoreStandardSteps {
   }
 
   /**
-   * @param orderId  <br/>orderId: {KEY_LIST_OF_CREATED_ORDERS[1].id}
+   * @param orderId         <br/>orderId: {KEY_LIST_OF_CREATED_ORDERS[1].id}
    * @param expectedTagList :PRIOR
    */
   @When("API Core - Operator check order {string} have the following Tags:")
   public void apiCoreBulkTagsParcelsWithBelowTag(String orderId, List<String> expectedTagList) {
     String resolvedOrderId = resolveValue(orderId);
+    List<String> expectedTagsList = expectedTagList.stream()
+        .filter(Objects::nonNull)
+        .collect(Collectors.toList());
     final List<String> responseTagList = getOrderClient().getOrderLevelTags(
         Long.parseLong(resolvedOrderId));
-    for (String expectedTag : expectedTagList) {
-      boolean contains = responseTagList.contains(expectedTag);
-      Assertions.assertThat(contains).as(f("Tags %s not exist in order %d", expectedTag, orderId))
-          .isTrue();
+    if (expectedTagsList.size() != 0) {
+      for (String expectedTag : expectedTagsList) {
+        boolean contains = responseTagList.contains(expectedTag);
+        Assertions.assertThat(contains)
+            .as(f("Tags %s exist in order %s", expectedTag, resolvedOrderId))
+            .isTrue();
+      }
+    } else {
+      Assertions.assertThat(responseTagList.isEmpty()).as("Tag is empty").isTrue();
     }
   }
 
@@ -456,8 +471,8 @@ public class ApiOrderSteps extends CoreStandardSteps {
     String comment = dataTableAsMap.get("comment");
     put(KEY_CORE_LAZADA_3PL_COMMENT, comment);
     doWithRetry(() ->
-      getLazada3PLClient().postLazada3PL(
-          Lazada3PL.builder().comment(comment).trackingId(trackingId).build())
+            getLazada3PLClient().postLazada3PL(
+                Lazada3PL.builder().comment(comment).trackingId(trackingId).build())
         , "API Core - Operator post Lazada 3PL");
   }
 
@@ -480,20 +495,23 @@ public class ApiOrderSteps extends CoreStandardSteps {
   }
 
   @Given("API Core -  Wait for following order state:")
-  public void apiOperatorWaitForOrderStatus(Map<String, String> dataTableRaw)
-      throws InterruptedException {
-    final Map<String, String> dataTable = resolveKeyValues(dataTableRaw);
-    Order expectedState = new Order();
-    expectedState.fromMap(dataTable);
-    int timeout = Integer.parseInt(dataTable.getOrDefault("timeout", "30"));
-    Assertions.assertThat(getOrderClient().waitUntilOrderState(expectedState, timeout, 1000))
-        .as("Order " + expectedState.getTrackingId() + " didn't get expected state " + dataTable)
-        .isTrue();
+  public void apiOperatorWaitForOrderStatus(Map<String, String> dataTableRaw) {
+    try {
+      final Map<String, String> dataTable = resolveKeyValues(dataTableRaw);
+      Order expectedState = new Order();
+      expectedState.fromMap(dataTable);
+      int timeout = Integer.parseInt(dataTable.getOrDefault("timeout", "30"));
+      Assertions.assertThat(getOrderClient().waitUntilOrderState(expectedState, timeout, 1000))
+          .as("Order " + expectedState.getTrackingId() + " didn't get expected state " + dataTable)
+          .isTrue();
+    } catch (Throwable t) {
+      throw new NvTestCoreOrderKafkaLagException(
+          "order state not updated yet because of Kafka lag ");
+    }
   }
 
   @Given("API Core - Verifies order state:")
-  public void apiOperatorVerifiesOrderState(Map<String, String> dataTableRaw)
-      throws InterruptedException {
+  public void apiOperatorVerifiesOrderState(Map<String, String> dataTableRaw) {
     Map<String, String> dataTable = new HashMap<>(dataTableRaw);
     dataTable.put("timeout", "1");
     apiOperatorWaitForOrderStatus(dataTable);
@@ -554,4 +572,47 @@ public class ApiOrderSteps extends CoreStandardSteps {
 
     put(KEY_CORE_ROUTE_CASH_INBOUND_COD, codInbound);
   }
+
+  /**
+   * @param dataTable <br><b>trackingId:</b>
+   *                  {KEY_LIST_OF_CREATED_TRACKING_IDS[1]}<br><b>eventType:</b> Weight Updated
+   */
+  @Given("API Core - Operator recalculate order price:")
+  public void apiOperatorRecalculateOrderPriceWithEvenType(Map<String, String> dataTable) {
+    dataTable = resolveKeyValues(dataTable);
+    String trackingId = dataTable.get("trackingId");
+    String eventType = dataTable.get("eventType");
+
+    doWithRetry(
+        () -> getOrderClient().batchRecalculate(eventType, trackingId),
+        "batch recalculate order", 3000, 10);
+  }
+
+  /**
+   * Cancel the Order by passing Tracking ID
+   *
+   * @param orderTrackingId key that contains order's tracking id, example:
+   *                        KEY_LIST_OF_CREATED_TRACKING_IDS
+   */
+  @Given("API Core - cancel order using tracking id {value} by using shipper token: {value}")
+  public void apiOperatorCancelCreatedOrderUsingTrackingId(String orderTrackingId,
+      String shipperToken) {
+    doWithRetry(() ->
+            new OrderClient(resolveValue(shipperToken)).cancelOrderV3(orderTrackingId),
+        "cancel order using tracking id");
+  }
+
+  @Given("API Core - Login with clientId {string} and clientSecret {string}")
+  public void apiShipperLoginWithCredentials(String clientId, String secret) {
+    String token = TokenUtils.getShipperToken(clientId, secret);
+    put(KEY_CORE_SHIPPER_TOKEN, token);
+  }
+
+  @Then("API Core - verify order pricing details:")
+  public void apiOperatorVerifyPricingInfo(Map<String, String> data) {
+    PricingDetails expected = new PricingDetails(resolveKeyValues(data));
+    PricingDetails actual = getOrderClient().getPricingDetails(expected.getOrderId());
+    expected.compareWithActual(actual);
+  }
+
 }

@@ -2,6 +2,36 @@
 
 <hr>
 
+## [1.3.21] 2023-11-06
+
+<hr>
+
+### Added
+
+- API Core - Operator fail to create new route from zonal routing using data below:
+- API Core - Operator recalculate order price:
+- API Core - van inbound order:
+- API Route - set tags to route:
+- DB Core - verifies cod_collections record was not created:
+- DB Core - verifies service_level in orders table
+- DB Core - verifies service_type in orders table
+- New Exception class `NvTestCoreOrderKafkaLagException` extends `NvTestEnvironmentException`
+
+### Fixed/Modified
+
+- Added NvTestCoreOrderKafkaLagException to steps:
+  - API Core - Operator get order details for tracking order {string} with granular status
+    {string}
+  - API Core - Operator verify Auto AV event
+  - API Core - Operator verify that event is published with correct details:
+  - API Core - Operator verify that {string} event is published for order id {string}
+  - API Core - Wait for following order state:
+
+- API Core - cancel order {value}
+- API Core - Operator check order {string} have the following Tags:
+- Add DRIVER_DAILY_COD_LIMIT key to @After("@RestoreSystemParams")
+- API Core - Operator create new route using data below:
+
 ## [1.3.20] 2023-10-07
 
 ### Added

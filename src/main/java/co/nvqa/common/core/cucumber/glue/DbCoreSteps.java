@@ -612,6 +612,17 @@ public class DbCoreSteps extends CoreStandardSteps {
     }, "verify cod_collections");
   }
 
+  @And("DB Core - verifies cod_collections record was not created:")
+  public void verifyCodCollectionsNotCreated(Map<String, String> data) {
+    CodCollections expected = new CodCollections(resolveKeyValues(data));
+    doWithRetry(() -> {
+      var actual = codCollectionDao.getMultipleCodCollections(expected.getWaypointId());
+      Assertions.assertThat(actual)
+          .as("List of cod_collections records for waypointId=%s", expected.getWaypointId())
+          .isEmpty();
+    }, "verify cod_collections");
+  }
+
   @And("DB Core - Operator verifies inbound_scans record:")
   public void verifyInboundScans(Map<String, String> data) {
     InboundScans expected = new InboundScans(resolveKeyValues(data));
@@ -678,5 +689,23 @@ public class DbCoreSteps extends CoreStandardSteps {
   @Given("DB Core - soft delete route {value}")
   public void dbOperatorSoftDeleteRoute(String routeId) {
     routeDbDao.softDeleteRoute(resolveValue(routeId));
+  }
+
+  /**
+   * Sample:<p> Then DB Core - verifies service_level in orders table<p>
+   * |orderId|{KEY_LIST_OF_CREATED_ORDERS[1].id}|<p> |serviceLevel|NEXTDAY|<p>
+   * <p>
+   * Service Level : can be NEXTDAY or STANDARD
+   *
+   * @param dataTable
+   */
+  @When("DB Core - verifies service_level in orders table")
+  public void operatorFindOrdersServiceLevel(Map<String, String> dataTable) {
+    Map<String, String> resolvedData = resolveKeyValues(dataTable);
+    long orderId = Long.parseLong(resolvedData.get("orderId"));
+    String expectedServiceType = resolvedData.get("serviceLevel");
+    String actualServiceType = orderDetailsDao.getOrdersServiceLevel(orderId);
+    Assertions.assertThat(actualServiceType).as("orders.service_level equal")
+        .isEqualTo(expectedServiceType);
   }
 }

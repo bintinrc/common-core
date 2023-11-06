@@ -75,6 +75,8 @@ public class Orders extends DataEntity<Orders> {
   private String toContact;
   @Column(name = "to_email")
   private String toEmail;
+  @Column(name = "to_district")
+  private String toDistrict;
 
   @Column(name = "service_type")
   private String serviceType;
@@ -101,6 +103,8 @@ public class Orders extends DataEntity<Orders> {
   private String shipperRefMetadata;
   @Column(name = "cod_id")
   private String codId;
+  @Column(name = "created_at")
+  private String createdAt;
   private String dimensions;
 
   public Orders(Map<String, ?> data) {

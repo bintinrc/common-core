@@ -26,8 +26,8 @@ public class ApiVanInboundClientSteps extends CoreStandardSteps {
 
 
   /**
-   * Example: And API Core - Operator van inbound orders |ordersListKey|{KEY_LIST_OF_CREATED_ORDERS[1]}|
-   * |routeKey|{KEY_LIST_OF_CREATED_ROUTES[1].id}|
+   * Example: And API Core - Operator van inbound orders
+   * |ordersListKey|{KEY_LIST_OF_CREATED_ORDERS[1]}| |routeKey|{KEY_LIST_OF_CREATED_ROUTES[1].id}|
    *
    * @param data Map of data from feature file.
    */
@@ -48,6 +48,17 @@ public class ApiVanInboundClientSteps extends CoreStandardSteps {
       Long deliveryWaypointId = trx.get(trx.size() - 1).getWaypointId();
       apiOperatorVanInboundParcel(trackingId, deliveryWaypointId, routeId);
     }
+  }
+
+  @Given("API Core - van inbound order:")
+  public void apiVanInbound(Map<String, String> data) {
+    data = resolveKeyValues(data);
+    long routeId = Long.parseLong(data.get("routeId"));
+    String trackingId = data.get("trackingId");
+    long waypointId = Long.parseLong(data.get("waypointId"));
+    doWithRetry(() -> {
+      apiOperatorVanInboundParcel(trackingId, waypointId, routeId);
+    }, "Van inbound an order");
   }
 
   @Given("API Core - Operator van inbound and start route using data:")
