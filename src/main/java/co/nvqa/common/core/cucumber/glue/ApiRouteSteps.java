@@ -118,6 +118,31 @@ public class ApiRouteSteps extends CoreStandardSteps {
   /**
    * Sample:<p>
    * <p>
+   * And API Core - Operator add multiple parcels to route "{KEY_LIST_OF_CREATED_ROUTES[1].id}" with
+   * type "DELIVERY" using data below:<br> | {KEY_LIST_OF_CREATED_ORDERS[1].id} |<br> |
+   * {KEY_LIST_OF_CREATED_ORDERS[2].id} |<br> | {KEY_LIST_OF_CREATED_ORDERS[3].id} |<br> |
+   * {KEY_LIST_OF_CREATED_ORDERS[4].id} |<br>
+   * <p>
+   */
+  @Given("API Core - Operator add multiple parcels to route {string} with type {string} using data below:")
+  public void apiOperatorAddMultipleParcelToTheRouteUsingDataBelow(
+      String routeId, String routeType, List<String> orderIds) {
+
+    String resolvedRouteId = resolveValue(routeId);
+    List<String> resolvedOrderIds = resolveValues(orderIds);
+
+    AddParcelToRouteRequest addParcelToRouteRequest = new AddParcelToRouteRequest();
+    addParcelToRouteRequest.setRouteId(Long.valueOf(resolvedRouteId));
+    addParcelToRouteRequest.setType(routeType);
+
+    resolvedOrderIds.forEach(orderId -> doWithRetry(
+        () -> getRouteClient().addParcelToRoute(Long.parseLong(orderId), addParcelToRouteRequest),
+        "add order to route"));
+  }
+
+  /**
+   * Sample:<p>
+   * <p>
    * When API Core - Operator add pickup job to the route using data below:<p> | jobId | 1111 |<p> |
    * addPickupJobToRouteRequest | {"new_route_id":95682687,"overwrite":false} |<p>
    * <p>
@@ -352,7 +377,8 @@ public class ApiRouteSteps extends CoreStandardSteps {
    * Sample:<p>
    * <p>
    * When API Core - Operator bulk add reservation to route using data below: | request | {"ids":
-   * [{KEY_LIST_OF_CREATED_RESERVATIONS[1].id}, {KEY_LIST_OF_CREATED_RESERVATIONS[2].id}],"new_route_id":{KEY_LIST_OF_CREATED_ROUTES[1].id},"overwrite":true}
+   * [{KEY_LIST_OF_CREATED_RESERVATIONS[1].id},
+   * {KEY_LIST_OF_CREATED_RESERVATIONS[2].id}],"new_route_id":{KEY_LIST_OF_CREATED_ROUTES[1].id},"overwrite":true}
    * |
    * <p>
    *
@@ -376,7 +402,8 @@ public class ApiRouteSteps extends CoreStandardSteps {
    * Sample:<p>
    * <p>
    * When API Core - Operator bulk add reservation to route with partial success: | request |
-   * {"ids": [{KEY_LIST_OF_CREATED_RESERVATIONS[1].id}, {KEY_LIST_OF_CREATED_RESERVATIONS[2].id}],"new_route_id":{KEY_LIST_OF_CREATED_ROUTES[1].id},"overwrite":true}
+   * {"ids": [{KEY_LIST_OF_CREATED_RESERVATIONS[1].id},
+   * {KEY_LIST_OF_CREATED_RESERVATIONS[2].id}],"new_route_id":{KEY_LIST_OF_CREATED_ROUTES[1].id},"overwrite":true}
    * |
    * <p>
    *
@@ -604,7 +631,8 @@ public class ApiRouteSteps extends CoreStandardSteps {
 
   /**
    * Sample: API Core - Operator parcel transfer to a new route: | request |
-   * {{"route_id":null,"route_date":"2021-01-19 08:25:13","from_driver_id":null,"to_driver_id":2679,"to_driver_hub_id":3,"orders":[{"tracking_id":"NVSGDIMMI000238068","inbound_type":"VAN_FROM_NINJAVAN","hub_id":3}]|
+   * {{"route_id":null,"route_date":"2021-01-19
+   * 08:25:13","from_driver_id":null,"to_driver_id":2679,"to_driver_hub_id":3,"orders":[{"tracking_id":"NVSGDIMMI000238068","inbound_type":"VAN_FROM_NINJAVAN","hub_id":3}]|
    *
    * @param dataTableAsMap Map of data from feature file.
    */
