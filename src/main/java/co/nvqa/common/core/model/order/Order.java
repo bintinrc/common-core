@@ -382,6 +382,8 @@ public class Order extends DataEntity<Order> implements Serializable {
     private List<ItemInfo> items;
     private String item;
     private String packageId;
+    private Boolean isOpenBox;
+
 
     public ShipperRefMetadata(Map<String, ?> data) {
       fromMap(data);
@@ -696,6 +698,9 @@ public class Order extends DataEntity<Order> implements Serializable {
       }
       if (node.get("package_id") != null) {
         result.setPackageId(node.get("package_id").asText());
+      }
+      if (node.get("is_open_box") != null) {
+        result.setIsOpenBox(node.get("is_open_box").asBoolean());
       }
       return result;
     }
