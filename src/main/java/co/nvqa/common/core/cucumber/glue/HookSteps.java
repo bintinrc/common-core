@@ -10,6 +10,7 @@ import co.nvqa.common.core.model.RouteGroup;
 import co.nvqa.common.core.model.coverage.CreateCoverageResponse;
 import co.nvqa.common.core.model.miscellanous.SalesPerson;
 import co.nvqa.common.core.model.order.Order;
+import co.nvqa.common.core.model.order.Tag;
 import co.nvqa.common.core.model.persisted_class.route.Coverage;
 import co.nvqa.common.core.model.persisted_class.route.RouteLogs;
 import co.nvqa.common.core.model.reservation.ReservationResponse;
@@ -223,5 +224,25 @@ public class HookSteps extends CoreStandardSteps {
         LOGGER.warn("Error to delete sales person: {}", t.getMessage());
       }
     });
+  }
+
+  @After("@DeleteOrderTagsV2")
+  public void deleteOrderTagsV2() {
+    final List<Tag> tags = get(KEY_LIST_OF_CREATED_ORDER_TAGS);
+    if (CollectionUtils.isNotEmpty(tags)) {
+      tags.forEach(tag -> {
+        if (tag != null) {
+          try {
+            if (tag.getId() != null) {
+              getOrderClient().deleteOrderTag(tag.getId());
+            } else {
+              getOrderClient().deleteOrderTag(tag.getName());
+            }
+          }catch (Throwable ex) {
+            LOGGER.warn("Could not delete order tag [{}]", tag.getName(), ex);
+          }
+        }
+      });
+    }
   }
 }
