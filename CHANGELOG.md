@@ -2,9 +2,16 @@
 
 <hr>
 
-## [1.3.21] 2023-11-06
+## [1.3.22] 2023-11-13
+
+### Added
+
+- API Core - Operator add multiple parcels to route {string} with type {string} using data below:
+- Add isOpenBox field to order model
 
 <hr>
+
+## [1.3.21] 2023-11-06
 
 ### Added
 
@@ -31,6 +38,8 @@
 - API Core - Operator check order {string} have the following Tags:
 - Add DRIVER_DAILY_COD_LIMIT key to @After("@RestoreSystemParams")
 - API Core - Operator create new route using data below:
+
+<hr>
 
 ## [1.3.20] 2023-10-07
 
