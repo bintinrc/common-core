@@ -8,6 +8,18 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Job {
+
+  public static final String TYPE_DELIVERY = "DELIVERY";
+  public static final String TYPE_TRANSACTION = "TRANSACTION";
+  public static final String TYPE_RESERVATION = "RESERVATION";
+
+  public static final String STATUS_SUCCESS = "SUCCESS";
+  public static final String STATUS_FAIL = "FAIL";
+  public static final String STATUS_PENDING = "PENDING";
+
+  public static final String MODE_DELIVERY = "DELIVERY";
+  public static final String MODE_PICKUP = "PICK_UP";
+
   private String action;
   private String confirmationCode;
   private String failureReason;
