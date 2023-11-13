@@ -627,7 +627,7 @@ public class ApiOrderSteps extends CoreStandardSteps {
     final Tag request = fromJsonSnakeCase(json, Tag.class);
     doWithRetry(() -> {
       Tag response = getOrderClient().createOrderTag(request);
-      putInList(KEY_LIST_OF_CREATED_ORDER_TAGS, response);
+      putInList(KEY_CORE_LIST_OF_CREATED_ORDER_TAGS, response);
     }, "create tag", 1000, 5);
   }
 
