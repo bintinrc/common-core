@@ -616,6 +616,10 @@ public class ApiOrderSteps extends CoreStandardSteps {
     expected.compareWithActual(actual);
   }
 
+  /**
+   * @param data <br><b>name:</b>
+   *                  ABF<br><b>description:</b> This tag is created by Automation Test
+   */
   @Given("API Core - create new order tag:")
   public void apiOperatorCreateOrderTag(Map<String, String> data) {
     final Map<String, String> dataTable = resolveKeyValues(data);
