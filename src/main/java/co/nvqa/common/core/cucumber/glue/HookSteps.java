@@ -228,7 +228,7 @@ public class HookSteps extends CoreStandardSteps {
 
   @After("@DeleteOrderTagsV2")
   public void deleteOrderTagsV2() {
-    final List<Tag> tags = get(KEY_LIST_OF_CREATED_ORDER_TAGS);
+    final List<Tag> tags = get(KEY_CORE_LIST_OF_CREATED_ORDER_TAGS);
     if (CollectionUtils.isNotEmpty(tags)) {
       tags.forEach(tag -> {
         if (tag != null) {
