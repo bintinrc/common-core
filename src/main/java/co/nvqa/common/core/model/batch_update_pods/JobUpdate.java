@@ -29,7 +29,7 @@ public class JobUpdate {
     private String failureReason;
     private Integer failureReasonId;
     private String action;
-    private Boolean setAllowReschedule;
+    private Boolean allowReschedule;
 
   }
 
