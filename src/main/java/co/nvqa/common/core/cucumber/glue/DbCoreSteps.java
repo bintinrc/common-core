@@ -1,6 +1,7 @@
 package co.nvqa.common.core.cucumber.glue;
 
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
+import co.nvqa.common.core.hibernate.BlobsDao;
 import co.nvqa.common.core.hibernate.CodCollectionDao;
 import co.nvqa.common.core.hibernate.CodInboundsDao;
 import co.nvqa.common.core.hibernate.InboundScansDao;
@@ -17,6 +18,7 @@ import co.nvqa.common.core.hibernate.RouteDbDao;
 import co.nvqa.common.core.hibernate.RouteMonitoringDataDao;
 import co.nvqa.common.core.hibernate.RouteWaypointDao;
 import co.nvqa.common.core.hibernate.ShipperPickupSearchDao;
+import co.nvqa.common.core.hibernate.TransactionReservationFailureReasonDao;
 import co.nvqa.common.core.hibernate.TransactionsDao;
 import co.nvqa.common.core.hibernate.WarehouseSweepsDao;
 import co.nvqa.common.core.hibernate.WaypointsDao;
@@ -32,10 +34,12 @@ import co.nvqa.common.core.model.persisted_class.core.OrderTags;
 import co.nvqa.common.core.model.persisted_class.core.OrderTagsSearch;
 import co.nvqa.common.core.model.persisted_class.core.Orders;
 import co.nvqa.common.core.model.persisted_class.core.OutboundScans;
+import co.nvqa.common.core.model.persisted_class.core.ReservationFailureReason;
 import co.nvqa.common.core.model.persisted_class.core.Reservations;
 import co.nvqa.common.core.model.persisted_class.core.RouteMonitoringData;
 import co.nvqa.common.core.model.persisted_class.core.RouteWaypoint;
 import co.nvqa.common.core.model.persisted_class.core.ShipperPickupSearch;
+import co.nvqa.common.core.model.persisted_class.core.TransactionFailureReasons;
 import co.nvqa.common.core.model.persisted_class.core.Transactions;
 import co.nvqa.common.core.model.persisted_class.core.WarehouseSweeps;
 import co.nvqa.common.core.model.persisted_class.core.Waypoints;
@@ -95,7 +99,10 @@ public class DbCoreSteps extends CoreStandardSteps {
   private OrderDeliveryVerificationsDao orderDeliveryVerificationsDao;
   @Inject
   private OrderDeliveryDetailsDao orderDeliveryDetailsDao;
-
+  @Inject
+  private TransactionReservationFailureReasonDao transactionReservationFailureReasonDao;
+  @Inject
+  private BlobsDao blobsDao;
   @Inject
   private OrderDao orderDao;
 
@@ -707,5 +714,65 @@ public class DbCoreSteps extends CoreStandardSteps {
     String actualServiceType = orderDetailsDao.getOrdersServiceLevel(orderId);
     Assertions.assertThat(actualServiceType).as("orders.service_level equal")
         .isEqualTo(expectedServiceType);
+  }
+
+  @When("DB Core - verify transaction_failure_reason record:")
+  public void verifyTxnFailureReason(Map<String, String> data) {
+    Map<String, String> resolvedData = resolveKeyValues(data);
+    TransactionFailureReasons expected = new TransactionFailureReasons(resolvedData);
+    doWithRetry(() -> {
+      TransactionFailureReasons actual = transactionReservationFailureReasonDao
+          .findTransactionFailureReasonByTransactionId(expected.getTransactionId());
+      Assertions.assertThat(actual)
+          .as("transaction_failure_reason record was found: " + resolvedData)
+          .isNotNull();
+      expected.compareWithActual(actual, resolvedData);
+    }, "verify transaction_failure_reason records", 10_000, 3);
+  }
+
+  @When("DB Core - verify reservation_failure_reason record:")
+  public void verifyRsvnFailureReason(Map<String, String> data) {
+    Map<String, String> resolvedData = resolveKeyValues(data);
+    ReservationFailureReason expected = new ReservationFailureReason(resolvedData);
+    doWithRetry(() -> {
+      ReservationFailureReason actual = transactionReservationFailureReasonDao
+          .findReservationFailureReasonByRsvnId(expected.getReservationId());
+      Assertions.assertThat(actual)
+          .as("reservation_failure_reason record was found: " + resolvedData)
+          .isNotNull();
+      expected.compareWithActual(actual, resolvedData);
+    }, "verify reservation_failure_reason records", 10_000, 3);
+  }
+
+  @When("DB Core - verify transaction_blob record:")
+  public void verifyTxnBlob(List<String> data) {
+    List<String> resolvedData = resolveValues(data);
+    doWithRetry(() -> {
+      resolvedData.forEach(e -> {
+        final long jobId = Long.parseLong(e);
+        final long blobId = blobsDao.getTransactionBlob(jobId).getBlobId();
+        Assertions.assertThat(blobId > 0)
+            .as(f("transaction blob id %d created", blobId)).isTrue();
+        String blobData = blobsDao.getBlobById(blobId).getData();
+        Assertions.assertThat(!blobData.isEmpty()).as("blob data created").isTrue();
+        putInMap(KEY_CORE_LIST_OF_BLOB_DATA, jobId, blobData);
+      });
+    }, "verify transaction_blob records", 10_000, 3);
+  }
+
+  @When("DB Core - verify reservation_blob record:")
+  public void verifyRsvnBlob(List<String> data) {
+    List<String> resolvedData = resolveValues(data);
+    doWithRetry(() -> {
+      resolvedData.forEach(e -> {
+        final long jobId = Long.parseLong(e);
+        final long blobId = blobsDao.getReservationBlob(jobId).getBlobId();
+        Assertions.assertThat(blobId > 0)
+            .as(f("reservation_blob id %d created", blobId)).isTrue();
+        String blobData = blobsDao.getBlobById(blobId).getData();
+        Assertions.assertThat(!blobData.isEmpty()).as("blob data created").isTrue();
+        putInMap(KEY_CORE_LIST_OF_BLOB_DATA, jobId, blobData);
+      });
+    }, "verify reservation_blob records", 10_000, 3);
   }
 }

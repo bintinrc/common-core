@@ -1,5 +1,7 @@
 package co.nvqa.common.core.model.persisted_class.core;
 
+import co.nvqa.common.model.DataEntity;
+import java.util.Map;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -15,7 +17,7 @@ import lombok.Setter;
 @Getter
 @Entity
 @Table(name = "reservation_failure_reason")
-public class ReservationFailureReason {
+public class ReservationFailureReason extends DataEntity<ReservationFailureReason> {
 
   @Id
   private Long id;
@@ -25,5 +27,9 @@ public class ReservationFailureReason {
   private Short failureReasonCodeId;
   @Column(name = "failure_reason_id")
   private Long failureReasonId;
+
+  public ReservationFailureReason(Map<String, ?> data) {
+    super(data);
+  }
 
 }
