@@ -3,6 +3,8 @@ package co.nvqa.common.core.client;
 import co.nvqa.common.client.SimpleApiClient;
 import co.nvqa.common.constants.HttpConstants;
 import co.nvqa.common.core.model.MessagingHistoryResponse;
+import co.nvqa.common.core.model.messaging.SendSmsRequest;
+import co.nvqa.common.core.model.messaging.SendSmsResponse;
 import co.nvqa.common.utils.NvTestHttpException;
 import co.nvqa.common.utils.StandardTestConstants;
 import co.nvqa.commonauth.utils.TokenUtils;
@@ -18,6 +20,16 @@ public class MessagingClient extends SimpleApiClient {
   public MessagingClient() {
     super(StandardTestConstants.API_BASE_URL, TokenUtils.getOperatorAuthToken(),
         DEFAULT_CAMEL_CASE_MAPPER);
+  }
+
+  public List<SendSmsResponse> sendSms(SendSmsRequest request) {
+    String url = "core/messaging/orders/sms";
+    RequestSpecification req = createAuthenticatedRequest().body(request);
+    Response r = doPost("Messaging client - Send SMS ", req, url);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+    return fromJsonToList(r.body().asString(), SendSmsResponse.class);
   }
 
   public List<MessagingHistoryResponse> getMessageNotificationBasedOnTrackingId(String trackingId) {
