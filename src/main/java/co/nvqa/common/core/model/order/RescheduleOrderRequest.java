@@ -1,5 +1,6 @@
 package co.nvqa.common.core.model.order;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,7 +25,9 @@ public class RescheduleOrderRequest {
   private String email;
   private String name;
   private Integer timeWindow;
+  @JsonProperty("address_1")
   private String address1;
+  @JsonProperty("address_2")
   private String address2;
   private String postalCode;
   private String city;
