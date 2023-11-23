@@ -40,6 +40,7 @@ public class Transactions extends DataEntity<Transactions> {
   private String city;
   private String country;
   private String postcode;
+  private String comments;
   @Column(name = "distribution_point_id")
   private Integer distributionPointId;
   @Column(name = "route_id")
