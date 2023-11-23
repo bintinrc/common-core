@@ -14,6 +14,7 @@ import co.nvqa.common.core.model.route.AddParcelToRouteRequest;
 import co.nvqa.common.core.model.route.AddPickupJobToRouteRequest;
 import co.nvqa.common.core.model.route.BulkAddPickupJobToRouteRequest;
 import co.nvqa.common.core.model.route.BulkAddPickupJobToRouteResponse;
+import co.nvqa.common.core.model.route.EditRouteRequest;
 import co.nvqa.common.core.model.route.MergeWaypointsResponse;
 import co.nvqa.common.core.model.route.MergeWaypointsResponse.Data;
 import co.nvqa.common.core.model.route.ParcelRouteTransferRequest;
@@ -515,7 +516,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
    * <ul>
    * <b>When API Core - Operator edit route details:</b>
    * <p>
-   * | editRouteRequest | [ { "id": {KEY_LIST_OF_CREATED_ROUTES[1].id}, "driverId": {ninja-driver-id}, "hubId": {hub-id}, "tags": [ {tag-ids} ], "zoneId": {zone-id}, "date":"{gradle-current-date-yyyy-MM-dd}T16:00:00Z", "datetime": "{gradle-current-date-yyyy-MM-dd} 16:00:00" } ] |
+   * | editRouteRequest | [ { "id": {KEY_LIST_OF_CREATED_ROUTES[1].id}, "driverId": {ninja-driver-id}, "hubId": {hub-id}, "tags": [ {tag-ids} ], "zoneId": {zone-id}, "date":"{date: 0 days next, yyyy-MM-dd}T16:00:00Z", "datetime": "{date: 0 days next, yyyy-MM-dd} 16:00:00" } ] |
    * </p>
    * </ul>
    */
@@ -525,7 +526,8 @@ public class ApiRouteSteps extends CoreStandardSteps {
     String editRouteRequestJson = StandardTestUtils
         .replaceTokens(resolvedDataTable.get("editRouteRequest"),
             StandardTestUtils.createDefaultTokens());
-    List<RouteRequest> editRouteRequest = fromJsonToList(editRouteRequestJson, RouteRequest.class);
+    List<EditRouteRequest> editRouteRequest = fromJsonToList(editRouteRequestJson,
+        EditRouteRequest.class);
 
     doWithRetry(
         () -> getRouteClient().editRouteDetails(editRouteRequest), "Edit Route Details");
@@ -774,8 +776,8 @@ public class ApiRouteSteps extends CoreStandardSteps {
       createRouteRequest.setDate(formattedRouteDate);
     }
 
-    if (createRouteRequest.getDatetime() == null) {
-      createRouteRequest.setDatetime(formattedRouteDateTime);
+    if (createRouteRequest.getDateTime() == null) {
+      createRouteRequest.setDateTime(formattedRouteDateTime);
     }
 
     if (createRouteRequest.getComments() == null) {
