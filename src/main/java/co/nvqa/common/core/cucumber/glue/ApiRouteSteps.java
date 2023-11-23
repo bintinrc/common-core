@@ -774,8 +774,8 @@ public class ApiRouteSteps extends CoreStandardSteps {
       createRouteRequest.setDate(formattedRouteDate);
     }
 
-    if (createRouteRequest.getDateTime() == null) {
-      createRouteRequest.setDateTime(formattedRouteDateTime);
+    if (createRouteRequest.getDatetime() == null) {
+      createRouteRequest.setDatetime(formattedRouteDateTime);
     }
 
     if (createRouteRequest.getComments() == null) {

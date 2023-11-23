@@ -17,7 +17,7 @@ import lombok.Setter;
 public class RouteRequest {
 
   private String date;
-  private String dateTime;
+  private String datetime;
   private Long driverId;
   private Long hubId;
   private String comments;
