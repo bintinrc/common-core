@@ -515,7 +515,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
    * <ul>
    * <b>When API Core - Operator edit route details:</b>
    * <p>
-   * | editRouteRequest | [ { "id": {KEY_LIST_OF_CREATED_ROUTES[1].id}, "driverId": {ninja-driver-id}, "hubId": {hub-id}, "tags": [ {tag-ids} ], "zoneId": {zone-id} } ] |
+   * | editRouteRequest | [ { "id": {KEY_LIST_OF_CREATED_ROUTES[1].id}, "driverId": {ninja-driver-id}, "hubId": {hub-id}, "tags": [ {tag-ids} ], "zoneId": {zone-id}, "date":"{gradle-current-date-yyyy-MM-dd}T16:00:00Z", "datetime": "{gradle-current-date-yyyy-MM-dd} 16:00:00" } ] |
    * </p>
    * </ul>
    */
