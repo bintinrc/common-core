@@ -2,6 +2,17 @@
 
 <hr>
 
+## [1.3.23] 2023-11-27
+
+### Added
+- Add datatable example in edit route details
+- Add field for cv2 migration
+- add send message api
+- Fix reschedule request fields
+- Create editRouteRequest model
+
+<hr>
+
 ## [1.3.22] 2023-11-13
 
 ### Added
