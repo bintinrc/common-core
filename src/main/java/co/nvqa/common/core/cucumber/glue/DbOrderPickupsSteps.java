@@ -1,9 +1,9 @@
 package co.nvqa.common.core.cucumber.glue;
 
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
+import co.nvqa.common.core.exception.NvTestCoreOrderKafkaLagException;
 import co.nvqa.common.core.hibernate.OrderPickupsDao;
 import co.nvqa.common.core.model.persisted_class.core.OrderPickup;
-import co.nvqa.common.utils.NvTestRuntimeException;
 import io.cucumber.java.en.When;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,11 +26,11 @@ public class DbOrderPickupsSteps extends CoreStandardSteps {
     final List<OrderPickup> orderPickups = doWithRetry(() -> {
       final List<OrderPickup> result = orderPickupsDao.getOrderPickupByOrderId(orderId);
       if (result.isEmpty()) {
-        throw new NvTestRuntimeException("pickup is not found for order " + orderId);
+        throw new NvTestCoreOrderKafkaLagException("pickup is not found for order " + orderId);
       }
       return result;
-    }, "reading pickup from order id: " + orderId, 3000, 30);
-    // the delay is 3sec * 30 = 1.5 mins, because core sometimes is very slow
+    }, "reading pickup from order id: " + orderId, 2000, 30);
+    // the delay is 2sec * 30 = 1 min, because core sometimes is very slow
     putAllInList(KEY_LIST_OF_RESERVATION_IDS,
         orderPickups.stream()
             .map(OrderPickup::getReservationId)
@@ -43,10 +43,10 @@ public class DbOrderPickupsSteps extends CoreStandardSteps {
     final List<OrderPickup> orderPickups = doWithRetry(() -> {
       final List<OrderPickup> result = orderPickupsDao.getOrderPickupByOrderId(orderId);
       if (result.isEmpty()) {
-        throw new NvTestRuntimeException("pickup is not found for order " + orderId);
+        throw new NvTestCoreOrderKafkaLagException("pickup is not found for order " + orderId);
       }
       return result;
-    }, "reading pickup from order id: " + orderId, 3000, 30);
+    }, "reading pickup from order id: " + orderId, 2000, 30);
     putAllInList(KEY_CORE_LIST_OF_ORDER_PICKUPS, orderPickups);
   }
 }
