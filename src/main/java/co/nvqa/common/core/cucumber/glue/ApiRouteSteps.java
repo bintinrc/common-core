@@ -2,6 +2,7 @@ package co.nvqa.common.core.cucumber.glue;
 
 import co.nvqa.common.constants.HttpConstants;
 import co.nvqa.common.core.client.RouteClient;
+import co.nvqa.common.core.client.TagClient;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.model.RouteGroup;
 import co.nvqa.common.core.model.coverage.CreateCoverageRequest;
@@ -21,6 +22,8 @@ import co.nvqa.common.core.model.route.ParcelRouteTransferRequest;
 import co.nvqa.common.core.model.route.ParcelRouteTransferResponse;
 import co.nvqa.common.core.model.route.RouteRequest;
 import co.nvqa.common.core.model.route.RouteResponse;
+import co.nvqa.common.core.model.route.RouteTag;
+import co.nvqa.common.core.model.route.TagResponse;
 import co.nvqa.common.core.model.waypoint.Waypoint;
 import co.nvqa.common.core.utils.CoreTestUtils;
 import co.nvqa.common.model.DataEntity;
@@ -51,6 +54,10 @@ public class ApiRouteSteps extends CoreStandardSteps {
   @Inject
   @Getter
   private RouteClient routeClient;
+
+  @Inject
+  @Getter
+  private TagClient tagClient;
 
 
   /**
@@ -803,5 +810,24 @@ public class ApiRouteSteps extends CoreStandardSteps {
       long routeId = Long.parseLong(finalData.get("routeId"));
       getRouteClient().setRouteTags(routeId, tagIds);
     }, "Set tags to route");
+  }
+
+  /**
+   * @param data <br><b>name:</b>
+   *             AAA<br><b>description:</b> This tag AAA is for testing
+   */
+  @Given("API Route - create new route tag:")
+  public void apiOperatorCreateRouteTag(Map<String, String> data) {
+    final Map<String, String> dataTable = resolveKeyValues(data);
+    final String json = toJsonSnakeCase(dataTable);
+    final RouteTag request = fromJsonSnakeCase(json, RouteTag.class);
+    doWithRetry(() -> {
+      TagResponse response = getTagClient().create(request);
+      response.getData().getTags().forEach(createTag -> {
+        if (createTag.getName().equalsIgnoreCase(request.getName())) {
+          putInList(KEY_CORE_LIST_OF_CREATED_ROUTE_TAGS, createTag);
+        }
+      });
+    }, "create tag", 1000, 5);
   }
 }

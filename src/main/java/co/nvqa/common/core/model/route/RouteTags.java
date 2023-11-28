@@ -1,5 +1,6 @@
-package co.nvqa.common.core.model;
+package co.nvqa.common.core.model.route;
 
+import co.nvqa.common.core.model.route.RouteTag;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,9 +11,9 @@ import lombok.Setter;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Tags {
+public class RouteTags {
 
-  private Tag tag;
-  private List<Tag> tags;
+  private RouteTag tag;
+  private List<RouteTag> tags;
 
 }
