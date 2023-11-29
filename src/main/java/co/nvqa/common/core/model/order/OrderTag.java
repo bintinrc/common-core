@@ -1,22 +1,21 @@
-package co.nvqa.common.core.model;
+package co.nvqa.common.core.model.order;
 
 import co.nvqa.common.model.DataEntity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.Map;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * JSON format: camel case
- */
-@JsonIgnoreProperties(ignoreUnknown = true)
 @Setter
 @Getter
-@AllArgsConstructor
+@Builder
 @NoArgsConstructor
-public class Tag extends DataEntity<Tag> {
+@AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class OrderTag extends DataEntity<OrderTag> {
 
   private Long id;
   private String name;
@@ -26,9 +25,8 @@ public class Tag extends DataEntity<Tag> {
   private String deletedAt;
   private Boolean editable;
 
-  public Tag(Map<String, ?> data) {
+  public OrderTag(Map<String, ?> data) {
     fromMap(data);
   }
-
 
 }

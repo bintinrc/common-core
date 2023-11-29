@@ -3,9 +3,9 @@ package co.nvqa.common.core.client;
 import co.nvqa.common.client.SimpleApiClient;
 import co.nvqa.common.constants.HttpConstants;
 import co.nvqa.common.core.model.ResponseWrapper;
-import co.nvqa.common.core.model.Tag;
-import co.nvqa.common.core.model.TagResponse;
-import co.nvqa.common.core.model.Tags;
+import co.nvqa.common.core.model.route.RouteTag;
+import co.nvqa.common.core.model.route.TagResponse;
+import co.nvqa.common.core.model.route.RouteTags;
 import co.nvqa.common.utils.NvTestHttpException;
 import co.nvqa.common.utils.StandardTestConstants;
 import co.nvqa.commonauth.utils.TokenUtils;
@@ -29,7 +29,7 @@ public class TagClient extends SimpleApiClient {
         DEFAULT_CAMEL_CASE_MAPPER);
   }
 
-  public TagResponse create(Tag tag) {
+  public TagResponse create(RouteTag tag) {
     String apiMethod = "route/1.0/tags";
 
     RequestSpecification requestSpecification = createAuthenticatedRequest()
@@ -43,7 +43,7 @@ public class TagClient extends SimpleApiClient {
     return fromJson(r.body().asString(), TagResponse.class);
   }
 
-  public TagResponse update(Tag tag) {
+  public TagResponse update(RouteTag tag) {
     String apiMethod = "route/1.0/tags/{id}";
 
     RequestSpecification requestSpecification = createAuthenticatedRequest()
@@ -86,15 +86,15 @@ public class TagClient extends SimpleApiClient {
   }
 
   public void deleteTag(String tagName) {
-    Tag tag = findTagByName(tagName);
+    RouteTag tag = findTagByName(tagName);
     if (tag == null) {
       throw new IllegalArgumentException("Tag " + tagName + " was not found");
     }
     deleteTag(tag.getId());
   }
 
-  public Tag findTagByName(String name) {
-    Tag result = null;
+  public RouteTag findTagByName(String name) {
+    RouteTag result = null;
 
     String apiMethod = "route/1.0/tags";
 
@@ -105,13 +105,13 @@ public class TagClient extends SimpleApiClient {
     response.then().assertThat().contentType(ContentType.JSON);
     response.then().assertThat().statusCode(HttpConstants.RESPONSE_200_SUCCESS);
 
-    ResponseWrapper<Tags> responseWrapper = fromJsonCamelCase(
-        response.then().extract().body().asString(), new TypeReference<ResponseWrapper<Tags>>() {
+    ResponseWrapper<RouteTags> responseWrapper = fromJsonCamelCase(
+        response.then().extract().body().asString(), new TypeReference<ResponseWrapper<RouteTags>>() {
         });
-    Tags tags = responseWrapper.getData();
+    RouteTags tags = responseWrapper.getData();
     LOGGER.info(f("Number of Tags: %s", tags.getTags().size()));
 
-    for (Tag tag : tags.getTags()) {
+    for (RouteTag tag : tags.getTags()) {
       if (name.equals(tag.getName())) {
         result = tag;
         break;
