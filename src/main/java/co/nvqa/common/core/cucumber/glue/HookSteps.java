@@ -4,17 +4,19 @@ import co.nvqa.common.core.client.OrderClient;
 import co.nvqa.common.core.client.ReservationClient;
 import co.nvqa.common.core.client.RouteClient;
 import co.nvqa.common.core.client.SalesClient;
+import co.nvqa.common.core.client.TagClient;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.hibernate.RouteDbDao;
 import co.nvqa.common.core.model.RouteGroup;
 import co.nvqa.common.core.model.coverage.CreateCoverageResponse;
 import co.nvqa.common.core.model.miscellanous.SalesPerson;
 import co.nvqa.common.core.model.order.Order;
-import co.nvqa.common.core.model.order.Tag;
+import co.nvqa.common.core.model.order.OrderTag;
 import co.nvqa.common.core.model.persisted_class.route.Coverage;
 import co.nvqa.common.core.model.persisted_class.route.RouteLogs;
 import co.nvqa.common.core.model.reservation.ReservationResponse;
 import co.nvqa.common.core.model.route.RouteResponse;
+import co.nvqa.common.core.model.route.RouteTag;
 import io.cucumber.guice.ScenarioScoped;
 import io.cucumber.java.After;
 import java.util.ArrayList;
@@ -53,6 +55,10 @@ public class HookSteps extends CoreStandardSteps {
   @Inject
   @Getter
   private RouteDbDao routeDbDao;
+
+  @Inject
+  @Getter
+  private TagClient tagClient;
 
 
   @After("@ArchiveRouteCommonV2")
@@ -228,18 +234,38 @@ public class HookSteps extends CoreStandardSteps {
 
   @After("@DeleteOrderTagsV2")
   public void deleteOrderTagsV2() {
-    final List<Tag> tags = get(KEY_CORE_LIST_OF_CREATED_ORDER_TAGS);
+    final List<OrderTag> tags = get(KEY_CORE_LIST_OF_CREATED_ORDER_TAGS);
+    if (CollectionUtils.isNotEmpty(tags)) {
+      tags.forEach(orderTag -> {
+        if (orderTag != null) {
+          try {
+            if (orderTag.getId() != null) {
+              getOrderClient().deleteOrderTag(orderTag.getId());
+            } else {
+              getOrderClient().deleteOrderTag(orderTag.getName());
+            }
+          } catch (Throwable ex) {
+            LOGGER.warn("Could not delete order tag [{}]", orderTag.getName(), ex);
+          }
+        }
+      });
+    }
+  }
+
+  @After("@DeleteRouteTagsV2")
+  public void deleteRouteTagsV2() {
+    final List<RouteTag> tags = get(KEY_CORE_LIST_OF_CREATED_ROUTE_TAGS);
     if (CollectionUtils.isNotEmpty(tags)) {
       tags.forEach(tag -> {
         if (tag != null) {
           try {
             if (tag.getId() != null) {
-              getOrderClient().deleteOrderTag(tag.getId());
+              getTagClient().deleteTag(tag.getId());
             } else {
-              getOrderClient().deleteOrderTag(tag.getName());
+              getTagClient().deleteTag(tag.getName());
             }
-          }catch (Throwable ex) {
-            LOGGER.warn("Could not delete order tag [{}]", tag.getName(), ex);
+          } catch (Throwable ex) {
+            LOGGER.warn("Could not delete route tag [{}]", tag.getName(), ex);
           }
         }
       });
