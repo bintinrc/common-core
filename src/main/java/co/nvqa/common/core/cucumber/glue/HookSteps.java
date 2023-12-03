@@ -1,7 +1,6 @@
 package co.nvqa.common.core.cucumber.glue;
 
 import co.nvqa.common.core.client.CoreNotificationsClient;
-import co.nvqa.common.core.client.InboundSettingsClient;
 import co.nvqa.common.core.client.OrderClient;
 import co.nvqa.common.core.client.ReservationClient;
 import co.nvqa.common.core.client.RouteClient;
@@ -9,7 +8,6 @@ import co.nvqa.common.core.client.SalesClient;
 import co.nvqa.common.core.client.TagClient;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.hibernate.RouteDbDao;
-import co.nvqa.common.core.model.InboundSettings;
 import co.nvqa.common.core.model.RouteGroup;
 import co.nvqa.common.core.model.SmsNotificationsSettings;
 import co.nvqa.common.core.model.coverage.CreateCoverageResponse;
@@ -63,9 +61,6 @@ public class HookSteps extends CoreStandardSteps {
   @Inject
   @Getter
   private TagClient tagClient;
-  @Inject
-  @Getter
-  private InboundSettingsClient inboundSettingsClient;
   @Inject
   @Getter
   private CoreNotificationsClient notificationsClient;
@@ -279,18 +274,6 @@ public class HookSteps extends CoreStandardSteps {
           }
         }
       });
-    }
-  }
-
-  @After("@RestoreInboundSettingsV2")
-  public void restoreInboundSettings() {
-    InboundSettings request = new InboundSettings();
-    request.setMaxWeight(get(KEY_CORE_MAX_WEIGHT_LIMIT_VALUE));
-    request.setWeightTolerance(get(KEY_CORE_WEIGHT_TOLERANCE_VALUE));
-
-    if (request.getWeightTolerance() != null || request.getMaxWeight() != null) {
-      retryIfAssertionErrorOrRuntimeExceptionOccurred(
-          () -> getInboundSettingsClient().setInboundSettings(request), "restore inbound settings");
     }
   }
 
