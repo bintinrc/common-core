@@ -1,5 +1,6 @@
 package co.nvqa.common.core.cucumber.glue;
 
+import co.nvqa.common.core.client.CoreNotificationsClient;
 import co.nvqa.common.core.client.OrderClient;
 import co.nvqa.common.core.client.ReservationClient;
 import co.nvqa.common.core.client.RouteClient;
@@ -8,6 +9,7 @@ import co.nvqa.common.core.client.TagClient;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.hibernate.RouteDbDao;
 import co.nvqa.common.core.model.RouteGroup;
+import co.nvqa.common.core.model.SmsNotificationsSettings;
 import co.nvqa.common.core.model.coverage.CreateCoverageResponse;
 import co.nvqa.common.core.model.miscellanous.SalesPerson;
 import co.nvqa.common.core.model.order.Order;
@@ -59,6 +61,9 @@ public class HookSteps extends CoreStandardSteps {
   @Inject
   @Getter
   private TagClient tagClient;
+  @Inject
+  @Getter
+  private CoreNotificationsClient notificationsClient;
 
 
   @After("@ArchiveRouteCommonV2")
@@ -269,6 +274,20 @@ public class HookSteps extends CoreStandardSteps {
           }
         }
       });
+    }
+  }
+
+  @After("@RestoreSmsNotificationsSettingsV2")
+  public void restoreSmsNotifSettings() {
+    SmsNotificationsSettings settings = get(KEY_CORE_SMS_NOTIFICATIONS_SETTINGS);
+    try {
+      if (settings != null) {
+        doWithRetry(() ->
+                getNotificationsClient().updateSmsNotificationsSettings(settings),
+            "update sms notification settings");
+      }
+    } catch (Throwable ex) {
+      LOGGER.warn("could not restore sms notification message {}", settings);
     }
   }
 }

@@ -1,5 +1,6 @@
 package co.nvqa.common.core.cucumber.glue;
 
+import co.nvqa.common.core.client.CoreNotificationsClient;
 import co.nvqa.common.core.client.MessagingClient;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.model.MessagingHistoryResponse;
@@ -16,6 +17,9 @@ public class ApiMessagingSteps extends CoreStandardSteps {
   @Inject
   @Getter
   private MessagingClient messagingClient;
+  @Inject
+  @Getter
+  private CoreNotificationsClient notificationsClient;
 
 
   /**
@@ -37,7 +41,7 @@ public class ApiMessagingSteps extends CoreStandardSteps {
 
   /**
    * Send sms with following datatable
-   *<pre>
+   * <pre>
    * Given API Core - Operator send sms with following data
    *       | template      | test {{tracking_id}}             |
    *       | trackingId    | {KEY_CREATED_ORDER_TRACKING_ID}  |
@@ -56,5 +60,16 @@ public class ApiMessagingSteps extends CoreStandardSteps {
     );
     req.setOrderDetails(List.of(smsPayload));
     doWithRetry(() -> messagingClient.sendSms(req), "Send SMS");
+  }
+
+  /*
+   * API step to get SMS notification for shippers
+   */
+  @When("API Core - Operator gets SMS notifications settings")
+  public void apiOperatorGetsSMSNotificationsSettings() {
+    doWithRetry(() ->
+            put(KEY_CORE_SMS_NOTIFICATIONS_SETTINGS,
+                getNotificationsClient().getSmsNotificationsSettings()),
+        "get sms notification settings");
   }
 }
