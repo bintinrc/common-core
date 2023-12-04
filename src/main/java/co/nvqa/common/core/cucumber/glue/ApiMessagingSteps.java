@@ -67,7 +67,9 @@ public class ApiMessagingSteps extends CoreStandardSteps {
    */
   @When("API Core - Operator gets SMS notifications settings")
   public void apiOperatorGetsSMSNotificationsSettings() {
-    put(KEY_CORE_SMS_NOTIFICATIONS_SETTINGS,
-        getNotificationsClient().getSmsNotificationsSettings());
+    doWithRetry(() ->
+            put(KEY_CORE_SMS_NOTIFICATIONS_SETTINGS,
+                getNotificationsClient().getSmsNotificationsSettings()),
+        "get sms notification settings");
   }
 }

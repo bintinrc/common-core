@@ -280,8 +280,14 @@ public class HookSteps extends CoreStandardSteps {
   @After("@RestoreSmsNotificationsSettingsV2")
   public void restoreSmsNotifSettings() {
     SmsNotificationsSettings settings = get(KEY_CORE_SMS_NOTIFICATIONS_SETTINGS);
-    if (settings != null) {
-      getNotificationsClient().updateSmsNotificationsSettings(settings);
+    try {
+      if (settings != null) {
+        doWithRetry(() ->
+                getNotificationsClient().updateSmsNotificationsSettings(settings),
+            "update sms notification settings");
+      }
+    } catch (Throwable ex) {
+      LOGGER.warn("could not restore sms notification message {}", settings);
     }
   }
 }
