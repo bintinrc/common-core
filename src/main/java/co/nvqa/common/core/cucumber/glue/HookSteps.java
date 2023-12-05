@@ -7,11 +7,13 @@ import co.nvqa.common.core.client.ReservationClient;
 import co.nvqa.common.core.client.RouteClient;
 import co.nvqa.common.core.client.SalesClient;
 import co.nvqa.common.core.client.TagClient;
+import co.nvqa.common.core.client.ThirdPartyShippersClient;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.hibernate.RouteDbDao;
 import co.nvqa.common.core.model.PrinterSettings;
 import co.nvqa.common.core.model.RouteGroup;
 import co.nvqa.common.core.model.SmsNotificationsSettings;
+import co.nvqa.common.core.model.ThirdPartyShippers;
 import co.nvqa.common.core.model.coverage.CreateCoverageResponse;
 import co.nvqa.common.core.model.miscellanous.SalesPerson;
 import co.nvqa.common.core.model.order.Order;
@@ -69,6 +71,9 @@ public class HookSteps extends CoreStandardSteps {
   @Inject
   @Getter
   private PrintersClient printersClient;
+  @Inject
+  @Getter
+  private ThirdPartyShippersClient thirdPartyShippersClient;
 
 
   @After("@ArchiveRouteCommonV2")
@@ -314,6 +319,24 @@ public class HookSteps extends CoreStandardSteps {
         }
       } catch (Throwable ex) {
         LOGGER.warn(f("Could not delete printer [%s]", printerSettings.getName()), ex);
+      }
+    }
+  }
+
+  @After("@DeleteThirdPartyShippersV2")
+  public void deleteThirdPartyShippers() {
+    ThirdPartyShippers thirdPartyShipper = get(KEY_CORE_CREATED_THIRD_PARTY_SHIPPER);
+    if (thirdPartyShipper != null) {
+      if (thirdPartyShipper.getId() != null) {
+        try {
+          doWithRetry(() -> getThirdPartyShippersClient().delete(thirdPartyShipper.getId()),
+              "delete third part shipper");
+        } catch (Throwable ex) {
+          LOGGER.warn(f("Could not delete Third Party Shipper [%s]", ex.getMessage()));
+        }
+      } else {
+        LOGGER.warn(f("Could not delete Third Party Shipper [%s] - id was not defined",
+            thirdPartyShipper.getName()));
       }
     }
   }
