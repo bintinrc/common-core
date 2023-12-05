@@ -16,9 +16,9 @@ public class ApiThirdPartyShippersSteps extends CoreStandardSteps {
   @Getter
   private ThirdPartyShippersClient thirdPartyShippersClient;
 
-  @Given("API Core - Operator gets data of created Third Party shipper")
-  public void apiOperatorGetsDataOfCreatedThirdPartyShipper() {
-    ThirdPartyShippers thirdPartyShipper = get(KEY_CORE_CREATED_THIRD_PARTY_SHIPPER);
+  @Given("API Core - Operator gets data of {string} Third Party shipper")
+  public void apiOperatorGetsDataOfCreatedThirdPartyShipper(String createdShipper) {
+    ThirdPartyShippers thirdPartyShipper = resolveValue(createdShipper);
     doWithRetry(() -> {
       List<ThirdPartyShippers> thirdPartyShippers = getThirdPartyShippersClient().getAll();
       ThirdPartyShippers apiData = thirdPartyShippers.stream()
