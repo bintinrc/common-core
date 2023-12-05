@@ -2,12 +2,14 @@ package co.nvqa.common.core.cucumber.glue;
 
 import co.nvqa.common.core.client.CoreNotificationsClient;
 import co.nvqa.common.core.client.OrderClient;
+import co.nvqa.common.core.client.PrintersClient;
 import co.nvqa.common.core.client.ReservationClient;
 import co.nvqa.common.core.client.RouteClient;
 import co.nvqa.common.core.client.SalesClient;
 import co.nvqa.common.core.client.TagClient;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.hibernate.RouteDbDao;
+import co.nvqa.common.core.model.PrinterSettings;
 import co.nvqa.common.core.model.RouteGroup;
 import co.nvqa.common.core.model.SmsNotificationsSettings;
 import co.nvqa.common.core.model.coverage.CreateCoverageResponse;
@@ -64,6 +66,9 @@ public class HookSteps extends CoreStandardSteps {
   @Inject
   @Getter
   private CoreNotificationsClient notificationsClient;
+  @Inject
+  @Getter
+  private PrintersClient printersClient;
 
 
   @After("@ArchiveRouteCommonV2")
@@ -288,6 +293,28 @@ public class HookSteps extends CoreStandardSteps {
       }
     } catch (Throwable ex) {
       LOGGER.warn("could not restore sms notification message {}", settings);
+    }
+  }
+
+  @After("@DeletePrinterV2")
+  public void deletePrinter() {
+    PrinterSettings printerSettings = get(KEY_CORE_PRINTER_SETTINGS);
+    if (printerSettings != null) {
+      try {
+        if (printerSettings.getId() == null) {
+          List<PrinterSettings> allPrinters = getPrintersClient().getAll();
+          allPrinters.stream()
+              .filter(printer -> StringUtils
+                  .equalsIgnoreCase(printerSettings.getName(), printer.getName()))
+              .findFirst()
+              .ifPresent(doWithRetry(() -> printer -> getPrintersClient().delete(printer.getId()),
+                  "printer deleted"));
+        } else {
+          doWithRetry(() -> getPrintersClient().delete(printerSettings.getId()), "printer deleted");
+        }
+      } catch (Throwable ex) {
+        LOGGER.warn(f("Could not delete printer [%s]", printerSettings.getName()), ex);
+      }
     }
   }
 }

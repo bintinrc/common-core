@@ -20,7 +20,7 @@ public class PrinterSettings extends DataEntity<PrinterSettings> {
 
   private String ipAddress;
 
-  private Integer version;
+  private String version;
 
   @JsonProperty("is_default")
   private boolean isDefault;
