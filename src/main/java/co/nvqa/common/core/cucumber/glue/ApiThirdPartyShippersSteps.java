@@ -17,17 +17,16 @@ public class ApiThirdPartyShippersSteps extends CoreStandardSteps {
   private ThirdPartyShippersClient thirdPartyShippersClient;
 
   @Given("API Core - Operator gets data of {string} Third Party shipper")
-  public void apiOperatorGetsDataOfCreatedThirdPartyShipper(String createdShipper) {
-    ThirdPartyShippers thirdPartyShipper = resolveValue(createdShipper);
+  public void apiOperatorGetsDataOfCreatedThirdPartyShipper(String shipperName) {
+    String thirdPartyShipperName = resolveValue(shipperName);
     doWithRetry(() -> {
       List<ThirdPartyShippers> thirdPartyShippers = getThirdPartyShippersClient().getAll();
-      ThirdPartyShippers apiData = thirdPartyShippers.stream()
-          .filter(shipper -> StringUtils.equals(shipper.getName(), thirdPartyShipper.getName()))
+      thirdPartyShippers.stream()
+          .filter(shipper -> StringUtils.equals(shipper.getName(), thirdPartyShipperName))
           .findFirst()
           .orElseThrow(() -> new RuntimeException(
               f("Third Party Shipper with name [%s] was not found",
-                  thirdPartyShipper.getName())));
-      thirdPartyShipper.setId(apiData.getId());
+                  thirdPartyShipperName)));
     }, "get All third party shippers");
   }
 }
