@@ -775,4 +775,16 @@ public class DbCoreSteps extends CoreStandardSteps {
       });
     }, "verify reservation_blob records", 10_000, 3);
   }
+
+  @Then("DB Core - verifies that latitude is in range -90 to 90 and longitude is in range -180 to 180 for waypointId {string}")
+  public void dbCoreVerifiesRangeLatLong(String waypointId) {
+    Long resolvedWayPointIdKey = Long.parseLong(resolveValue(waypointId));
+    doWithRetry(() -> {
+      Waypoints result = waypointsDao.getWaypointsDetails(resolvedWayPointIdKey);
+      Assertions.assertThat(result.getLatitude() <= 90 && -90 <= result.getLatitude())
+          .as("Assertion for lat column value is as expected");
+      Assertions.assertThat(result.getLongitude() <= 180 && -180 <= result.getLongitude())
+          .as("Assertion for lat column value is as expected");
+    }, "Validating verified lat long values are as expected");
+  }
 }

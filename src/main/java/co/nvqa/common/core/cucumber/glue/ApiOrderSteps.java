@@ -17,7 +17,7 @@ import co.nvqa.common.core.model.order.PricingDetails;
 import co.nvqa.common.core.model.order.RescheduleOrderRequest;
 import co.nvqa.common.core.model.order.RescheduleOrderResponse;
 import co.nvqa.common.core.model.order.RtsOrderRequest;
-import co.nvqa.common.core.model.order.Tag;
+import co.nvqa.common.core.model.order.OrderTag;
 import co.nvqa.common.utils.JsonUtils;
 import co.nvqa.common.utils.NvTestRuntimeException;
 import co.nvqa.common.utils.StandardTestUtils;
@@ -624,9 +624,9 @@ public class ApiOrderSteps extends CoreStandardSteps {
   public void apiOperatorCreateOrderTag(Map<String, String> data) {
     final Map<String, String> dataTable = resolveKeyValues(data);
     final String json = toJsonSnakeCase(dataTable);
-    final Tag request = fromJsonSnakeCase(json, Tag.class);
+    final OrderTag request = fromJsonSnakeCase(json, OrderTag.class);
     doWithRetry(() -> {
-      Tag response = getOrderClient().createOrderTag(request);
+      OrderTag response = getOrderClient().createOrderTag(request);
       putInList(KEY_CORE_LIST_OF_CREATED_ORDER_TAGS, response);
     }, "create tag", 1000, 5);
   }
