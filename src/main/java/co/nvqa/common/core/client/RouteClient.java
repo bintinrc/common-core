@@ -382,17 +382,14 @@ public class RouteClient extends SimpleApiClient {
     return r;
   }
 
-  public void addReservationToRouteGroup(long routeGroupId, long reservationId) {
-    addReservationsToRouteGroup(routeGroupId, reservationId);
-  }
-
-  public void addReservationsToRouteGroup(long routeGroupId, long... reservationId) {
+  public void addReservationsToRouteGroup(long routeGroupId, List<Long> reservationIds) {
     String apiMethod = "route/1.0/route-groups/{routeGroupId}/references";
+    String rsvnIds = toJsonSnakeCase(reservationIds);
 
     RequestSpecification requestSpecification = createAuthenticatedRequest()
         .pathParam("routeGroupId", routeGroupId)
         .queryParam("append", true)
-        .body(f("{\"transactionIds\":[], \"reservationIds\":%s}", Arrays.toString(reservationId)));
+        .body(f("{\"transactionIds\":[], \"reservationIds\":%s}", rsvnIds));
 
     Response r = doPost("Route - Add Reservation(s) to Route Group", requestSpecification,
         apiMethod);
@@ -402,17 +399,14 @@ public class RouteClient extends SimpleApiClient {
     r.then().contentType(ContentType.JSON);
   }
 
-  public void addTransactionToRouteGroup(long routeGroupId, long transactionId) {
-    addTransactionsToRouteGroup(routeGroupId, transactionId);
-  }
-
-  public void addTransactionsToRouteGroup(long routeGroupId, Long... transactionIds) {
+  public void addTransactionsToRouteGroup(long routeGroupId, List<Long> transactionIds) {
     String apiMethod = "route/1.0/route-groups/{routeGroupId}/references";
+    String txnIds = toJson(transactionIds);
 
     RequestSpecification requestSpecification = createAuthenticatedRequest()
         .pathParam("routeGroupId", routeGroupId)
         .queryParam("append", true)
-        .body(f("{\"transactionIds\":%s, \"reservationIds\":[]}", Arrays.toString(transactionIds)));
+        .body(f("{\"transactionIds\":%s, \"reservationIds\":[]}", txnIds));
 
     Response r = doPost("Route - Add Transaction(s) to Route Group", requestSpecification,
         apiMethod);
@@ -517,6 +511,7 @@ public class RouteClient extends SimpleApiClient {
 
     return doPut("Core - Add Parcel to Route by Tracking Id", spec, url);
   }
+
   public void startRoute(long routeId, long driverId, StartRouteRequest request) {
     Response r = startRouteAndGetRawResponse(routeId, driverId, request);
     r.then().statusCode(
