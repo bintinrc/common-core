@@ -11,6 +11,7 @@ import co.nvqa.common.core.model.route.AddParcelToRouteRequest;
 import co.nvqa.common.core.model.route.AddPickupJobToRouteRequest;
 import co.nvqa.common.core.model.route.BulkAddPickupJobToRouteRequest;
 import co.nvqa.common.core.model.route.BulkAddPickupJobToRouteResponse;
+import co.nvqa.common.core.model.route.EditRouteRequest;
 import co.nvqa.common.core.model.route.GetRouteDetailsResponse;
 import co.nvqa.common.core.model.route.MergeWaypointsResponse;
 import co.nvqa.common.core.model.route.ParcelRouteTransferRequest;
@@ -490,7 +491,7 @@ public class RouteClient extends SimpleApiClient {
     response.then().contentType(ContentType.JSON);
   }
 
-  public void editRouteDetails(List<RouteRequest> routeRequest) {
+  public void editRouteDetails(List<EditRouteRequest> routeRequest) {
     String url = "core/routes/details";
     String json = toJson(routeRequest);
     RequestSpecification rs = createAuthenticatedRequest()
