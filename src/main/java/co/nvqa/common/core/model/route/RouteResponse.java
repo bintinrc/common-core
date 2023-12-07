@@ -57,7 +57,7 @@ public class RouteResponse {
 
     private String uuid;
     private Long id;
-    private String firstName;
+    private String displayName;
     private String lastName;
     private String licenseNumber;
     private String driverType;
