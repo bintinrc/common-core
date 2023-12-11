@@ -6,6 +6,8 @@
 
 ### Added
 
+Error classification:
+
 - Throw `NvTestCoreOrderKafkaLagException()` instead of `AssertionError()`
   for `API Core - Operator get order details for tracking order` step.
 
