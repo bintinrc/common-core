@@ -2,6 +2,48 @@
 
 <hr>
 
+## [1.3.24] 2023-12-11
+
+### Added
+
+Error classification:
+
+- Throw `NvTestCoreOrderKafkaLagException()` instead of `AssertionError()`
+  for `API Core - Operator get order details for tracking order` step.
+
+Model class name disambiguation:
+
+- Renamed `co.nvqa.common.core.model.order.Tag` to `co.nvqa.common.core.model.order.OrderTag`
+- Renamed `co.nvqa.common.core.model.route.Tag` to `co.nvqa.common.core.model.route.RouteTag`
+
+New KEYS:
+
+- KEY_CORE_LIST_OF_CREATED_ROUTE_TAGS
+- KEY_CORE_SMS_NOTIFICATIONS_SETTINGS
+- KEY_CORE_PRINTER_SETTINGS
+- KEY_CORE_CREATED_THIRD_PARTY_SHIPPER
+- KEY_CORE_CREATED_THIRD_PARTY_SHIPPER_EDITED
+
+New Steps:
+
+- API Core - Operator adds new printer using data below:
+- API Core - Operator gets SMS notifications settings
+- API Core - Operator verify the {string} Third Party Shipper is searchable
+- API Route - Operator add reservations to {string}:
+- API Route - Operator add transactions to {string}:
+- API Route - create new route tag:
+- DB Core - verifies that latitude is in range -90 to 90 and longitude is in range -180 to 180 for
+  waypointId {string}
+
+New Hooks:
+
+- @DeletePrinterV2
+- @DeleteRouteTagsV2
+- @DeleteThirdPartyShippersV2
+- @RestoreSmsNotificationsSettingsV2
+
+<hr>
+
 ## [1.3.23] 2023-11-27
 
 ### Added

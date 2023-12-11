@@ -2,6 +2,7 @@ package co.nvqa.common.core.client;
 
 import co.nvqa.common.client.SimpleApiClient;
 import co.nvqa.common.constants.HttpConstants;
+import co.nvqa.common.core.exception.NvTestCoreOrderKafkaLagException;
 import co.nvqa.common.core.model.EditDeliveryOrderRequest;
 import co.nvqa.common.core.model.order.BatchOrderInfo;
 import co.nvqa.common.core.model.order.BulkForceSuccessOrderRequest;
@@ -14,6 +15,7 @@ import co.nvqa.common.core.model.order.Order.PackageContent;
 import co.nvqa.common.core.model.order.Order.PricingInfo;
 import co.nvqa.common.core.model.order.Order.ShipperRefMetadata;
 import co.nvqa.common.core.model.order.Order.Transaction;
+import co.nvqa.common.core.model.order.OrderTag;
 import co.nvqa.common.core.model.order.OrderTagsRequest;
 import co.nvqa.common.core.model.order.PricingDetails;
 import co.nvqa.common.core.model.order.RescheduleOrderRequest;
@@ -22,7 +24,6 @@ import co.nvqa.common.core.model.order.RtsOrderRequest;
 import co.nvqa.common.core.model.order.SearchOrderRequest;
 import co.nvqa.common.core.model.order.SearchOrderResponse;
 import co.nvqa.common.core.model.order.SearchOrderTagResponse;
-import co.nvqa.common.core.model.order.Tag;
 import co.nvqa.common.core.model.order.UserDetails;
 import co.nvqa.common.utils.NvTestHttpException;
 import co.nvqa.common.utils.NvTestRuntimeException;
@@ -80,7 +81,7 @@ public class OrderClient extends SimpleApiClient {
     SearchOrderResponse result = fromJson(r.body().asString(), SearchOrderResponse.class);
 
     if (result.getCount() == 0) {
-      throw new AssertionError("Order not found!");
+      throw new NvTestCoreOrderKafkaLagException("Order not found!");
     } else if (completeDetails) {
       long orderId = result.getOrders().get(0).getId();
       return getOrder(orderId);
@@ -461,7 +462,7 @@ public class OrderClient extends SimpleApiClient {
     return fromJsonCamelCaseToList(r.getBody().asString(), SearchOrderTagResponse.class);
   }
 
-  public List<Tag> getAllTags() {
+  public List<OrderTag> getAllTags() {
     String url = "core/orders/tags/all";
 
     RequestSpecification spec = createAuthenticatedRequest();
@@ -472,7 +473,7 @@ public class OrderClient extends SimpleApiClient {
     }
     r.then().contentType(ContentType.JSON);
 
-    return r.body().jsonPath().getList(".", Tag.class);
+    return r.body().jsonPath().getList(".", OrderTag.class);
   }
 
   public void deleteOrderTag(Long tagId) {
@@ -499,15 +500,15 @@ public class OrderClient extends SimpleApiClient {
   }
 
   public void deleteOrderTag(String name) {
-    List<Tag> tags = getAllTags();
-    Tag tag = tags.stream()
+    List<OrderTag> tags = getAllTags();
+    OrderTag tag = tags.stream()
         .filter(t -> StringUtils.equalsIgnoreCase(t.getName(), name))
         .findFirst()
         .orElseThrow(() -> new IllegalArgumentException("Tag [" + name + "] was not found"));
     deleteOrderTag(tag.getId());
   }
 
-  public Tag createOrderTag(Tag tag) {
+  public OrderTag createOrderTag(OrderTag tag) {
     String apiMethod = "core/orders/tags/new";
 
     RequestSpecification requestSpecification = createAuthenticatedRequest()
@@ -518,7 +519,7 @@ public class OrderClient extends SimpleApiClient {
       throw new NvTestHttpException("unexpected http status: " + r.statusCode());
     }
     r.then().contentType(ContentType.JSON);
-    return r.body().as(Tag.class);
+    return r.body().as(OrderTag.class);
   }
 
   public void updateOrderCop(Long orderId, Double copAmount) {

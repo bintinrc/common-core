@@ -1,20 +1,28 @@
 package co.nvqa.common.core.cucumber.glue;
 
+import co.nvqa.common.core.client.CoreNotificationsClient;
 import co.nvqa.common.core.client.OrderClient;
+import co.nvqa.common.core.client.PrintersClient;
 import co.nvqa.common.core.client.ReservationClient;
 import co.nvqa.common.core.client.RouteClient;
 import co.nvqa.common.core.client.SalesClient;
+import co.nvqa.common.core.client.TagClient;
+import co.nvqa.common.core.client.ThirdPartyShippersClient;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.hibernate.RouteDbDao;
+import co.nvqa.common.core.model.PrinterSettings;
 import co.nvqa.common.core.model.RouteGroup;
+import co.nvqa.common.core.model.SmsNotificationsSettings;
+import co.nvqa.common.core.model.ThirdPartyShippers;
 import co.nvqa.common.core.model.coverage.CreateCoverageResponse;
 import co.nvqa.common.core.model.miscellanous.SalesPerson;
 import co.nvqa.common.core.model.order.Order;
-import co.nvqa.common.core.model.order.Tag;
+import co.nvqa.common.core.model.order.OrderTag;
 import co.nvqa.common.core.model.persisted_class.route.Coverage;
 import co.nvqa.common.core.model.persisted_class.route.RouteLogs;
 import co.nvqa.common.core.model.reservation.ReservationResponse;
 import co.nvqa.common.core.model.route.RouteResponse;
+import co.nvqa.common.core.model.route.RouteTag;
 import io.cucumber.guice.ScenarioScoped;
 import io.cucumber.java.After;
 import java.util.ArrayList;
@@ -53,6 +61,19 @@ public class HookSteps extends CoreStandardSteps {
   @Inject
   @Getter
   private RouteDbDao routeDbDao;
+
+  @Inject
+  @Getter
+  private TagClient tagClient;
+  @Inject
+  @Getter
+  private CoreNotificationsClient notificationsClient;
+  @Inject
+  @Getter
+  private PrintersClient printersClient;
+  @Inject
+  @Getter
+  private ThirdPartyShippersClient thirdPartyShippersClient;
 
 
   @After("@ArchiveRouteCommonV2")
@@ -228,21 +249,95 @@ public class HookSteps extends CoreStandardSteps {
 
   @After("@DeleteOrderTagsV2")
   public void deleteOrderTagsV2() {
-    final List<Tag> tags = get(KEY_CORE_LIST_OF_CREATED_ORDER_TAGS);
+    final List<OrderTag> tags = get(KEY_CORE_LIST_OF_CREATED_ORDER_TAGS);
+    if (CollectionUtils.isNotEmpty(tags)) {
+      tags.forEach(orderTag -> {
+        if (orderTag != null) {
+          try {
+            if (orderTag.getId() != null) {
+              getOrderClient().deleteOrderTag(orderTag.getId());
+            } else {
+              getOrderClient().deleteOrderTag(orderTag.getName());
+            }
+          } catch (Throwable ex) {
+            LOGGER.warn("Could not delete order tag [{}]", orderTag.getName(), ex);
+          }
+        }
+      });
+    }
+  }
+
+  @After("@DeleteRouteTagsV2")
+  public void deleteRouteTagsV2() {
+    final List<RouteTag> tags = get(KEY_CORE_LIST_OF_CREATED_ROUTE_TAGS);
     if (CollectionUtils.isNotEmpty(tags)) {
       tags.forEach(tag -> {
         if (tag != null) {
           try {
             if (tag.getId() != null) {
-              getOrderClient().deleteOrderTag(tag.getId());
+              getTagClient().deleteTag(tag.getId());
             } else {
-              getOrderClient().deleteOrderTag(tag.getName());
+              getTagClient().deleteTag(tag.getName());
             }
-          }catch (Throwable ex) {
-            LOGGER.warn("Could not delete order tag [{}]", tag.getName(), ex);
+          } catch (Throwable ex) {
+            LOGGER.warn("Could not delete route tag [{}]", tag.getName(), ex);
           }
         }
       });
+    }
+  }
+
+  @After("@RestoreSmsNotificationsSettingsV2")
+  public void restoreSmsNotifSettings() {
+    SmsNotificationsSettings settings = get(KEY_CORE_SMS_NOTIFICATIONS_SETTINGS);
+    try {
+      if (settings != null) {
+        doWithRetry(() ->
+                getNotificationsClient().updateSmsNotificationsSettings(settings),
+            "update sms notification settings");
+      }
+    } catch (Throwable ex) {
+      LOGGER.warn("could not restore sms notification message {}", settings);
+    }
+  }
+
+  @After("@DeletePrinterV2")
+  public void deletePrinter() {
+    PrinterSettings printerSettings = get(KEY_CORE_PRINTER_SETTINGS);
+    if (printerSettings != null) {
+      try {
+        if (printerSettings.getId() == null) {
+          List<PrinterSettings> allPrinters = getPrintersClient().getAll();
+          allPrinters.stream()
+              .filter(printer -> StringUtils
+                  .equalsIgnoreCase(printerSettings.getName(), printer.getName()))
+              .findFirst()
+              .ifPresent(doWithRetry(() -> printer -> getPrintersClient().delete(printer.getId()),
+                  "printer deleted"));
+        } else {
+          doWithRetry(() -> getPrintersClient().delete(printerSettings.getId()), "printer deleted");
+        }
+      } catch (Throwable ex) {
+        LOGGER.warn(f("Could not delete printer [%s]", printerSettings.getName()), ex);
+      }
+    }
+  }
+
+  @After("@DeleteThirdPartyShippersV2")
+  public void deleteThirdPartyShippers() {
+    ThirdPartyShippers thirdPartyShipper = get(KEY_CORE_CREATED_THIRD_PARTY_SHIPPER_EDITED,get(KEY_CORE_CREATED_THIRD_PARTY_SHIPPER,ThirdPartyShippers.class));
+    if (thirdPartyShipper != null) {
+      if (thirdPartyShipper.getId() != null) {
+        try {
+          doWithRetry(() -> getThirdPartyShippersClient().delete(thirdPartyShipper.getId()),
+              "delete third part shipper");
+        } catch (Throwable ex) {
+          LOGGER.warn(f("Could not delete Third Party Shipper [%s]", ex.getMessage()));
+        }
+      } else {
+        LOGGER.warn(f("Could not delete Third Party Shipper [%s] - id was not defined",
+            thirdPartyShipper.getName()));
+      }
     }
   }
 }

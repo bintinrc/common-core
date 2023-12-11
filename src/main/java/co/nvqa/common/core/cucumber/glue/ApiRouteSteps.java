@@ -2,6 +2,7 @@ package co.nvqa.common.core.cucumber.glue;
 
 import co.nvqa.common.constants.HttpConstants;
 import co.nvqa.common.core.client.RouteClient;
+import co.nvqa.common.core.client.TagClient;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.model.RouteGroup;
 import co.nvqa.common.core.model.coverage.CreateCoverageRequest;
@@ -21,6 +22,8 @@ import co.nvqa.common.core.model.route.ParcelRouteTransferRequest;
 import co.nvqa.common.core.model.route.ParcelRouteTransferResponse;
 import co.nvqa.common.core.model.route.RouteRequest;
 import co.nvqa.common.core.model.route.RouteResponse;
+import co.nvqa.common.core.model.route.RouteTag;
+import co.nvqa.common.core.model.route.TagResponse;
 import co.nvqa.common.core.model.waypoint.Waypoint;
 import co.nvqa.common.core.utils.CoreTestUtils;
 import co.nvqa.common.model.DataEntity;
@@ -51,6 +54,10 @@ public class ApiRouteSteps extends CoreStandardSteps {
   @Inject
   @Getter
   private RouteClient routeClient;
+
+  @Inject
+  @Getter
+  private TagClient tagClient;
 
 
   /**
@@ -378,8 +385,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
    * Sample:<p>
    * <p>
    * When API Core - Operator bulk add reservation to route using data below: | request | {"ids":
-   * [{KEY_LIST_OF_CREATED_RESERVATIONS[1].id},
-   * {KEY_LIST_OF_CREATED_RESERVATIONS[2].id}],"new_route_id":{KEY_LIST_OF_CREATED_ROUTES[1].id},"overwrite":true}
+   * [{KEY_LIST_OF_CREATED_RESERVATIONS[1].id}, {KEY_LIST_OF_CREATED_RESERVATIONS[2].id}],"new_route_id":{KEY_LIST_OF_CREATED_ROUTES[1].id},"overwrite":true}
    * |
    * <p>
    *
@@ -403,8 +409,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
    * Sample:<p>
    * <p>
    * When API Core - Operator bulk add reservation to route with partial success: | request |
-   * {"ids": [{KEY_LIST_OF_CREATED_RESERVATIONS[1].id},
-   * {KEY_LIST_OF_CREATED_RESERVATIONS[2].id}],"new_route_id":{KEY_LIST_OF_CREATED_ROUTES[1].id},"overwrite":true}
+   * {"ids": [{KEY_LIST_OF_CREATED_RESERVATIONS[1].id}, {KEY_LIST_OF_CREATED_RESERVATIONS[2].id}],"new_route_id":{KEY_LIST_OF_CREATED_ROUTES[1].id},"overwrite":true}
    * |
    * <p>
    *
@@ -633,8 +638,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
 
   /**
    * Sample: API Core - Operator parcel transfer to a new route: | request |
-   * {{"route_id":null,"route_date":"2021-01-19
-   * 08:25:13","from_driver_id":null,"to_driver_id":2679,"to_driver_hub_id":3,"orders":[{"tracking_id":"NVSGDIMMI000238068","inbound_type":"VAN_FROM_NINJAVAN","hub_id":3}]|
+   * {{"route_id":null,"route_date":"2021-01-19 08:25:13","from_driver_id":null,"to_driver_id":2679,"to_driver_hub_id":3,"orders":[{"tracking_id":"NVSGDIMMI000238068","inbound_type":"VAN_FROM_NINJAVAN","hub_id":3}]|
    *
    * @param dataTableAsMap Map of data from feature file.
    */
@@ -743,7 +747,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
       List<MilkRunGroup> milkrunGroups = getRouteClient().getMilkrunGroups(new Date());
 
       MilkRunGroup group = milkrunGroups.stream().filter(
-              milkrunGroup -> StringUtils.equals(milkrunGroup.getName(), reservationGroupName))
+          milkrunGroup -> StringUtils.equals(milkrunGroup.getName(), reservationGroupName))
           .findFirst().orElseThrow(() -> new RuntimeException(
               "Could not find milkrun group with name [" + reservationGroupName + "]"));
       put(KEY_CORE_CREATED_RESERVATION_GROUP_ID, group.getId());
@@ -804,4 +808,60 @@ public class ApiRouteSteps extends CoreStandardSteps {
       getRouteClient().setRouteTags(routeId, tagIds);
     }, "Set tags to route");
   }
+
+  /**
+   * Sample:<p>
+   *
+   * @param data <br><b>name:</b>
+   *             AAA<br><b>description:</b> This tag AAA is for testing
+   */
+  @Given("API Route - create new route tag:")
+  public void apiOperatorCreateRouteTag(Map<String, String> data) {
+    final Map<String, String> dataTable = resolveKeyValues(data);
+    final String json = toJsonSnakeCase(dataTable);
+    final RouteTag request = fromJsonSnakeCase(json, RouteTag.class);
+    doWithRetry(() -> {
+      TagResponse response = getTagClient().create(request);
+      response.getData().getTags().forEach(createTag -> {
+        if (createTag.getName().equalsIgnoreCase(request.getName())) {
+          putInList(KEY_CORE_LIST_OF_CREATED_ROUTE_TAGS, createTag);
+        }
+      });
+    }, "create tag", 1000, 5);
+  }
+
+  /**
+   * Sample:<p>
+   * <p>
+   * Given API Route - Operator add transactions to "{KEY_LIST_OF_CREATED_ROUTE_GROUPS[1].id}":
+   * <p> | {KEY_LIST_OF_CREATED_ORDERS[1].transactions[1].id} |</p>
+   * <p>| {KEY_LIST_OF_CREATED_ORDERS[1].transactions[2].id} |</p>
+   */
+  @When("API Route - Operator add transactions to {string}:")
+  public void operatorAddTxnToRouteGroup(String routeGroupId, List<String> transactionIds) {
+    final long id = Long.parseLong(resolveValue(routeGroupId));
+    transactionIds = resolveValues(transactionIds);
+    List<Long> ids = transactionIds.stream().map(Long::parseLong).collect(Collectors.toList());
+    doWithRetry(
+        () -> getRouteClient().addTransactionsToRouteGroup(id, ids),
+        "add transactions route group", 1000, 5);
+  }
+
+  /**
+   * Sample:<p>
+   * <p>
+   * Given API Route - Operator add reservations to "{KEY_LIST_OF_CREATED_ROUTE_GROUPS[1].id}":
+   * <p> | {KEY_LIST_OF_CREATED_RESERVATIONS[1].id} |</p>
+   * <p>| {KEY_LIST_OF_CREATED_RESERVATIONS[2].id} |</p>
+   */
+  @When("API Route - Operator add reservations to {string}:")
+  public void operatorAddRsvnToRouteGroup(String routeGroupId, List<String> rsvnIds) {
+    final long id = Long.parseLong(resolveValue(routeGroupId));
+    rsvnIds = resolveValues(rsvnIds);
+    List<Long> ids = rsvnIds.stream().map(Long::parseLong).collect(Collectors.toList());
+    doWithRetry(
+        () -> getRouteClient().addReservationsToRouteGroup(id, ids),
+        "add reservations route group", 1000, 5);
+  }
+
 }
