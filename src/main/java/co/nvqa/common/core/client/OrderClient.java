@@ -2,6 +2,7 @@ package co.nvqa.common.core.client;
 
 import co.nvqa.common.client.SimpleApiClient;
 import co.nvqa.common.constants.HttpConstants;
+import co.nvqa.common.core.exception.NvTestCoreOrderKafkaLagException;
 import co.nvqa.common.core.model.EditDeliveryOrderRequest;
 import co.nvqa.common.core.model.order.BatchOrderInfo;
 import co.nvqa.common.core.model.order.BulkForceSuccessOrderRequest;
@@ -80,7 +81,7 @@ public class OrderClient extends SimpleApiClient {
     SearchOrderResponse result = fromJson(r.body().asString(), SearchOrderResponse.class);
 
     if (result.getCount() == 0) {
-      throw new AssertionError("Order not found!");
+      throw new NvTestCoreOrderKafkaLagException("Order not found!");
     } else if (completeDetails) {
       long orderId = result.getOrders().get(0).getId();
       return getOrder(orderId);
