@@ -192,7 +192,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
       LOGGER.error("bulkAddPickupJobToTheRouteRequest: {}",
           bulkAddPickupJobToTheRouteRequestTemplate);
       throw new NvTestCoreCastingErrorException(
-          "error casting `bulkAddPickupJobToTheRouteRequest` to BulkAddPickupJobToRouteRequest.class",
+          "error casting bulkAddPickupJobToTheRouteRequest to BulkAddPickupJobToRouteRequest.class",
           e);
     }
 

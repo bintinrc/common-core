@@ -794,7 +794,8 @@ public class OrderClient extends SimpleApiClient {
 
       return order;
     } catch (Exception ex) {
-      throw new NvTestCoreCastingErrorException(ex);
+      LOGGER.error("jsonOrder: {}", jsonOrder);
+      throw new NvTestCoreCastingErrorException("unable to cast jsonOrder to Order.class", ex);
     }
   }
 
