@@ -5,6 +5,7 @@ import co.nvqa.common.core.client.Lazada3PLClient;
 import co.nvqa.common.core.client.OrderClient;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.exception.NvTestCoreOrderKafkaLagException;
+import co.nvqa.common.core.exception.NvTestCoreRescheduleFailedException;
 import co.nvqa.common.core.model.CodInbound;
 import co.nvqa.common.core.model.EditDeliveryOrderRequest;
 import co.nvqa.common.core.model.Lazada3PL;
@@ -19,7 +20,6 @@ import co.nvqa.common.core.model.order.RescheduleOrderRequest;
 import co.nvqa.common.core.model.order.RescheduleOrderResponse;
 import co.nvqa.common.core.model.order.RtsOrderRequest;
 import co.nvqa.common.utils.JsonUtils;
-import co.nvqa.common.utils.NvTestRuntimeException;
 import co.nvqa.common.utils.StandardTestUtils;
 import co.nvqa.commonauth.utils.TokenUtils;
 import io.cucumber.guice.ScenarioScoped;
@@ -267,7 +267,7 @@ public class ApiOrderSteps extends CoreStandardSteps {
       final RescheduleOrderResponse response = getOrderClient().rescheduleOrder(orderId,
           request);
       if (reattempt && !response.getStatus().equalsIgnoreCase("Success")) {
-        throw new NvTestRuntimeException("reschedule fail: " + response.getMessage());
+        throw new NvTestCoreRescheduleFailedException("reschedule fail: " + response.getMessage());
       }
     }, "Reschedule order", 3000, 10);
 

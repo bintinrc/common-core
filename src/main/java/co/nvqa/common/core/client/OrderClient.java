@@ -2,6 +2,7 @@ package co.nvqa.common.core.client;
 
 import co.nvqa.common.client.SimpleApiClient;
 import co.nvqa.common.constants.HttpConstants;
+import co.nvqa.common.core.exception.NvTestCoreCastingErrorException;
 import co.nvqa.common.core.exception.NvTestCoreOrderKafkaLagException;
 import co.nvqa.common.core.model.EditDeliveryOrderRequest;
 import co.nvqa.common.core.model.order.BatchOrderInfo;
@@ -26,7 +27,6 @@ import co.nvqa.common.core.model.order.SearchOrderResponse;
 import co.nvqa.common.core.model.order.SearchOrderTagResponse;
 import co.nvqa.common.core.model.order.UserDetails;
 import co.nvqa.common.utils.NvTestHttpException;
-import co.nvqa.common.utils.NvTestRuntimeException;
 import co.nvqa.common.utils.StandardTestConstants;
 import co.nvqa.commonauth.utils.TokenUtils;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -794,7 +794,7 @@ public class OrderClient extends SimpleApiClient {
 
       return order;
     } catch (Exception ex) {
-      throw new NvTestRuntimeException(ex);
+      throw new NvTestCoreCastingErrorException(ex);
     }
   }
 
