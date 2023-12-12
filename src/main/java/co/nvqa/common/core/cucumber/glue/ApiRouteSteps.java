@@ -4,6 +4,7 @@ import co.nvqa.common.constants.HttpConstants;
 import co.nvqa.common.core.client.RouteClient;
 import co.nvqa.common.core.client.TagClient;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
+import co.nvqa.common.core.exception.NvTestCoreCastingErrorException;
 import co.nvqa.common.core.model.RouteGroup;
 import co.nvqa.common.core.model.coverage.CreateCoverageRequest;
 import co.nvqa.common.core.model.coverage.CreateCoverageResponse;
@@ -47,9 +48,13 @@ import javax.inject.Inject;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ScenarioScoped
 public class ApiRouteSteps extends CoreStandardSteps {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(ApiRouteSteps.class);
 
   @Inject
   @Getter
@@ -179,8 +184,17 @@ public class ApiRouteSteps extends CoreStandardSteps {
     final String bulkAddPickupJobToTheRouteRequestTemplate = resolvedDataTable
         .get("bulkAddPickupJobToTheRouteRequest");
 
-    final BulkAddPickupJobToRouteRequest bulkAddPickupJobToRouteRequest = fromJsonSnakeCase(
-        bulkAddPickupJobToTheRouteRequestTemplate, BulkAddPickupJobToRouteRequest.class);
+    final BulkAddPickupJobToRouteRequest bulkAddPickupJobToRouteRequest;
+    try {
+      bulkAddPickupJobToRouteRequest = fromJsonSnakeCase(
+          bulkAddPickupJobToTheRouteRequestTemplate, BulkAddPickupJobToRouteRequest.class);
+    } catch (Exception e) {
+      LOGGER.error("bulkAddPickupJobToTheRouteRequest: {}",
+          bulkAddPickupJobToTheRouteRequestTemplate);
+      throw new NvTestCoreCastingErrorException(
+          "error casting bulkAddPickupJobToTheRouteRequest to BulkAddPickupJobToRouteRequest.class",
+          e);
+    }
 
     doWithRetry(() -> {
       BulkAddPickupJobToRouteResponse response = getRouteClient().bulkAddPickupJobToRoute(
