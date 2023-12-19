@@ -4,11 +4,11 @@ plugins {
 }
 
 group 'co.nvqa'
-version '1.3.25-RC1'
+version '1.3.25-RC3'
 
 
 sourceCompatibility = JavaVersion.VERSION_11
-String qaRepoUsername = System.getenv("nvqaRepositoryUsername") ?
+String qaRepoUsername = System.getenv("nvqaRepository   Username") ?
         System.getenv("nvqaRepositoryUsername") :
         "${defaultNvqaRepositoryUsername}"
 String qaRepoPassword = System.getenv("nvqaRepositoryPassword") ?
