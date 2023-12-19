@@ -5,6 +5,7 @@ import co.nvqa.common.core.client.RouteClient;
 import co.nvqa.common.core.client.TagClient;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.exception.NvTestCoreCastingErrorException;
+import co.nvqa.common.core.exception.NvTestCoreMilkrunGroupNotFoundException;
 import co.nvqa.common.core.model.RouteGroup;
 import co.nvqa.common.core.model.coverage.CreateCoverageRequest;
 import co.nvqa.common.core.model.coverage.CreateCoverageResponse;
@@ -759,12 +760,12 @@ public class ApiRouteSteps extends CoreStandardSteps {
     final String reservationGroupName = resolvedDataTable.get("reservationGroupName");
     doWithRetry(() -> {
       List<MilkRunGroup> milkrunGroups = getRouteClient().getMilkrunGroups(new Date());
-
       MilkRunGroup group = milkrunGroups.stream().filter(
-          milkrunGroup -> StringUtils.equals(milkrunGroup.getName(), reservationGroupName))
-          .findFirst().orElseThrow(() -> new RuntimeException(
+              milkrunGroup -> StringUtils.equals(milkrunGroup.getName(), reservationGroupName))
+          .findFirst().orElseThrow(() -> new NvTestCoreMilkrunGroupNotFoundException(
               "Could not find milkrun group with name [" + reservationGroupName + "]"));
       put(KEY_CORE_CREATED_RESERVATION_GROUP_ID, group.getId());
+      putInList(KEY_CORE_LIST_OF_CREATED_RESERVATION_GROUP, group);
     }, "Operator get created Reservation Group params");
   }
 

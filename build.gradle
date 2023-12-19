@@ -8,7 +8,7 @@ version '1.3.25-RC3'
 
 
 sourceCompatibility = JavaVersion.VERSION_11
-String qaRepoUsername = System.getenv("nvqaRepository   Username") ?
+String qaRepoUsername = System.getenv("nvqaRepositoryUsername") ?
         System.getenv("nvqaRepositoryUsername") :
         "${defaultNvqaRepositoryUsername}"
 String qaRepoPassword = System.getenv("nvqaRepositoryPassword") ?
