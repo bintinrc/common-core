@@ -1,5 +1,12 @@
 # Change log
 
+## [1.3.25] 2023-12-19
+
+### Added
+
+New Method :
+-Method : updateReservationDetails, no step definition (step definition on DriverApp side for specific case)
+
 <hr>
 
 ## [1.3.24] 2023-12-11
