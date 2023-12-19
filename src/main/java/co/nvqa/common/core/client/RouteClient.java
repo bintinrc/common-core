@@ -6,6 +6,7 @@ import co.nvqa.common.core.model.RouteGroup;
 import co.nvqa.common.core.model.coverage.CreateCoverageRequest;
 import co.nvqa.common.core.model.coverage.CreateCoverageResponse;
 import co.nvqa.common.core.model.pickup.MilkRunGroup;
+import co.nvqa.common.core.model.pickup.MilkrunPendingTask;
 import co.nvqa.common.core.model.reservation.BulkRouteReservationResponse;
 import co.nvqa.common.core.model.route.AddParcelToRouteRequest;
 import co.nvqa.common.core.model.route.AddPickupJobToRouteRequest;
@@ -28,6 +29,7 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -614,6 +616,7 @@ public class RouteClient extends SimpleApiClient {
 
     Response r = doGet(f("API Route - Get Route ID %d Details", routeId),
         requestSpecification, apiMethod);
+
     if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
       throw new NvTestHttpException("unexpected http status: " + r.statusCode());
     }
@@ -648,6 +651,48 @@ public class RouteClient extends SimpleApiClient {
     }
     r.then().contentType(ContentType.JSON);
     return r.body().jsonPath().getList("data", MilkRunGroup.class);
+  }
+
+  public List<MilkrunPendingTask> getMilkrunPendingTasks() {
+    String apiMethod = "route/1.0/milkrun-pending-tasks";
+    RequestSpecification requestSpecification = createAuthenticatedRequest();
+    Response r = doGet("API Route - Get Milkrun Groups", requestSpecification, apiMethod);
+
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+    r.then().contentType(ContentType.JSON);
+    return r.body().jsonPath().getList("data", MilkrunPendingTask.class);
+  }
+
+  public void unassignMilkrunPendingTask(long pendingTaskId) {
+    String apiMethod = "route/1.0/milkrun-pending-tasks/{pending-task-id}";
+    RequestSpecification requestSpecification = createAuthenticatedRequest()
+        .pathParam("pending-task-id", pendingTaskId);
+
+    Response r = doDelete("API Route - Unassign Milkrun Pending Task", requestSpecification,
+        apiMethod);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+  }
+
+  public void deleteAllMilkrunGroupPickupLocations(MilkRunGroup milkRunGroup) {
+    String apiMethod = "route/1.0/milkrun-groups";
+    milkRunGroup.setSamsIds(new ArrayList<>());
+
+    List<MilkRunGroup> updateMilkrunGroupRequest = new ArrayList<>();
+    updateMilkrunGroupRequest.add(milkRunGroup);
+    RequestSpecification requestSpecification = createAuthenticatedRequest().body(
+        toJson(updateMilkrunGroupRequest));
+
+    Response r = doPut("Api Route - Delete All Milkrun Group Pickup Locations",
+        requestSpecification, apiMethod);
+
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+    r.then().contentType(ContentType.JSON);
   }
 
   public void deleteMilkrunGroup(long groupId) {
