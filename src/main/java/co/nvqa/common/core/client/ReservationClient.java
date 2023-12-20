@@ -2,6 +2,8 @@ package co.nvqa.common.core.client;
 
 import co.nvqa.common.client.SimpleApiClient;
 import co.nvqa.common.constants.HttpConstants;
+import co.nvqa.common.core.model.persisted_class.core.Reservations;
+import co.nvqa.common.core.model.reservation.ReservationDetailRequest;
 import co.nvqa.common.core.model.reservation.ReservationFilter;
 import co.nvqa.common.core.model.reservation.ReservationRequest;
 import co.nvqa.common.core.model.reservation.ReservationResponse;
@@ -171,5 +173,19 @@ public class ReservationClient extends SimpleApiClient {
 
     Response response = doPost("Operator Portal - Update Reservation", requestSpecification, url);
     response.then().assertThat().statusCode(HttpConstants.RESPONSE_200_SUCCESS);
+  }
+
+  public void updateReservationDetails(long reservationId, ReservationDetailRequest request) {
+    String url = "reservation/2.0/reservations/{reservation_id}";
+
+    RequestSpecification spec = createAuthenticatedRequest()
+        .pathParam("reservation_id", reservationId)
+        .body(toJsonSnakeCase(request));
+
+    Response r = doPost("RESERVATION - UPDATE RESERVATION DETAILS", spec, url);
+    r.then().contentType(ContentType.JSON);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
   }
 }
