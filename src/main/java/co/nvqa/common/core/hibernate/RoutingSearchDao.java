@@ -8,7 +8,7 @@ import co.nvqa.common.utils.StandardTestConstants;
 public class RoutingSearchDao extends DbBase {
 
     public RoutingSearchDao() {
-        super(CoreTestConstants.DB_EVENTS_URL, StandardTestConstants.DB_USER,
+        super(CoreTestConstants.DB_ROUTING_SEARCH_URL, StandardTestConstants.DB_USER,
                 StandardTestConstants.DB_PASS, "co.nvqa.common.core.model.persisted_class.routing_search");
     }
 

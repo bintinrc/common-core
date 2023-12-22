@@ -26,7 +26,7 @@ public class CoreTestConstants extends PropertiesReader {
                 StandardTestConstants.DB_PORT_TIDB,
                 StringUtils.lowerCase(StandardTestConstants.NV_DATABASE_ENVIRONMENT),
                 "gl");
-        DB_ROUTING_SEARCH_URL = String.format("jdbc:mysql://%s:%s/events_%s_%s?characterEncoding=UTF-8",
+        DB_ROUTING_SEARCH_URL = String.format("jdbc:mysql://%s:%s/routing_search_%s_%s?characterEncoding=UTF-8",
                 StringUtils.lowerCase(StandardTestConstants.DB_HOST_TIDB),
                 StandardTestConstants.DB_PORT_TIDB,
                 StringUtils.lowerCase(StandardTestConstants.NV_DATABASE_ENVIRONMENT),
