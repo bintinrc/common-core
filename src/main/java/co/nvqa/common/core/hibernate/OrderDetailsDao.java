@@ -1,9 +1,9 @@
 package co.nvqa.common.core.hibernate;
 
+import co.nvqa.common.core.exception.NvTestCoreOrderKafkaLagException;
 import co.nvqa.common.core.model.persisted_class.core.OrderDetails;
 import co.nvqa.common.core.utils.CoreTestConstants;
 import co.nvqa.common.database.DbBase;
-import co.nvqa.common.utils.NvTestRuntimeException;
 import co.nvqa.common.utils.StandardTestConstants;
 import java.util.List;
 import javax.inject.Singleton;
@@ -38,7 +38,8 @@ public class OrderDetailsDao extends DbBase {
     if (order != null) {
       return order.getServiceLevel();
     } else {
-      throw new NvTestRuntimeException("order record is not found for order " + orderId);
+      throw new NvTestCoreOrderKafkaLagException(
+          "order record is not found for order " + orderId);
     }
   }
 }

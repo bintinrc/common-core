@@ -2,9 +2,12 @@
 
 <hr>
 
-## [1.3.25-RC4]
+## [1.3.25] 2023-12-22
 
 ### Added
+
+New Method :
+-Method : updateReservationDetails, no step definition (step definition on DriverApp side for specific case)
 
 New Steps:
 - `API Core - Operator search pickup using data below:`, to search pickup by some filters

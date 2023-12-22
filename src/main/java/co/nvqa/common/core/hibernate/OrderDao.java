@@ -1,11 +1,11 @@
 package co.nvqa.common.core.hibernate;
 
+import co.nvqa.common.core.exception.NvTestCoreOrderKafkaLagException;
 import co.nvqa.common.core.model.order.Order.Dimension;
 import co.nvqa.common.core.model.persisted_class.core.Orders;
 import co.nvqa.common.core.utils.CoreTestConstants;
 import co.nvqa.common.database.DbBase;
 import co.nvqa.common.utils.JsonUtils;
-import co.nvqa.common.utils.NvTestRuntimeException;
 import co.nvqa.common.utils.StandardTestConstants;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +33,7 @@ public class OrderDao extends DbBase {
       result = orders.get(0).getWeight();
       return result;
     } else {
-      throw new NvTestRuntimeException("order record is not found for order " + orderId);
+      throw new NvTestCoreOrderKafkaLagException("order record is not found for order " + orderId);
     }
   }
 
@@ -54,7 +54,7 @@ public class OrderDao extends DbBase {
     if (order != null) {
       return JsonUtils.fromJsonCamelCase(order.getData(), Dimension.class);
     } else {
-      throw new NvTestRuntimeException("order record is not found for order " + orderId);
+      throw new NvTestCoreOrderKafkaLagException("order record is not found for order " + orderId);
     }
   }
 
@@ -67,7 +67,7 @@ public class OrderDao extends DbBase {
     if (order != null) {
       return JsonUtils.fromJsonSnakeCase(order.getDimensions(), Dimension.class);
     } else {
-      throw new NvTestRuntimeException("order record is not found for order " + orderId);
+      throw new NvTestCoreOrderKafkaLagException("order record is not found for order " + orderId);
     }
   }
 
@@ -140,7 +140,7 @@ public class OrderDao extends DbBase {
     if (order != null) {
       return order.getServiceType();
     } else {
-      throw new NvTestRuntimeException("order record is not found for order " + orderId);
+      throw new NvTestCoreOrderKafkaLagException("order record is not found for order " + orderId);
     }
   }
 }
