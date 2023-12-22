@@ -2,6 +2,18 @@
 
 <hr>
 
+## [1.3.25-RC4]
+
+### Added
+
+New Steps:
+- `API Core - Operator search pickup using data below:`, to search pickup by some filters
+
+New KEYS:
+- KEY_CORE_LIST_OF_PICKUPS
+
+<hr>
+
 ## [1.3.24] 2023-12-11
 
 ### Added

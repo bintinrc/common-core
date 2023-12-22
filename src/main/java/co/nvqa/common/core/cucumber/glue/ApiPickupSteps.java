@@ -3,6 +3,7 @@ package co.nvqa.common.core.cucumber.glue;
 import co.nvqa.common.core.client.PickupClient;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.model.pickup.Pickup;
+import co.nvqa.common.core.model.pickup.PickupSearchRequest;
 import io.cucumber.guice.ScenarioScoped;
 import io.cucumber.java.en.When;
 import java.util.List;
@@ -40,6 +41,24 @@ public class ApiPickupSteps extends CoreStandardSteps {
         }, "get pickup details");
   }
 
+  /**
+   * Sample:
+   * <p>
+   * When API Core - Operator search pickup using data below:
+   * <br/>| requestJson | {"reservation_ids":[111111,111122] } |
+   *
+   * @param dataTableAsMap Map of data from feature file.
+   */
+  @When("API Core - Operator search pickup using data below:")
+  public void searchPickup(Map<String, String> dataTableAsMap) {
+    String resolvedJsonRequest = resolveValue(dataTableAsMap.get("requestJson"));
+    PickupSearchRequest request = getPickupClient().fromJson(resolvedJsonRequest,
+        PickupSearchRequest.class);
+    doWithRetry(() -> {
+      final List<Pickup> pickups = getPickupClient().searchPickupsWithFilters(request);
+      putAllInList(KEY_CORE_LIST_OF_PICKUPS, pickups);
+    }, "Search Pickup");
+  }
 
   @When("API Core - Operator verify pods in pickup details of reservation id below:")
   public void getPickupWithPodDetailsFromReservationId(Map<String, String> dataTable) {
