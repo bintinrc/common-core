@@ -1,6 +1,7 @@
 package co.nvqa.common.core.cucumber.glue;
 
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
+import co.nvqa.common.core.exception.NvTestCoreTransactionStatusMismatchException;
 import co.nvqa.common.core.hibernate.BlobsDao;
 import co.nvqa.common.core.hibernate.CodCollectionDao;
 import co.nvqa.common.core.hibernate.CodInboundsDao;
@@ -44,7 +45,6 @@ import co.nvqa.common.core.model.persisted_class.core.Transactions;
 import co.nvqa.common.core.model.persisted_class.core.WarehouseSweeps;
 import co.nvqa.common.core.model.persisted_class.core.Waypoints;
 import co.nvqa.common.model.DataEntity;
-import co.nvqa.common.utils.NvTestRuntimeException;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -369,7 +369,8 @@ public class DbCoreSteps extends CoreStandardSteps {
         if (mapOfData.containsKey("pickup_address")) {
           Transactions txn = pickupTxns.stream()
               .filter(e -> e.getStatus().equalsIgnoreCase("PENDING")).findAny().orElseThrow(
-                  () -> new NvTestRuntimeException("new transaction status is not pending"));
+                  () -> new NvTestCoreTransactionStatusMismatchException(
+                      "new transaction status is not pending"));
           String actualPickupAddress = f("%s %s %s %s", txn.getAddress1(), txn.getAddress2(),
               txn.getPostcode(), txn.getCountry());
           Assertions.assertThat(actualPickupAddress).as("pickup transaction address details")
@@ -386,7 +387,8 @@ public class DbCoreSteps extends CoreStandardSteps {
         if (mapOfData.containsKey("delivery_address")) {
           Transactions txn = deliveryTxns.stream()
               .filter(e -> e.getStatus().equalsIgnoreCase("PENDING")).findAny().orElseThrow(
-                  () -> new NvTestRuntimeException("new transaction status is not pending"));
+                  () -> new NvTestCoreTransactionStatusMismatchException(
+                      "new transaction status is not pending"));
           String actualDeliveryAddress = f("%s %s %s %s", txn.getAddress1(), txn.getAddress2(),
               txn.getPostcode(), txn.getCountry());
           Assertions.assertThat(actualDeliveryAddress).as("delivery transaction address details")

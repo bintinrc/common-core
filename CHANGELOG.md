@@ -2,6 +2,21 @@
 
 <hr>
 
+## [1.3.25] 2023-12-22
+
+### Added
+
+New Method :
+-Method : updateReservationDetails, no step definition (step definition on DriverApp side for specific case)
+
+New Steps:
+- `API Core - Operator search pickup using data below:`, to search pickup by some filters
+
+New KEYS:
+- KEY_CORE_LIST_OF_PICKUPS
+
+<hr>
+
 ## [1.3.24] 2023-12-11
 
 ### Added

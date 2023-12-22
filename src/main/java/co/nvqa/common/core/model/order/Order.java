@@ -229,11 +229,11 @@ public class Order extends DataEntity<Order> implements Serializable {
   }
 
   public Transaction getLastDeliveryTransaction() {
-    List<Transaction> transactions = getTransactions().stream()
+    List<Transaction> transactionsList = getTransactions().stream()
         .filter(transaction -> StringUtils
             .equalsIgnoreCase(Transaction.TYPE_DELIVERY, transaction.getType()))
         .collect(Collectors.toList());
-    return Iterables.getLast(transactions, null);
+    return Iterables.getLast(transactionsList, null);
   }
 
   public List<Transaction> getDeliveryTransactions() {
