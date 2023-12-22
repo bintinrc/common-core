@@ -664,20 +664,6 @@ public class OrderClient extends SimpleApiClient {
     r.then().contentType(ContentType.JSON);
   }
 
-  public void updateOrderPickupAddress(long orderId, UserDetails to) {
-    String url = "core/2.1/orders/{orderId}";
-
-    RequestSpecification spec = createAuthenticatedRequest()
-        .pathParam("orderId", orderId)
-        .body(toJsonSnakeCase(Map.of("to", to)));
-
-    Response r = doPatch("Core - Order Delivery Address Update", spec, url);
-    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
-      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
-    }
-    r.then().contentType(ContentType.JSON);
-  }
-
   public BatchOrderInfo retrieveBatchOrderInfo(long batchId) {
     String url = "core/orders/bybatchid/{batchId}";
 
