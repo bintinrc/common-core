@@ -128,6 +128,12 @@ public class EventDetailDeserializer extends JsonDeserializer<EventDetail> {
             JsonUtils.fromJsonSnakeCase(node.get("order_status").toString(), EventValueString.class));
 
     }
+    if (node.get("ticket_id") != null) {
+      result.setTicketId(node.get("ticket_id").asLong());
+    }
+    if (node.get("order_outcome") != null) {
+      result.setOrderOutcome(node.get("order_outcome").asText());
+    }
     return result;
   }
 }
