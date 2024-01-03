@@ -57,6 +57,10 @@ public class EventDetail extends DataEntity<EventDetail> {
   private EventValue height;
   private EventValue width;
 
+  //ticket resolution
+  private Long ticketId;
+  private String orderOutcome;
+
   @Getter
   @Setter
   @Builder
