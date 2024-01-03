@@ -651,11 +651,11 @@ public class OrderClient extends SimpleApiClient {
   }
 
   public void updateOrderDeliveryAddress(long orderId, UserDetails to) {
-    String url = "core/2.1/orders/{orderId}";
+    String url = "core/2.0/orders/{orderId}";
 
     RequestSpecification spec = createAuthenticatedRequest()
         .pathParam("orderId", orderId)
-        .body(toJsonSnakeCase(to));
+        .body(toJsonSnakeCase(Map.of("to", to)));
 
     Response r = doPatch("Core - Order Delivery Address Update", spec, url);
     if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
