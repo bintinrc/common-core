@@ -2,7 +2,7 @@
 
 <hr>
 
-## [1.3.25] 2023-12-22
+## [1.3.25] 2024-1-8
 
 ### Added
 
@@ -11,9 +11,23 @@ New Method :
 
 New Steps:
 - `API Core - Operator search pickup using data below:`, to search pickup by some filters
+- `DB Routing Search - verify transactions record:`, to verify transaction record in routingSearch DB
+
+Model class:
+- Add ticketId and orderOutcome fields in Event Detail model
+- Add new model for RPM Page
+
+new variable:
+- Add global shipper id variable for reservation creation
 
 New KEYS:
 - KEY_CORE_LIST_OF_PICKUPS
+
+Fixed code:
+- remove method for updateOrderPickupAddress in orderClient
+
+Error Classification:
+- Catch casting exception error 
 
 <hr>
 
