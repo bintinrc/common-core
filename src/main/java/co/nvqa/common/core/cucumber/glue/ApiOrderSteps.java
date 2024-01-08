@@ -5,6 +5,7 @@ import co.nvqa.common.core.client.Lazada3PLClient;
 import co.nvqa.common.core.client.OrderClient;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.exception.NvTestCoreOrderKafkaLagException;
+import co.nvqa.common.core.exception.NvTestCoreRescheduleFailedException;
 import co.nvqa.common.core.model.CodInbound;
 import co.nvqa.common.core.model.EditDeliveryOrderRequest;
 import co.nvqa.common.core.model.Lazada3PL;
@@ -12,14 +13,13 @@ import co.nvqa.common.core.model.order.BulkForceSuccessOrderRequest;
 import co.nvqa.common.core.model.order.DeliveryDetails;
 import co.nvqa.common.core.model.order.Order;
 import co.nvqa.common.core.model.order.Order.Dimension;
+import co.nvqa.common.core.model.order.OrderTag;
 import co.nvqa.common.core.model.order.ParcelJob;
 import co.nvqa.common.core.model.order.PricingDetails;
 import co.nvqa.common.core.model.order.RescheduleOrderRequest;
 import co.nvqa.common.core.model.order.RescheduleOrderResponse;
 import co.nvqa.common.core.model.order.RtsOrderRequest;
-import co.nvqa.common.core.model.order.OrderTag;
 import co.nvqa.common.utils.JsonUtils;
-import co.nvqa.common.utils.NvTestRuntimeException;
 import co.nvqa.common.utils.StandardTestUtils;
 import co.nvqa.commonauth.utils.TokenUtils;
 import io.cucumber.guice.ScenarioScoped;
@@ -42,13 +42,9 @@ import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
 import org.hamcrest.Matchers;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @ScenarioScoped
 public class ApiOrderSteps extends CoreStandardSteps {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(ApiOrderSteps.class);
 
   @Inject
   @Getter
@@ -271,7 +267,7 @@ public class ApiOrderSteps extends CoreStandardSteps {
       final RescheduleOrderResponse response = getOrderClient().rescheduleOrder(orderId,
           request);
       if (reattempt && !response.getStatus().equalsIgnoreCase("Success")) {
-        throw new NvTestRuntimeException("reschedule fail: " + response.getMessage());
+        throw new NvTestCoreRescheduleFailedException("reschedule fail: " + response.getMessage());
       }
     }, "Reschedule order", 3000, 10);
 
@@ -393,7 +389,7 @@ public class ApiOrderSteps extends CoreStandardSteps {
         .collect(Collectors.toList());
     final List<String> responseTagList = getOrderClient().getOrderLevelTags(
         Long.parseLong(resolvedOrderId));
-    if (expectedTagsList.size() != 0) {
+    if (!expectedTagsList.isEmpty()) {
       for (String expectedTag : expectedTagsList) {
         boolean contains = responseTagList.contains(expectedTag);
         Assertions.assertThat(contains)

@@ -1,6 +1,5 @@
 package co.nvqa.common.core.model.route;
 
-import co.nvqa.common.core.model.route.RouteTag;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

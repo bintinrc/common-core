@@ -11,7 +11,6 @@ import co.nvqa.common.core.model.order.Order.PreviousAddressDetails;
 import co.nvqa.common.core.model.persisted_class.core.Cods;
 import co.nvqa.common.core.model.persisted_class.core.OrderDeliveryVerifications;
 import co.nvqa.common.core.model.persisted_class.core.Orders;
-import co.nvqa.common.utils.NvTestRuntimeException;
 import co.nvqa.common.utils.StandardTestUtils;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
@@ -112,18 +111,13 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
 
   @Then("DB Core - Operator generate stamp id for {string} orders")
   public void generateStampId(String totalOrder) {
-    long totalOrderRequest = Long.parseLong(totalOrder);
+    int totalOrderRequest = Integer.parseInt(totalOrder);
     for (int i = 0; i < totalOrderRequest; i++) {
       doWithRetry(() -> {
-        try {
-          String stampId = StandardTestUtils.generateStampId();
-          if (orderDao.getSingleOrderDetailsByStampId(stampId) != null) {
-            throw new AssertionError();
-          }
-          putInList(KEY_CORE_LIST_OF_CREATED_STAMP_ID, stampId);
-        } catch (AssertionError ae) {
-          throw new NvTestRuntimeException(ae);
-        }
+        String stampId = StandardTestUtils.generateStampId();
+        Assertions.assertThat(orderDao.getSingleOrderDetailsByStampId(stampId))
+            .as("new stampId should not match existing stampId in DB").isNull();
+        putInList(KEY_CORE_LIST_OF_CREATED_STAMP_ID, stampId);
       }, "Generate Stamp ID");
     }
   }

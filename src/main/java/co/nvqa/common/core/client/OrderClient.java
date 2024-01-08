@@ -2,6 +2,7 @@ package co.nvqa.common.core.client;
 
 import co.nvqa.common.client.SimpleApiClient;
 import co.nvqa.common.constants.HttpConstants;
+import co.nvqa.common.core.exception.NvTestCoreCastingErrorException;
 import co.nvqa.common.core.exception.NvTestCoreOrderKafkaLagException;
 import co.nvqa.common.core.model.EditDeliveryOrderRequest;
 import co.nvqa.common.core.model.order.BatchOrderInfo;
@@ -26,7 +27,6 @@ import co.nvqa.common.core.model.order.SearchOrderResponse;
 import co.nvqa.common.core.model.order.SearchOrderTagResponse;
 import co.nvqa.common.core.model.order.UserDetails;
 import co.nvqa.common.utils.NvTestHttpException;
-import co.nvqa.common.utils.NvTestRuntimeException;
 import co.nvqa.common.utils.StandardTestConstants;
 import co.nvqa.commonauth.utils.TokenUtils;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -651,11 +651,11 @@ public class OrderClient extends SimpleApiClient {
   }
 
   public void updateOrderDeliveryAddress(long orderId, UserDetails to) {
-    String url = "core/2.1/orders/{orderId}";
+    String url = "core/2.0/orders/{orderId}";
 
     RequestSpecification spec = createAuthenticatedRequest()
         .pathParam("orderId", orderId)
-        .body(toJsonSnakeCase(to));
+        .body(toJsonSnakeCase(Map.of("to", to)));
 
     Response r = doPatch("Core - Order Delivery Address Update", spec, url);
     if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
@@ -794,7 +794,8 @@ public class OrderClient extends SimpleApiClient {
 
       return order;
     } catch (Exception ex) {
-      throw new NvTestRuntimeException(ex);
+      LOGGER.error("jsonOrder: {}", jsonOrder);
+      throw new NvTestCoreCastingErrorException("unable to cast jsonOrder to Order.class", ex);
     }
   }
 
