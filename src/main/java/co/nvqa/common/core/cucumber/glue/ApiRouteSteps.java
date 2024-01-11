@@ -400,7 +400,8 @@ public class ApiRouteSteps extends CoreStandardSteps {
    * Sample:<p>
    * <p>
    * When API Core - Operator bulk add reservation to route using data below: | request | {"ids":
-   * [{KEY_LIST_OF_CREATED_RESERVATIONS[1].id}, {KEY_LIST_OF_CREATED_RESERVATIONS[2].id}],"new_route_id":{KEY_LIST_OF_CREATED_ROUTES[1].id},"overwrite":true}
+   * [{KEY_LIST_OF_CREATED_RESERVATIONS[1].id},
+   * {KEY_LIST_OF_CREATED_RESERVATIONS[2].id}],"new_route_id":{KEY_LIST_OF_CREATED_ROUTES[1].id},"overwrite":true}
    * |
    * <p>
    *
@@ -424,7 +425,8 @@ public class ApiRouteSteps extends CoreStandardSteps {
    * Sample:<p>
    * <p>
    * When API Core - Operator bulk add reservation to route with partial success: | request |
-   * {"ids": [{KEY_LIST_OF_CREATED_RESERVATIONS[1].id}, {KEY_LIST_OF_CREATED_RESERVATIONS[2].id}],"new_route_id":{KEY_LIST_OF_CREATED_ROUTES[1].id},"overwrite":true}
+   * {"ids": [{KEY_LIST_OF_CREATED_RESERVATIONS[1].id},
+   * {KEY_LIST_OF_CREATED_RESERVATIONS[2].id}],"new_route_id":{KEY_LIST_OF_CREATED_ROUTES[1].id},"overwrite":true}
    * |
    * <p>
    *
@@ -653,7 +655,8 @@ public class ApiRouteSteps extends CoreStandardSteps {
 
   /**
    * Sample: API Core - Operator parcel transfer to a new route: | request |
-   * {{"route_id":null,"route_date":"2021-01-19 08:25:13","from_driver_id":null,"to_driver_id":2679,"to_driver_hub_id":3,"orders":[{"tracking_id":"NVSGDIMMI000238068","inbound_type":"VAN_FROM_NINJAVAN","hub_id":3}]|
+   * {{"route_id":null,"route_date":"2021-01-19
+   * 08:25:13","from_driver_id":null,"to_driver_id":2679,"to_driver_hub_id":3,"orders":[{"tracking_id":"NVSGDIMMI000238068","inbound_type":"VAN_FROM_NINJAVAN","hub_id":3}]|
    *
    * @param dataTableAsMap Map of data from feature file.
    */

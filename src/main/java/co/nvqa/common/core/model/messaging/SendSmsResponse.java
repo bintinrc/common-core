@@ -13,6 +13,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SendSmsResponse {
+
   private SendSmsData data;
 
 
@@ -22,6 +23,7 @@ public class SendSmsResponse {
   @NoArgsConstructor
   @AllArgsConstructor
   public static class SendSmsData {
+
     @JsonProperty("tracking_id")
     private String trackingId;
 

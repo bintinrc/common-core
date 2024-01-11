@@ -13,6 +13,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class RecipientDetail {
+
   private String name;
   private String email;
   private String phoneNumber;

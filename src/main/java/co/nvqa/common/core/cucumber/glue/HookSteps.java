@@ -325,7 +325,8 @@ public class HookSteps extends CoreStandardSteps {
 
   @After("@DeleteThirdPartyShippersV2")
   public void deleteThirdPartyShippers() {
-    ThirdPartyShippers thirdPartyShipper = get(KEY_CORE_CREATED_THIRD_PARTY_SHIPPER_EDITED,get(KEY_CORE_CREATED_THIRD_PARTY_SHIPPER,ThirdPartyShippers.class));
+    ThirdPartyShippers thirdPartyShipper = get(KEY_CORE_CREATED_THIRD_PARTY_SHIPPER_EDITED,
+        get(KEY_CORE_CREATED_THIRD_PARTY_SHIPPER, ThirdPartyShippers.class));
     if (thirdPartyShipper != null) {
       if (thirdPartyShipper.getId() != null) {
         try {

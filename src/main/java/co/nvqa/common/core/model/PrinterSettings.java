@@ -14,6 +14,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PrinterSettings extends DataEntity<PrinterSettings> {
+
   private Long id;
 
   private String name;

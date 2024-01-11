@@ -19,7 +19,7 @@ public class DebugClient extends SimpleApiClient {
         DEFAULT_CAMEL_CASE_MAPPER);
   }
 
-  public Map<String,Object> getTotalCod(Long driverId, String routeDate) {
+  public Map<String, Object> getTotalCod(Long driverId, String routeDate) {
     String url = "core/debug/driver/{driverId}/total-cod";
     RequestSpecification spec = createAuthenticatedRequest()
         .pathParam("driverId", driverId)

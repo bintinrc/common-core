@@ -16,6 +16,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SendSmsRequest {
+
   private String template;
   @JsonProperty("order_details")
   private List<Map<String, Object>> orderDetails;
