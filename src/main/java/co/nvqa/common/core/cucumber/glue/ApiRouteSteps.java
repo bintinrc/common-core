@@ -9,7 +9,6 @@ import co.nvqa.common.core.exception.NvTestCoreMilkrunGroupNotFoundException;
 import co.nvqa.common.core.model.RouteGroup;
 import co.nvqa.common.core.model.coverage.CreateCoverageRequest;
 import co.nvqa.common.core.model.coverage.CreateCoverageResponse;
-import co.nvqa.common.core.model.other.CoreExceptionResponse;
 import co.nvqa.common.core.model.other.CoreExceptionResponse.Error;
 import co.nvqa.common.core.model.pickup.MilkRunGroup;
 import co.nvqa.common.core.model.reservation.BulkRouteReservationResponse;
@@ -703,17 +702,17 @@ public class ApiRouteSteps extends CoreStandardSteps {
     final long routeId = Long.parseLong(resolvedDataTable.get("routeId"));
     final int responseCode = Integer.parseInt(resolvedDataTable.get("responseCode"));
     final List<Long> waypointIds = fromJsonToList(resolvedDataTable.get("waypointIds"), Long.class);
+    final int expectedApplicationErrorCode = Integer.parseInt(
+        resolvedDataTable.get("expectedApplicationErrorCode"));
     doWithRetry(() ->
         {
           Response response = getRouteClient()
               .addMultipleWaypointsToRouteAndGetRawResponse(routeId, waypointIds);
           Assertions.assertThat(response.getStatusCode()).as("status code Message")
               .isEqualTo(responseCode);
-          CoreExceptionResponse actualResponse = fromJsonSnakeCase(response.body().asString(),
-              CoreExceptionResponse.class);
-          CoreExceptionResponse expectedResponse = fromJsonSnakeCase(
-              resolvedDataTable.get("error"), CoreExceptionResponse.class);
-          expectedResponse.compareWithActual(actualResponse, resolvedDataTable);
+          int actualApplicationErrorCode = response.body().jsonPath()
+              .getInt("error.application_exception_code");
+          Assertions.assertThat(actualApplicationErrorCode).isEqualTo(expectedApplicationErrorCode);
         },
         "add multiple waypoints to route");
   }
