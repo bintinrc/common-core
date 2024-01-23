@@ -630,8 +630,9 @@ public class ApiRouteSteps extends CoreStandardSteps {
 
   @Given("API Route - Operator run FM auto route cron job for date {string}")
   public void runFmRoutingCronJob(String date) {
+    String resolvedDate = resolveValue(date);
     doWithRetry(
-        () -> getRouteClient().runFmAutoRouteCronJob(date),
+        () -> getRouteClient().runFmAutoRouteCronJob(resolvedDate.substring(0, 10)), // YYYY-MM-DD
         "run fm routing cronjob");
   }
 
