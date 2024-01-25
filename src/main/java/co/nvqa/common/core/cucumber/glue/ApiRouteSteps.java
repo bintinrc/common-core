@@ -341,21 +341,19 @@ public class ApiRouteSteps extends CoreStandardSteps {
     final Optional<Boolean> overwriteParam = dataTableAsMap.containsKey("overwrite") ?
         Optional.of(Boolean.valueOf(dataTableAsMap.get("overwrite"))) : Optional.of(true);
     final Boolean overwrite = overwriteParam.get();
-
     final int expectedStatusCode = Integer.parseInt(resolvedDataTable.get("expectedStatusCode"));
-    final String expectedErrorMessage = resolvedDataTable.get("expectedErrorMessage");
-
+    final int expectedApplicationErrorCode = Integer.parseInt(
+        resolvedDataTable.get("expectedApplicationErrorCode"));
     doWithRetry(() -> {
-      Response r = getRouteClient().addReservationToRouteAndGetRawResponse(routeId,
+      Response response = getRouteClient().addReservationToRouteAndGetRawResponse(routeId,
           reservationId, overwrite);
 
-      Assertions.assertThat(r.statusCode())
-          .as("expected http status: " + r.statusCode())
+      Assertions.assertThat(response.statusCode())
+          .as("expected http status: " + response.statusCode())
           .isEqualTo(expectedStatusCode);
 
-      Assertions.assertThat(r.getBody().asString())
-          .as("expected error message: " + r.getBody().asString())
-          .isEqualTo(expectedErrorMessage);
+      int actualApplicationErrorCode = response.body().jsonPath().getInt("code");
+      Assertions.assertThat(actualApplicationErrorCode).isEqualTo(expectedApplicationErrorCode);
     }, "(expected) failed add reservation to route");
   }
 
@@ -379,19 +377,19 @@ public class ApiRouteSteps extends CoreStandardSteps {
     Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
     final long reservationResultId = Long.parseLong(resolveValue(reservationId));
     final int expectedStatusCode = Integer.parseInt(resolvedDataTable.get("expectedStatusCode"));
-    final String expectedErrorMessage = resolvedDataTable.get("expectedErrorMessage");
+    final int expectedApplicationErrorCode = Integer.parseInt(
+        resolvedDataTable.get("expectedApplicationErrorCode"));
 
     doWithRetry(() -> {
-      Response r = getRouteClient().pullReservationOutOfRouteAndGetRawResponse(
+      Response response = getRouteClient().pullReservationOutOfRouteAndGetRawResponse(
           reservationResultId);
 
-      Assertions.assertThat(r.statusCode())
-          .as("expected http status: " + r.statusCode())
+      Assertions.assertThat(response.statusCode())
+          .as("expected http status: " + response.statusCode())
           .isEqualTo(expectedStatusCode);
 
-      Assertions.assertThat(r.getBody().asString())
-          .as("expected error message: " + r.getBody().asString())
-          .isEqualTo(expectedErrorMessage);
+      int actualApplicationErrorCode = response.body().jsonPath().getInt("code");
+      Assertions.assertThat(actualApplicationErrorCode).isEqualTo(expectedApplicationErrorCode);
     }, "(expected) failed add reservation to route");
   }
 
@@ -708,7 +706,8 @@ public class ApiRouteSteps extends CoreStandardSteps {
         {
           Response response = getRouteClient()
               .addMultipleWaypointsToRouteAndGetRawResponse(routeId, waypointIds);
-          Assertions.assertThat(response.getStatusCode()).as("status code Message")
+          Assertions.assertThat(response.getStatusCode())
+              .as("expected http status: " + response.statusCode())
               .isEqualTo(responseCode);
           int actualApplicationErrorCode = response.body().jsonPath()
               .getInt("error.application_exception_code");
