@@ -124,13 +124,14 @@ public class ApiReservationSteps extends CoreStandardSteps {
   @When("API Core - Operator update priority level for the reservation using data below:")
   public void apiOperatorUpdatePriorityLevelForTheReservation(Map<String, String> dataTableAsMap) {
     long pickupAddressId = Long.parseLong(resolveValue(dataTableAsMap.get("pickupAddressId")));
+    long globalShipperId = Long.parseLong(resolveValue(dataTableAsMap.get("globalShipperId")));
     long legacyShipperId = Long.parseLong(resolveValue(dataTableAsMap.get("legacyShipperId")));
     long priorityLevel = Long.parseLong(resolveValue(dataTableAsMap.get("priorityLevel")));
     long reservationId = Long.parseLong(resolveValue(dataTableAsMap.get("reservationId")));
     doWithRetry(
         () ->
             getReservationClient()
-                .updatePriorityLevelOfReservation(pickupAddressId, legacyShipperId, priorityLevel,
+                .updatePriorityLevelOfReservation(pickupAddressId,globalShipperId, legacyShipperId, priorityLevel,
                     reservationId), "update priority level");
   }
 
