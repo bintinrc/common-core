@@ -93,7 +93,7 @@ public class ReservationClient extends SimpleApiClient {
   }
 
   public ReservationResponse updatePriorityLevelOfReservation(long pickupAddressId,
-      long globalShipperId,long legacyShipperId,
+      long globalShipperId, long legacyShipperId,
       long priorityLevel, long reservationId) {
     String url = "reservation/2.0/reservations/{reservation_id}";
 
@@ -101,7 +101,7 @@ public class ReservationClient extends SimpleApiClient {
         .pathParam("reservation_id", reservationId)
         .body(
             f("{\"pickup_address_id\":%d,\"global_shipper_id\":%d,\"legacy_shipper_id\":%d,\"reservation_type_value\":0,\"priority_level\":%d}",
-                pickupAddressId,globalShipperId, legacyShipperId, priorityLevel));
+                pickupAddressId, globalShipperId, legacyShipperId, priorityLevel));
 
     Response r = doPost("RESERVATION - UPDATE PRIORITY LEVEL", spec, url);
     r.then().contentType(ContentType.JSON);

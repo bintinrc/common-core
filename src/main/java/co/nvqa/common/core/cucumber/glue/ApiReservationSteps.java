@@ -131,7 +131,7 @@ public class ApiReservationSteps extends CoreStandardSteps {
     doWithRetry(
         () ->
             getReservationClient()
-                .updatePriorityLevelOfReservation(pickupAddressId,globalShipperId, legacyShipperId, priorityLevel,
+                .updatePriorityLevelOfReservation(pickupAddressId, globalShipperId, legacyShipperId, priorityLevel,
                     reservationId), "update priority level");
   }
 
