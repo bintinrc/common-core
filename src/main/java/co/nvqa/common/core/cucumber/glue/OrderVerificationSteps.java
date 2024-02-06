@@ -89,6 +89,7 @@ public class OrderVerificationSteps extends CoreStandardSteps {
         "refresh created order");
 
   }
+
   private Order apiOperatorGetOrderDetails(Long orderId) {
     String methodInfo = f("%s - [Order ID = %d]", getCurrentMethodName(), orderId);
     return doWithRetry(() -> getOrderClient().getOrder(orderId),

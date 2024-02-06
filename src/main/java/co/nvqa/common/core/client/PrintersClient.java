@@ -6,10 +6,10 @@ import co.nvqa.common.core.model.PrinterSettings;
 import co.nvqa.common.utils.NvTestHttpException;
 import co.nvqa.common.utils.StandardTestConstants;
 import co.nvqa.commonauth.utils.TokenUtils;
-import javax.inject.Singleton;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import java.util.List;
+import javax.inject.Singleton;
 
 @Singleton
 public class PrintersClient extends SimpleApiClient {

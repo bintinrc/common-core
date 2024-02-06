@@ -4,8 +4,8 @@ import co.nvqa.common.client.SimpleApiClient;
 import co.nvqa.common.constants.HttpConstants;
 import co.nvqa.common.core.model.ResponseWrapper;
 import co.nvqa.common.core.model.route.RouteTag;
-import co.nvqa.common.core.model.route.TagResponse;
 import co.nvqa.common.core.model.route.RouteTags;
+import co.nvqa.common.core.model.route.TagResponse;
 import co.nvqa.common.utils.NvTestHttpException;
 import co.nvqa.common.utils.StandardTestConstants;
 import co.nvqa.commonauth.utils.TokenUtils;
@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("WeakerAccess")
 @Singleton
 public class TagClient extends SimpleApiClient {
-  
+
   private static final Logger LOGGER = LoggerFactory.getLogger(TagClient.class);
 
   public TagClient() {
@@ -106,7 +106,8 @@ public class TagClient extends SimpleApiClient {
     response.then().assertThat().statusCode(HttpConstants.RESPONSE_200_SUCCESS);
 
     ResponseWrapper<RouteTags> responseWrapper = fromJsonCamelCase(
-        response.then().extract().body().asString(), new TypeReference<ResponseWrapper<RouteTags>>() {
+        response.then().extract().body().asString(),
+        new TypeReference<ResponseWrapper<RouteTags>>() {
         });
     RouteTags tags = responseWrapper.getData();
     LOGGER.info(f("Number of Tags: %s", tags.getTags().size()));

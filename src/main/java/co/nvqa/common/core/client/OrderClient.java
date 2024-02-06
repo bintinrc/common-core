@@ -154,7 +154,8 @@ public class OrderClient extends SimpleApiClient {
     }
   }
 
-  public void editDeliveryOrderDetails(EditDeliveryOrderRequest editDeliveryOrderRequest, Long orderId) {
+  public void editDeliveryOrderDetails(EditDeliveryOrderRequest editDeliveryOrderRequest,
+      Long orderId) {
     String uri = "core/2.0/orders/{orderId}";
     RequestSpecification spec = createAuthenticatedRequest()
         .pathParam("orderId", orderId)

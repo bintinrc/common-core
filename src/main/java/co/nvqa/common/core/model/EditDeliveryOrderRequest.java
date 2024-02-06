@@ -14,6 +14,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class EditDeliveryOrderRequest {
+
   private ParcelJob parcelJob;
   private RecipientDetail to;
 }

@@ -7,5 +7,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class UpdateRoutedWaypointRequest {
+
   private List<Waypoint> waypoints;
 }

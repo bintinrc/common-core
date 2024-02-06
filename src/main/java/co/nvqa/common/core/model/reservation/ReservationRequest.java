@@ -7,18 +7,18 @@ import lombok.Setter;
 @Getter
 public class ReservationRequest {
 
-    private Long globalShipperId;
-    private Long legacyShipperId;
-    private String pickupStartTime;
-    private String pickupEndTime;
-    private String pickupApproxVolume;
-    private String pickupInstruction;
-    private Long pickupAddressId;
-    private String pickupServiceType;
-    private String pickupServiceLevel;
-    private Boolean isOnDemand;
-    private Integer priorityLevel;
-    private Long timewindowId;
-    private Boolean disableCutoffValidation;
+  private Long globalShipperId;
+  private Long legacyShipperId;
+  private String pickupStartTime;
+  private String pickupEndTime;
+  private String pickupApproxVolume;
+  private String pickupInstruction;
+  private Long pickupAddressId;
+  private String pickupServiceType;
+  private String pickupServiceLevel;
+  private Boolean isOnDemand;
+  private Integer priorityLevel;
+  private Long timewindowId;
+  private Boolean disableCutoffValidation;
 
 }

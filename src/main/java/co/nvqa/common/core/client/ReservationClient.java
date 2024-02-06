@@ -2,7 +2,6 @@ package co.nvqa.common.core.client;
 
 import co.nvqa.common.client.SimpleApiClient;
 import co.nvqa.common.constants.HttpConstants;
-import co.nvqa.common.core.model.persisted_class.core.Reservations;
 import co.nvqa.common.core.model.reservation.ReservationDetailRequest;
 import co.nvqa.common.core.model.reservation.ReservationFilter;
 import co.nvqa.common.core.model.reservation.ReservationRequest;
