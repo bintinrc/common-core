@@ -795,4 +795,16 @@ public class RouteClient extends SimpleApiClient {
         .body(json);
     return doPut("Route - Add Multiple Waypoints to Route", spec, url);
   }
+
+  public Response geRouteDetailsByRouteId(long routeId) {
+    String url = "route-v2/routes/{routeId}";
+    RequestSpecification spec = createAuthenticatedRequest()
+        .pathParam("routeId", routeId);
+    Response r = doGet("Route - Get Route Details", spec, url);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+    return r;
+  }
+
 }
