@@ -369,22 +369,6 @@ public class RouteClient extends SimpleApiClient {
     }
   }
 
-  public Response getGraphqlRouteDetails(Long routeId) {
-    final String uri = "core/graphql/route";
-    String routeRequest = f(
-        "{\"query\": \"query ($id: Int!) {route (id: $id){id, hubId, date, driverId}}\",\"variables\": { \"id\": %s}}",
-        routeId);
-
-    RequestSpecification requestSpecification = createAuthenticatedRequest()
-        .body(routeRequest);
-    final Response r = doPost(f("ROUTE SEARCH - GET DETAILS OF ROUTE ID %d", routeId),
-        requestSpecification, uri);
-    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
-      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
-    }
-    return r;
-  }
-
   public void addReservationsToRouteGroup(long routeGroupId, List<Long> reservationIds) {
     String apiMethod = "route/1.0/route-groups/{routeGroupId}/references";
     String rsvnIds = toJsonSnakeCase(reservationIds);
@@ -795,4 +779,16 @@ public class RouteClient extends SimpleApiClient {
         .body(json);
     return doPut("Route - Add Multiple Waypoints to Route", spec, url);
   }
+
+  public Response geRouteDetailsByRouteId(long routeId) {
+    String url = "route-v2/routes/{routeId}";
+    RequestSpecification spec = createAuthenticatedRequest()
+        .pathParam("routeId", routeId);
+    Response r = doGet("Route - Get Route Details", spec, url);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+    return r;
+  }
+
 }

@@ -41,6 +41,7 @@ import javax.inject.Inject;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
+import org.assertj.core.util.Strings;
 import org.hamcrest.Matchers;
 
 @ScenarioScoped
@@ -66,10 +67,14 @@ public class ApiOrderSteps extends CoreStandardSteps {
    *
    * @param tracking key that contains order's tracking id, example:
    *                 KEY_LIST_OF_CREATED_TRACKING_IDS
+   * @throws IllegalArgumentException when the passed {trackingId} is null or empty
    */
   @When("API Core - Operator get order details for tracking order {string}")
   public void apiOperatorGetOrderDetailsForTrackingOrder(String tracking) {
     final String trackingId = resolveValue(tracking);
+    if (Strings.isNullOrEmpty(trackingId)) {
+      throw new IllegalArgumentException("Tracking id must not be null");
+    }
     final Order order = doWithRetry(
         () -> getOrderClient().searchOrderByTrackingId(trackingId),
         "Order client search order by tracking id", 20_000, 3);
@@ -114,12 +119,16 @@ public class ApiOrderSteps extends CoreStandardSteps {
    * @param tracking               key that contains order's tracking id, example:
    *                               KEY_LIST_OF_CREATED_TRACKING_IDS
    * @param expectedGranularStatus PENDING PICKUP, ARRIVED AT SORTING HUB, ...
+   *
+   * @throws IllegalArgumentException when the passed {trackingId} is null or empty
    */
   @When("API Core - Operator get order details for tracking order {string} with granular status {string}")
   public void apiOperatorGetOrderDetailsForTrackingOrderWithGranularStatus(String tracking,
       String expectedGranularStatus) {
     final String trackingId = resolveValue(tracking);
-
+    if (Strings.isNullOrEmpty(trackingId)) {
+      throw new IllegalArgumentException("Tracking id must not be null");
+    }
     try {
       final Order order = doWithRetry(() -> {
         final Order tempOrder = getOrderClient().searchOrderByTrackingId(trackingId);

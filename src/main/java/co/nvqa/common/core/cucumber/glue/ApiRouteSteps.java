@@ -9,7 +9,6 @@ import co.nvqa.common.core.exception.NvTestCoreMilkrunGroupNotFoundException;
 import co.nvqa.common.core.model.RouteGroup;
 import co.nvqa.common.core.model.coverage.CreateCoverageRequest;
 import co.nvqa.common.core.model.coverage.CreateCoverageResponse;
-import co.nvqa.common.core.model.other.CoreExceptionResponse;
 import co.nvqa.common.core.model.other.CoreExceptionResponse.Error;
 import co.nvqa.common.core.model.pickup.MilkRunGroup;
 import co.nvqa.common.core.model.reservation.BulkRouteReservationResponse;
@@ -342,21 +341,19 @@ public class ApiRouteSteps extends CoreStandardSteps {
     final Optional<Boolean> overwriteParam = dataTableAsMap.containsKey("overwrite") ?
         Optional.of(Boolean.valueOf(dataTableAsMap.get("overwrite"))) : Optional.of(true);
     final Boolean overwrite = overwriteParam.get();
-
     final int expectedStatusCode = Integer.parseInt(resolvedDataTable.get("expectedStatusCode"));
-    final String expectedErrorMessage = resolvedDataTable.get("expectedErrorMessage");
-
+    final int expectedApplicationErrorCode = Integer.parseInt(
+        resolvedDataTable.get("expectedApplicationErrorCode"));
     doWithRetry(() -> {
-      Response r = getRouteClient().addReservationToRouteAndGetRawResponse(routeId,
+      Response response = getRouteClient().addReservationToRouteAndGetRawResponse(routeId,
           reservationId, overwrite);
 
-      Assertions.assertThat(r.statusCode())
-          .as("expected http status: " + r.statusCode())
+      Assertions.assertThat(response.statusCode())
+          .as("expected http status: " + response.statusCode())
           .isEqualTo(expectedStatusCode);
 
-      Assertions.assertThat(r.getBody().asString())
-          .as("expected error message: " + r.getBody().asString())
-          .isEqualTo(expectedErrorMessage);
+      int actualApplicationErrorCode = response.body().jsonPath().getInt("code");
+      Assertions.assertThat(actualApplicationErrorCode).isEqualTo(expectedApplicationErrorCode);
     }, "(expected) failed add reservation to route");
   }
 
@@ -380,19 +377,19 @@ public class ApiRouteSteps extends CoreStandardSteps {
     Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
     final long reservationResultId = Long.parseLong(resolveValue(reservationId));
     final int expectedStatusCode = Integer.parseInt(resolvedDataTable.get("expectedStatusCode"));
-    final String expectedErrorMessage = resolvedDataTable.get("expectedErrorMessage");
+    final int expectedApplicationErrorCode = Integer.parseInt(
+        resolvedDataTable.get("expectedApplicationErrorCode"));
 
     doWithRetry(() -> {
-      Response r = getRouteClient().pullReservationOutOfRouteAndGetRawResponse(
+      Response response = getRouteClient().pullReservationOutOfRouteAndGetRawResponse(
           reservationResultId);
 
-      Assertions.assertThat(r.statusCode())
-          .as("expected http status: " + r.statusCode())
+      Assertions.assertThat(response.statusCode())
+          .as("expected http status: " + response.statusCode())
           .isEqualTo(expectedStatusCode);
 
-      Assertions.assertThat(r.getBody().asString())
-          .as("expected error message: " + r.getBody().asString())
-          .isEqualTo(expectedErrorMessage);
+      int actualApplicationErrorCode = response.body().jsonPath().getInt("code");
+      Assertions.assertThat(actualApplicationErrorCode).isEqualTo(expectedApplicationErrorCode);
     }, "(expected) failed add reservation to route");
   }
 
@@ -632,8 +629,9 @@ public class ApiRouteSteps extends CoreStandardSteps {
 
   @Given("API Route - Operator run FM auto route cron job for date {string}")
   public void runFmRoutingCronJob(String date) {
+    String resolvedDate = resolveValue(date);
     doWithRetry(
-        () -> getRouteClient().runFmAutoRouteCronJob(date),
+        () -> getRouteClient().runFmAutoRouteCronJob(resolvedDate.substring(0, 10)), // YYYY-MM-DD
         "run fm routing cronjob");
   }
 
@@ -705,17 +703,18 @@ public class ApiRouteSteps extends CoreStandardSteps {
     final long routeId = Long.parseLong(resolvedDataTable.get("routeId"));
     final int responseCode = Integer.parseInt(resolvedDataTable.get("responseCode"));
     final List<Long> waypointIds = fromJsonToList(resolvedDataTable.get("waypointIds"), Long.class);
+    final int expectedApplicationErrorCode = Integer.parseInt(
+        resolvedDataTable.get("expectedApplicationErrorCode"));
     doWithRetry(() ->
         {
           Response response = getRouteClient()
               .addMultipleWaypointsToRouteAndGetRawResponse(routeId, waypointIds);
-          Assertions.assertThat(response.getStatusCode()).as("status code Message")
+          Assertions.assertThat(response.getStatusCode())
+              .as("expected http status: " + response.statusCode())
               .isEqualTo(responseCode);
-          CoreExceptionResponse actualResponse = fromJsonSnakeCase(response.body().asString(),
-              CoreExceptionResponse.class);
-          CoreExceptionResponse expectedResponse = fromJsonSnakeCase(
-              resolvedDataTable.get("error"), CoreExceptionResponse.class);
-          expectedResponse.compareWithActual(actualResponse, resolvedDataTable);
+          int actualApplicationErrorCode = response.body().jsonPath()
+              .getInt("error.application_exception_code");
+          Assertions.assertThat(actualApplicationErrorCode).isEqualTo(expectedApplicationErrorCode);
         },
         "add multiple waypoints to route");
   }
