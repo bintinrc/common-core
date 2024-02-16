@@ -2,7 +2,6 @@ package co.nvqa.common.core.cucumber.glue;
 
 import co.nvqa.common.core.client.CoreDpClient;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
-import co.nvqa.common.core.model.dp.CustomerCollectRequest;
 import co.nvqa.common.core.model.dp.DpTagging;
 import co.nvqa.common.core.model.dp.DpUntagging;
 import io.cucumber.java.en.And;
@@ -16,19 +15,6 @@ public class ApiDpSteps extends CoreStandardSteps {
   @Inject
   @Getter
   private CoreDpClient coreDpClient;
-
-  /**
-   * API Core - Operator perform dp drop off with order id "{string}"
-   *
-   * @param orderIdString example: {KEY_LIST_OF_CREATED_ORDERS[1].id}
-   */
-  @And("API Core - Operator perform dp drop off with order id {string}")
-  public void operatorPerformDpDropOff(String orderIdString) {
-    Long orderId = Long.parseLong(resolveValue(orderIdString));
-
-    doWithRetry(
-        () -> getCoreDpClient().driverDropOffToDp(orderId), "core drop off dp");
-  }
 
   @And("API Core - Operator tag to dp for the order:")
   public void operatorTagToDp(Map<String, String> source) {
@@ -91,17 +77,6 @@ public class ApiDpSteps extends CoreStandardSteps {
         "untag from dp");
   }
 
-  @And("API Core - Customer collect from dp:")
-  public void customerCollectDpOrder(Map<String, String> source) {
-    final Map<String, String> resolvedDataTable = resolveKeyValues(source);
-    final long orderId = Long.parseLong(resolvedDataTable.get("orderId"));
-    final CustomerCollectRequest request = fromJsonSnakeCase(resolvedDataTable.get("request"),
-        CustomerCollectRequest.class);
-    doWithRetry(
-        () -> getCoreDpClient().customerCollect(orderId, request),
-        "customer collect from dp");
-  }
-
   @And("API Core - Operator overstay order from dp:")
   public void operatorOverstayFromDp(Map<String, String> source) {
     final Map<String, String> resolvedDataTable = resolveKeyValues(source);
@@ -110,16 +85,5 @@ public class ApiDpSteps extends CoreStandardSteps {
     doWithRetry(
         () -> getCoreDpClient().overstayFromDp(orderId, dpId),
         "overstay from dp");
-  }
-
-  @And("API Core - Operator lodge in order at dp:")
-  public void operatorLodgeInAtDp(Map<String, String> source) {
-    final Map<String, String> resolvedDataTable = resolveKeyValues(source);
-    final long orderId = Long.parseLong(resolvedDataTable.get("orderId"));
-    final String json = resolvedDataTable.get("request");
-    final Boolean isReverify = Boolean.parseBoolean(resolvedDataTable.get("isReverify"));
-    doWithRetry(
-        () -> getCoreDpClient().lodgeInAtDp(orderId, json, isReverify),
-        "lodge in at dp");
   }
 }
