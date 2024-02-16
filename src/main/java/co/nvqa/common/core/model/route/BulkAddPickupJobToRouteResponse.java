@@ -12,6 +12,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BulkAddPickupJobToRouteResponse {
+
   private List<CoreExceptionResponse> successfulJobs;
   private List<CoreExceptionResponse> failedJobs;
 }

@@ -18,6 +18,7 @@ import lombok.Setter;
 @Entity
 @Table(name = "order_details")
 public class OrderDetails extends DataEntity<OrderDetails> {
+
   @Id
   private Long id;
 

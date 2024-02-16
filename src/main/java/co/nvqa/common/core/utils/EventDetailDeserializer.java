@@ -99,33 +99,34 @@ public class EventDetailDeserializer extends JsonDeserializer<EventDetail> {
       result.setMode(node.get("mode").asText());
     }
     if (node.get("weight") != null && (node.get("weight").isObject())) {
-        result.setWeight(
-            JsonUtils.fromJsonSnakeCase(node.get("weight").toString(), EventValue.class));
+      result.setWeight(
+          JsonUtils.fromJsonSnakeCase(node.get("weight").toString(), EventValue.class));
 
     }
     if (node.get("length") != null && (node.get("length").isObject())) {
-        result.setLength(
-            JsonUtils.fromJsonSnakeCase(node.get("length").toString(), EventValue.class));
+      result.setLength(
+          JsonUtils.fromJsonSnakeCase(node.get("length").toString(), EventValue.class));
 
     }
     if (node.get("height") != null && (node.get("height").isObject())) {
-        result.setHeight(
-            JsonUtils.fromJsonSnakeCase(node.get("height").toString(), EventValue.class));
+      result.setHeight(
+          JsonUtils.fromJsonSnakeCase(node.get("height").toString(), EventValue.class));
 
     }
     if (node.get("width") != null && (node.get("width").isObject())) {
-        result.setWidth(
-            JsonUtils.fromJsonSnakeCase(node.get("width").toString(), EventValue.class));
+      result.setWidth(
+          JsonUtils.fromJsonSnakeCase(node.get("width").toString(), EventValue.class));
 
     }
     if (node.get("granular_status") != null && (node.get("granular_status").isObject())) {
-        result.setGranularStatus(
-            JsonUtils.fromJsonSnakeCase(node.get("granular_status").toString(), EventValueString.class));
+      result.setGranularStatus(
+          JsonUtils.fromJsonSnakeCase(node.get("granular_status").toString(),
+              EventValueString.class));
 
     }
     if (node.get("order_status") != null && (node.get("order_status").isObject())) {
-        result.setOrderStatus(
-            JsonUtils.fromJsonSnakeCase(node.get("order_status").toString(), EventValueString.class));
+      result.setOrderStatus(
+          JsonUtils.fromJsonSnakeCase(node.get("order_status").toString(), EventValueString.class));
 
     }
     if (node.get("ticket_id") != null) {

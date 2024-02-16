@@ -15,7 +15,7 @@ public class RejectParcelListRequest {
   private String comment;
   private String reason;
 
-  public RejectParcelListRequest(String trackingId){
+  public RejectParcelListRequest(String trackingId) {
     this.trackingId = trackingId;
     this.reason = "Invalid Tracking ID - does not exist in system";
     this.comment = "webhook test auto comment";

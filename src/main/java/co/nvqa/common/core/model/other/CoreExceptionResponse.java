@@ -37,6 +37,7 @@ public class CoreExceptionResponse extends DataEntity<CoreExceptionResponse> {
     @Getter
     @Setter
     public static class Data extends DataEntity<Data> {
+
       private String message;
     }
   }

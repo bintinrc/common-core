@@ -2,7 +2,6 @@ package co.nvqa.common.core.client;
 
 import co.nvqa.common.client.SimpleApiClient;
 import co.nvqa.common.constants.HttpConstants;
-import co.nvqa.common.core.model.persisted_class.core.Reservations;
 import co.nvqa.common.core.model.reservation.ReservationDetailRequest;
 import co.nvqa.common.core.model.reservation.ReservationFilter;
 import co.nvqa.common.core.model.reservation.ReservationRequest;
@@ -93,15 +92,15 @@ public class ReservationClient extends SimpleApiClient {
   }
 
   public ReservationResponse updatePriorityLevelOfReservation(long pickupAddressId,
-      long legacyShipperId,
+      long globalShipperId, long legacyShipperId,
       long priorityLevel, long reservationId) {
     String url = "reservation/2.0/reservations/{reservation_id}";
 
     RequestSpecification spec = createAuthenticatedRequest()
         .pathParam("reservation_id", reservationId)
         .body(
-            f("{\"pickup_address_id\":%d,\"legacy_shipper_id\":%d,\"reservation_type_value\":0,\"priority_level\":%d}",
-                pickupAddressId, legacyShipperId, priorityLevel));
+            f("{\"pickup_address_id\":%d,\"global_shipper_id\":%d,\"legacy_shipper_id\":%d,\"reservation_type_value\":0,\"priority_level\":%d}",
+                pickupAddressId, globalShipperId, legacyShipperId, priorityLevel));
 
     Response r = doPost("RESERVATION - UPDATE PRIORITY LEVEL", spec, url);
     r.then().contentType(ContentType.JSON);

@@ -44,8 +44,8 @@ public class ApiPickupSteps extends CoreStandardSteps {
   /**
    * Sample:
    * <p>
-   * When API Core - Operator search pickup using data below:
-   * <br/>| requestJson | {"reservation_ids":[111111,111122] } |
+   * When API Core - Operator search pickup using data below: <br/>| requestJson |
+   * {"reservation_ids":[111111,111122] } |
    *
    * @param dataTableAsMap Map of data from feature file.
    */

@@ -2,7 +2,50 @@
 
 <hr>
 
-## [1.3.25] 2024-1-8
+## [1.4.0] 2024-02-16
+
+### New steps
+
+- DB Routing Search - verify transactions record is hard deleted:
+
+### Modified Steps
+
+- The step `API Core - Operator update priority level for the reservation using data below:` now
+  needs mandatory `globalShipperId` in dataTable
+- The step `API Route - Operator run FM auto route cron job for date {string}` now can resolve dates
+  given from keys (ScenarioStorage)
+
+### Removed deprecated APIs
+
+- core/2.0/orders/{orderId}/collect
+- core/2.0/orders/{orderId}/dropoff
+- core/2.0/orders/{orderId}/lodgein
+- core/3.0/routes/monitoring
+- core/3.0/routes/monitoring/routes/{routeId}
+- core/graphql/route
+- core/messaging/orders/sms
+- core/messaging/orders/sms/history?tracking_id={trackingId}
+
+### Removed deprecated classes
+
+- CustomerCollectRequest()
+- LodgeInRequest()
+- MessagingClient()
+- MessagingHistoryResponse()
+- RouteMonitoringClient()
+- RouteMonitoringResponse()
+
+### Removed Steps
+
+- API Core - Customer collect from dp:
+- API Core - Operator gets all the SMS notification by Tracking ID {string}
+- API Core - Operator lodge in order at dp:
+- API Core - Operator perform dp drop off with order id {string}
+- API Core - Operator send sms with following data
+
+<hr>
+
+## [1.3.25] 2024-01-08
 
 ### Added
 

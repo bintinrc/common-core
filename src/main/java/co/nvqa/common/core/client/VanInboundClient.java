@@ -11,6 +11,7 @@ import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
 public class VanInboundClient extends SimpleApiClient {
+
   public VanInboundClient() {
     super(StandardTestConstants.API_BASE_URL, TokenUtils.getOperatorAuthToken(),
         DEFAULT_CAMEL_CASE_MAPPER);
@@ -26,6 +27,7 @@ public class VanInboundClient extends SimpleApiClient {
 
     return doPost("CORE - VAN INBOUND", spec, uri);
   }
+
   public void vanInbound(VanInboundRequest[] requests, long routeId) {
     Response r = vanInboundAndGetRawResponse(requests, routeId);
     if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
@@ -33,10 +35,12 @@ public class VanInboundClient extends SimpleApiClient {
     }
     r.then().contentType(ContentType.JSON);
   }
+
   public Response vanInboundAndGetRawResponse(VanInboundRequest request, long routeId) {
     VanInboundRequest[] requests = new VanInboundRequest[]{request};
     return vanInboundAndGetRawResponse(requests, routeId);
   }
+
   public void vanInbound(VanInboundRequest request, long routeId) {
     VanInboundRequest[] requests = new VanInboundRequest[]{request};
     vanInbound(requests, routeId);
