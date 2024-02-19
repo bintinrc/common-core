@@ -2,6 +2,12 @@
 
 <hr>
 
+## [1.41.1-RC1] 2024-02-19
+
+### New steps
+
+- API Core - update order delivery type:
+
 ## [1.4.0] 2024-02-16
 
 ### New steps
