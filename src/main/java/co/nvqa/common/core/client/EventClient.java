@@ -15,7 +15,7 @@ import javax.inject.Singleton;
 public class EventClient extends SimpleApiClient {
 
   public EventClient() {
-    super(StandardTestConstants.API_BASE_URL, TokenUtils.getOperatorAuthToken(),
+    super(TokenUtils.getOperatorAuthToken(),
         DEFAULT_SNAKE_CASE_MAPPER);
   }
 

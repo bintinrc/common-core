@@ -15,7 +15,7 @@ import javax.inject.Singleton;
 public class CalendarClient extends SimpleApiClient {
 
   public CalendarClient() {
-    super(StandardTestConstants.API_BASE_URL, TokenUtils.getOperatorAuthToken(),
+    super(TokenUtils.getOperatorAuthToken(),
         DEFAULT_CAMEL_CASE_MAPPER);
   }
 

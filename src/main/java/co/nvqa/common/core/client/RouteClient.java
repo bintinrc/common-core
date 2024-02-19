@@ -39,7 +39,7 @@ import javax.inject.Singleton;
 public class RouteClient extends SimpleApiClient {
 
   public RouteClient() {
-    super(StandardTestConstants.API_BASE_URL, TokenUtils.getOperatorAuthToken(),
+    super(TokenUtils.getOperatorAuthToken(),
         DEFAULT_CAMEL_CASE_MAPPER);
   }
 

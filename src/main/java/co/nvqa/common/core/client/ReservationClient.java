@@ -26,7 +26,7 @@ import javax.inject.Singleton;
 public class ReservationClient extends SimpleApiClient {
 
   public ReservationClient() {
-    super(StandardTestConstants.API_BASE_URL, TokenUtils.getOperatorAuthToken(),
+    super(TokenUtils.getOperatorAuthToken(),
         DEFAULT_SNAKE_CASE_MAPPER);
   }
 

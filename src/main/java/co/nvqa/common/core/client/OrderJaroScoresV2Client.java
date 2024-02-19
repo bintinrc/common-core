@@ -14,7 +14,7 @@ import java.util.List;
 public class OrderJaroScoresV2Client extends SimpleApiClient {
 
   public OrderJaroScoresV2Client() {
-    super(StandardTestConstants.API_BASE_URL, TokenUtils.getOperatorAuthToken(),
+    super(TokenUtils.getOperatorAuthToken(),
         DEFAULT_SNAKE_CASE_MAPPER);
   }
 

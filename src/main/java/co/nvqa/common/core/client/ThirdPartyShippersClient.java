@@ -17,7 +17,7 @@ import javax.inject.Singleton;
 public class ThirdPartyShippersClient extends SimpleApiClient {
 
   public ThirdPartyShippersClient() {
-    super(StandardTestConstants.API_BASE_URL, TokenUtils.getOperatorAuthToken(),
+    super(TokenUtils.getOperatorAuthToken(),
         DEFAULT_CAMEL_CASE_MAPPER);
   }
 

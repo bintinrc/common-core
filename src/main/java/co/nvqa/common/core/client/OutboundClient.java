@@ -14,7 +14,7 @@ import javax.inject.Singleton;
 public class OutboundClient extends SimpleApiClient {
 
   public OutboundClient() {
-    super(StandardTestConstants.API_BASE_URL, TokenUtils.getOperatorAuthToken(),
+    super(TokenUtils.getOperatorAuthToken(),
         DEFAULT_CAMEL_CASE_MAPPER);
   }
 
