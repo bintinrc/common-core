@@ -641,4 +641,19 @@ public class ApiOrderSteps extends CoreStandardSteps {
     doWithRetry(() -> orderClient.deleteOrderTag(Long.valueOf(resolveValue(tagId))),
         "API Core - Operator delete order tag with tag id");
   }
+
+  /**
+   * @param dataTableRaw <br/> <b>orderId</b>: {KEY_LIST_OF_CREATED_ORDERS[1].id}<br/>
+   *                     <b>deliveryType</b>: 6 <br/>
+   */
+  @Given("API Core - update order delivery type:")
+  public void apiOperatorUpdateOrderDeliveryTypeTo(Map<String, String> dataTableRaw) {
+    final Map<String, String> dataTable = resolveKeyValues(dataTableRaw);
+    final long orderId = Long.parseLong(dataTable.get("orderId"));
+    final int deliveryType = Integer.parseInt(dataTable.get("deliveryType"));
+    doWithRetry(
+        () -> getOrderClient().updateDeliveryTypes(orderId, deliveryType),
+        "Update order delivery type");
+      }
+
 }
