@@ -11,7 +11,7 @@ import javax.inject.Singleton;
 public class ParameterClient extends SimpleApiClient {
 
   public ParameterClient() {
-    super(StandardTestConstants.API_BASE_URL, TokenUtils.getOperatorAuthToken(),
+    super(TokenUtils.getOperatorAuthToken(),
         DEFAULT_SNAKE_CASE_MAPPER);
   }
 

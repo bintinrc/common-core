@@ -25,7 +25,7 @@ public class TagClient extends SimpleApiClient {
   private static final Logger LOGGER = LoggerFactory.getLogger(TagClient.class);
 
   public TagClient() {
-    super(StandardTestConstants.API_BASE_URL, TokenUtils.getOperatorAuthToken(),
+    super(TokenUtils.getOperatorAuthToken(),
         DEFAULT_CAMEL_CASE_MAPPER);
   }
 

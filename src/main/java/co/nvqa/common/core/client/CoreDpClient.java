@@ -16,7 +16,7 @@ import javax.inject.Singleton;
 public class CoreDpClient extends SimpleApiClient {
 
   public CoreDpClient() {
-    super(StandardTestConstants.API_BASE_URL, TokenUtils.getOperatorAuthToken(),
+    super(TokenUtils.getOperatorAuthToken(),
         DEFAULT_SNAKE_CASE_MAPPER);
   }
 
