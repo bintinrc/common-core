@@ -311,6 +311,16 @@ public class DbCoreSteps extends CoreStandardSteps {
       if (data.containsKey("routeId") && data.get("routeId").equalsIgnoreCase("null")) {
         Assertions.assertThat(actual.getRouteId()).as("route_id is null").isNull();
       }
+      if (data.containsKey("startTimeCustom")) {
+        String startTime = resolvedData.get("startTimeCustom").replaceAll("[TZ]", " ").trim();
+        Assertions.assertThat(actual.getStartTime()).as("start time")
+            .isEqualTo(startTime);
+      }
+      if (data.containsKey("endTimeCustom")) {
+        String endTime = resolvedData.get("endTimeCustom").replaceAll("[TZ]", " ").trim();
+        Assertions.assertThat(actual.getEndTime()).as("end time")
+            .isEqualTo(endTime);
+      }
     }, "verify transactions records", 10_000, 3);
   }
 
