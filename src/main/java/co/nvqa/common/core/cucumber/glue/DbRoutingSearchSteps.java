@@ -26,13 +26,13 @@ public class DbRoutingSearchSteps extends CoreStandardSteps {
 
       if (data.containsKey("startTxnTimeCustom")) {
         String startTime = resolvedData.get("startTxnTimeCustom").replaceAll("[TZ]", " ").trim();
-        Assertions.assertThat(startTime).as("start time")
-            .isEqualTo(actual.getTxnStartTime());
+        Assertions.assertThat(actual.getTxnStartTime()).as("start time")
+            .isEqualTo(startTime);
       }
       if (data.containsKey("endTxnTimeCustom")) {
         String endTime = resolvedData.get("endTxnTimeCustom").replaceAll("[TZ]", " ").trim();
-        Assertions.assertThat(endTime).as("end time")
-            .isEqualTo(actual.getTxnEndTime());
+        Assertions.assertThat(actual.getTxnEndTime()).as("end time")
+            .isEqualTo(endTime);
       }
     }, "Get record from transactions table", 10_000, 5);
   }

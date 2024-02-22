@@ -313,13 +313,13 @@ public class DbCoreSteps extends CoreStandardSteps {
       }
       if (data.containsKey("startTimeCustom")) {
         String startTime = resolvedData.get("startTimeCustom").replaceAll("[TZ]", " ").trim();
-        Assertions.assertThat(startTime).as("start time")
-            .isEqualTo(actual.getStartTime());
+        Assertions.assertThat(actual.getStartTime()).as("start time")
+            .isEqualTo(startTime);
       }
       if (data.containsKey("endTimeCustom")) {
         String endTime = resolvedData.get("endTimeCustom").replaceAll("[TZ]", " ").trim();
-        Assertions.assertThat(endTime).as("end time")
-            .isEqualTo(actual.getEndTime());
+        Assertions.assertThat(actual.getEndTime()).as("end time")
+            .isEqualTo(endTime);
       }
     }, "verify transactions records", 10_000, 3);
   }
