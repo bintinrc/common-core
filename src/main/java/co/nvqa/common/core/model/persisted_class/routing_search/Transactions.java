@@ -50,6 +50,10 @@ public class Transactions extends DataEntity<Transactions> {
   private String zoneType;
   @Column(name = "deleted_at")
   private String deletedAt;
+  @Column(name = "txn_start_time")
+  private String txnStartTime;
+  @Column(name = "txn_end_time")
+  private String txnEndTime;
 
   public Transactions(Map<String, ?> data) {
     super(data);
