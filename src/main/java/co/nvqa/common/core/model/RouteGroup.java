@@ -22,6 +22,7 @@ public class RouteGroup extends DataEntity<RouteGroup> {
   private List<Long> transactionIds;
   private List<Long> reservationIds;
   private List<Long> pickupAppointmentJobIds;
+  private List<Long> pudoPickupAppointmentJobIds;
 
   public RouteGroup(Map<String, ?> data) {
     super(data);
