@@ -13,7 +13,7 @@ import io.restassured.specification.RequestSpecification;
 public class VanInboundClient extends SimpleApiClient {
 
   public VanInboundClient() {
-    super(StandardTestConstants.API_BASE_URL, TokenUtils.getOperatorAuthToken(),
+    super(TokenUtils.getOperatorAuthToken(),
         DEFAULT_CAMEL_CASE_MAPPER);
   }
 

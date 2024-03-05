@@ -54,12 +54,12 @@ public class OrderClient extends SimpleApiClient {
   private static final Logger LOGGER = LoggerFactory.getLogger(OrderClient.class);
 
   public OrderClient() {
-    super(StandardTestConstants.API_BASE_URL, TokenUtils.getOperatorAuthToken(),
+    super(TokenUtils.getOperatorAuthToken(),
         DEFAULT_CAMEL_CASE_MAPPER);
   }
 
   public OrderClient(String shipperToken) {
-    super(StandardTestConstants.API_BASE_URL, shipperToken,
+    super(shipperToken,
         DEFAULT_CAMEL_CASE_MAPPER);
   }
 
