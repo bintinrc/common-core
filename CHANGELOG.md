@@ -10,6 +10,10 @@
 
 ## [1.4.0] 2024-02-16
 
+### New steps
+
+- DB Routing Search - verify transactions record is hard deleted:
+
 ### Modified Steps
 
 - The step `API Core - Operator update priority level for the reservation using data below:` now
