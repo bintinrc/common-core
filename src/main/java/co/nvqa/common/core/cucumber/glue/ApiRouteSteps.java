@@ -100,9 +100,8 @@ public class ApiRouteSteps extends CoreStandardSteps {
           .createRouteAndGetRawResponse(generateRouteRequest(dataTableAsMap));
       Assertions.assertThat(createRouteResponse.getStatusCode()).as("status code")
           .isEqualTo(HttpConstants.RESPONSE_500_INTERNAL_SERVER_ERROR);
-      Error actual = fromJsonSnakeCase(createRouteResponse.getBody().asString(), Error.class);
-      Error expected = fromJsonSnakeCase(resolvedDataTable.get("errorMessage"), Error.class);
-      expected.compareWithActual(actual, resolvedDataTable);
+      Assertions.assertThat(createRouteResponse.getBody().asString())
+          .matches(resolvedDataTable.get("errorResponseMatches"));
     }, "failed to create route");
   }
 
