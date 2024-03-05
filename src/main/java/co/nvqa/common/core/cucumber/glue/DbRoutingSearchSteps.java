@@ -23,6 +23,17 @@ public class DbRoutingSearchSteps extends CoreStandardSteps {
       Assertions.assertThat(actual).as("transactions record was not found: " + resolvedData)
           .isNotNull();
       expected.compareWithActual(actual, resolvedData);
+
+      if (data.containsKey("startTxnTimeCustom")) {
+        String startTime = resolvedData.get("startTxnTimeCustom").replaceAll("[TZ]", " ").trim();
+        Assertions.assertThat(actual.getTxnStartTime()).as("start time")
+            .isEqualTo(startTime);
+      }
+      if (data.containsKey("endTxnTimeCustom")) {
+        String endTime = resolvedData.get("endTxnTimeCustom").replaceAll("[TZ]", " ").trim();
+        Assertions.assertThat(actual.getTxnEndTime()).as("end time")
+            .isEqualTo(endTime);
+      }
     }, "Get record from transactions table", 10_000, 5);
   }
 
