@@ -7,7 +7,7 @@
 - Upgrade to common-auth 1.5.0
 <hr>
 
-## [1.41.1-RC1] 2024-02-19
+## [1.41.1] 2024-03-05
 
 ### New steps
 
