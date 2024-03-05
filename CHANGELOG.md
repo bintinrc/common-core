@@ -3,6 +3,7 @@
 <hr>
 
 ### [1.5.0] 2024-02-09
+
 - Upgrade to common-base 1.5.0
 - Upgrade to common-auth 1.5.0
  
