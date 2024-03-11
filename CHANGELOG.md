@@ -1,4 +1,9 @@
 # Change log
+<hr>
+
+### [1.5.2] 2024-03-11
+
+remove duplication of setting the value of delivery_verification_mode in get order
 
 <hr>
 
