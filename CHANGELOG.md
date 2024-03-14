@@ -1,9 +1,10 @@
 # Change log
 <hr>
 
-### [1.5.2] 2024-03-11
+### [1.5.2-RC2] 2024-03-11
 
-remove duplication of setting the value of delivery_verification_mode in get order
+- Remove duplication of setting the value of delivery_verification_mode in get order step
+- Drop legacy_id column from JobWaypoint hibernate model (ROUTE-961)
 
 <hr>
 
