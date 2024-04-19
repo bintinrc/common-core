@@ -19,7 +19,10 @@ public class WaypointPhotos {
 
   @Id
   private Long id;
+
+  @Column(name = "url")
   private String url;
+
   @Column(name = "waypoint_id")
   private Long waypointId;
 

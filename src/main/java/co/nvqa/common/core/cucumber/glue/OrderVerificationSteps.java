@@ -48,7 +48,7 @@ public class OrderVerificationSteps extends CoreStandardSteps {
 
     if (waypointIds.values().stream().distinct().count() != 1) {
       Assertions.fail(
-          f("Not all %s waypoint ids of given orders are the same: %s", waypointIds));
+          f("Not all waypoint ids of given orders are the same: %s", waypointIds));
     }
 
   }
@@ -73,7 +73,7 @@ public class OrderVerificationSteps extends CoreStandardSteps {
 
     if (waypointIds.values().stream().distinct().count() != orderIds.size()) {
       Assertions.fail(
-          f("Not all %s waypoint ids of given orders are the different: %s", waypointIds));
+          f("Not all waypoint ids of given orders are the different: %s", waypointIds));
     }
   }
 

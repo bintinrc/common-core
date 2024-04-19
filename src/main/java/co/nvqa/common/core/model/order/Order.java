@@ -684,9 +684,7 @@ public class Order extends DataEntity<Order> implements Serializable {
         result.setDeliveryVerificationMode(node.get("delivery_verification_mode").asText());
       }
 
-      if (node.get("delivery_verification_identity") != null) {
-        result.setDeliveryVerificationMode(node.get("delivery_verification_identity").asText());
-      }
+
 
       if (node.get("collection_point") != null) {
         result.setCollectionPoint(node.get("collection_point").asText());
