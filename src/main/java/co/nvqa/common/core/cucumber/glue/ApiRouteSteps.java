@@ -25,6 +25,7 @@ import co.nvqa.common.core.model.route.RouteRequest;
 import co.nvqa.common.core.model.route.RouteResponse;
 import co.nvqa.common.core.model.route.RouteTag;
 import co.nvqa.common.core.model.route.TagResponse;
+import co.nvqa.common.core.model.route.UpdateRoutesAndWaypointsRequest;
 import co.nvqa.common.core.model.waypoint.Waypoint;
 import co.nvqa.common.core.utils.CoreTestUtils;
 import co.nvqa.common.model.DataEntity;
@@ -880,4 +881,22 @@ public class ApiRouteSteps extends CoreStandardSteps {
         "add reservations route group", 1000, 5);
   }
 
+  /**
+   * Sample:<p>
+   * <p>
+   * When API Route - Operator Edit Route Waypoint on Zonal Routing Edit Route:
+   * <p>      | {"route_id": {KEY_LIST_OF_CREATED_ROUTES[1].id}, "driver_id": {driver-id},
+   * "waypoint_ids": [{KEY_LIST_OF_CREATED_ORDERS[1].transactions[2].waypointId}]} |</p>
+   */
+  @When("API Route - Operator Edit Route Waypoint on Zonal Routing Edit Route:")
+  public void routev2EditRouteZonalRouting(List<String> requestData) {
+    List<String> resolvedData = resolveValues(requestData);
+    List<UpdateRoutesAndWaypointsRequest> request = resolvedData.stream()
+        .map(data -> fromJsonSnakeCase(data, UpdateRoutesAndWaypointsRequest.class))
+        .collect(Collectors.toList());
+
+    doWithRetry(
+        () -> getRouteClient().updateRoutesAndWaypointsFromZonalRouting(request),
+        "Route V2 - Zonal Routing Update Route");
+  }
 }

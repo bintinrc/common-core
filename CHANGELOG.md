@@ -1,10 +1,21 @@
 # Change log
+
 <hr>
 
-### [1.5.2-RC2] 2024-03-11
+### [1.5.2] 2024-04-18
 
 - Remove duplication of setting the value of delivery_verification_mode in get order step
 - Drop legacy_id column from JobWaypoint hibernate model (ROUTE-961)
+- Upgrade to common-base 1.5.3
+- Upgrade to common-auth 1.5.2
+
+New step:
+
+- API Route - Operator Edit Route Waypoint on Zonal Routing Edit Route:
+
+This step will replace Core's step:
+
+- API Core - Operator Edit Route Waypoint on Zonal Routing Edit Route:
 
 <hr>
 
