@@ -891,12 +891,9 @@ public class ApiRouteSteps extends CoreStandardSteps {
   @When("API Route - Operator Edit Route Waypoint on Zonal Routing Edit Route:")
   public void routev2EditRouteZonalRouting(List<String> requestData) {
     List<String> resolvedData = resolveValues(requestData);
-    List<UpdateRoutesAndWaypointsRequest> request = new ArrayList<>();
-    resolvedData.forEach(data -> {
-      UpdateRoutesAndWaypointsRequest req = fromJsonSnakeCase(data,
-          UpdateRoutesAndWaypointsRequest.class);
-      request.add(req);
-    });
+    List<UpdateRoutesAndWaypointsRequest> request = resolvedData.stream()
+        .map(data -> fromJsonSnakeCase(data, UpdateRoutesAndWaypointsRequest.class))
+        .collect(Collectors.toList());
 
     doWithRetry(
         () -> getRouteClient().updateRoutesAndWaypointsFromZonalRouting(request),
