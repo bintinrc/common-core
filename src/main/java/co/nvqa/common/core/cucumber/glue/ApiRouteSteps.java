@@ -25,7 +25,7 @@ import co.nvqa.common.core.model.route.RouteRequest;
 import co.nvqa.common.core.model.route.RouteResponse;
 import co.nvqa.common.core.model.route.RouteTag;
 import co.nvqa.common.core.model.route.TagResponse;
-import co.nvqa.common.core.model.route.UpdateRoutesAndWaypointsRequest;
+import co.nvqa.common.core.model.route_v2.UpdateRoutesAndWaypointsRequest;
 import co.nvqa.common.core.model.waypoint.Waypoint;
 import co.nvqa.common.core.utils.CoreTestUtils;
 import co.nvqa.common.model.DataEntity;
@@ -889,7 +889,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
    * "waypoint_ids": [{KEY_LIST_OF_CREATED_ORDERS[1].transactions[2].waypointId}]} |</p>
    */
   @When("API Route - Operator Edit Route Waypoint on Zonal Routing Edit Route:")
-  public void routev2EditRouteZonalRouting(List<String> requestData) {
+  public void routev2OperatorEditRouteWaypointOnZonalRoutingPage(List<String> requestData) {
     List<String> resolvedData = resolveValues(requestData);
     List<UpdateRoutesAndWaypointsRequest> request = resolvedData.stream()
         .map(data -> fromJsonSnakeCase(data, UpdateRoutesAndWaypointsRequest.class))
@@ -898,5 +898,19 @@ public class ApiRouteSteps extends CoreStandardSteps {
     doWithRetry(
         () -> getRouteClient().updateRoutesAndWaypointsFromZonalRouting(request),
         "Route V2 - Zonal Routing Update Route");
+  }
+
+  @Given("API Route - Operator add parcel to the route using data below:")
+  public void routev2ApiOperatorAddParcelToTheRouteUsingDataBelow(
+      Map<String, String> dataTableAsMap) {
+    final Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
+    final long routeId = Long.parseLong(resolvedDataTable.get("routeId"));
+    final long orderId = Long.parseLong(resolvedDataTable.get("orderId"));
+    final String transactionType = resolvedDataTable.get("transactionType");
+    final String routeSource = resolvedDataTable.get("routeSource");
+
+    doWithRetry(
+        () -> getRouteClient().addOrderToRoute(routeId, orderId, transactionType, routeSource),
+        "add order to route");
   }
 }
