@@ -1,4 +1,4 @@
-package co.nvqa.common.core.model.route;
+package co.nvqa.common.core.model.route_v2;
 
 import java.util.List;
 import lombok.AllArgsConstructor;

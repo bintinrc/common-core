@@ -20,7 +20,7 @@ import co.nvqa.common.core.model.route.ParcelRouteTransferResponse;
 import co.nvqa.common.core.model.route.RouteRequest;
 import co.nvqa.common.core.model.route.RouteResponse;
 import co.nvqa.common.core.model.route.StartRouteRequest;
-import co.nvqa.common.core.model.route.UpdateRoutesAndWaypointsRequest;
+import co.nvqa.common.core.model.route_v2.UpdateRoutesAndWaypointsRequest;
 import co.nvqa.common.core.model.waypoint.Waypoint;
 import co.nvqa.common.utils.NvTestHttpException;
 import co.nvqa.commonauth.utils.TokenUtils;
@@ -797,6 +797,20 @@ public class RouteClient extends SimpleApiClient {
     RequestSpecification requestSpecification = createAuthenticatedRequest()
         .body(toJsonSnakeCase(request));
     Response response = doPut("Route-v2 Update Routes and Waypoints", requestSpecification, url);
+    if (response.statusCode() != HttpConstants.RESPONSE_204_NO_CONTENT) {
+      throw new NvTestHttpException("unexpected http status: " + response.statusCode());
+    }
+  }
+
+  public void addOrderToRoute(Long routeId, Long orderId,
+      String transactionType, String routeSource) {
+    String url = "route-v2/routes/{routeId}/orders/{orderId}";
+    RequestSpecification spec = createAuthenticatedRequest()
+        .pathParam("routeId", routeId)
+        .pathParam("orderId", orderId)
+        .queryParam("transaction_type", transactionType)
+        .queryParam("route_source", routeSource);
+    Response response = doPut("Route-v2 Add Order to Route", spec, url);
     if (response.statusCode() != HttpConstants.RESPONSE_204_NO_CONTENT) {
       throw new NvTestHttpException("unexpected http status: " + response.statusCode());
     }

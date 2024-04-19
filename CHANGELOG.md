@@ -1,5 +1,16 @@
 # Change log
 
+## [1.5.3-RC1] 2024-04-19
+
+New Step
+
+- API Route - Operator add parcel to the route using data below:
+
+This step will replace these Core step:
+
+- API Core - Operator add parcel to the route using data below:
+- API Core - Operator new add parcel to DP holding route:
+
 <hr>
 
 ### [1.5.2] 2024-04-18
