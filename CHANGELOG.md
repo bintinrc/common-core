@@ -6,9 +6,10 @@ New Step
 
 - API Route - Operator add parcel to the route using data below:
 
-This step will replace Core's step:
+This step will replace these Core step:
 
 - API Core - Operator add parcel to the route using data below:
+- API Core - Operator new add parcel to DP holding route:
 
 <hr>
 
