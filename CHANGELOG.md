@@ -1,5 +1,33 @@
 # Change log
 
+## [1.5.3-RC1] 2024-04-19
+
+New Step
+
+- API Route - Operator add parcel to the route using data below:
+
+This step will replace these Core step:
+
+- API Core - Operator add parcel to the route using data below:
+- API Core - Operator new add parcel to DP holding route:
+
+<hr>
+
+### [1.5.2] 2024-04-18
+
+- Remove duplication of setting the value of delivery_verification_mode in get order step
+- Drop legacy_id column from JobWaypoint hibernate model (ROUTE-961)
+- Upgrade to common-base 1.5.3
+- Upgrade to common-auth 1.5.2
+
+New step:
+
+- API Route - Operator Edit Route Waypoint on Zonal Routing Edit Route:
+
+This step will replace Core's step:
+
+- API Core - Operator Edit Route Waypoint on Zonal Routing Edit Route:
+
 <hr>
 
 ### [1.5.1] 2024-03-05

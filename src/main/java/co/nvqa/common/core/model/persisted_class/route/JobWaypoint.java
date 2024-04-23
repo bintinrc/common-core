@@ -22,9 +22,6 @@ public class JobWaypoint {
   @Column(name = "id")
   private Long id;
 
-  @Column(name = "legacy_id")
-  private Long legacyId;
-
   @Column(name = "system_id")
   private String systemId;
 
