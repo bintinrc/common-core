@@ -546,7 +546,7 @@ public class RouteClient extends SimpleApiClient {
     Response response = getDeliveryWaypointIdAsRawResponse(trackingId);
     response.then().assertThat().statusCode(HttpConstants.RESPONSE_200_SUCCESS);
     response.then().assertThat().contentType(ContentType.JSON);
-    return response.jsonPath().<Integer>get("delivery.waypointId");
+    return response.jsonPath().get("delivery.waypointId");
   }
 
   public Response getDeliveryWaypointIdAsRawResponse(String trackingId) {
