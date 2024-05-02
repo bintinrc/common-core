@@ -325,4 +325,13 @@ public class DbRouteSteps extends CoreStandardSteps {
       put(KEY_COVERAGE_ID, actual.get(actual.size() - 1).getId());
     }, "fetch coverage id");
   }
+
+  @And("DB Route - operator get waypoints details for {string}")
+  public void dbRouteGetWaypointDetails(String waypointId) {
+    Long resolvedWayPointIdKey = Long.parseLong(resolveValue(waypointId));
+    doWithRetry(() -> {
+      Waypoints result = routeDbDao.getWaypointsDetails(resolvedWayPointIdKey);
+      put(KEY_ROUTE_WAYPOINT_DETAILS, result);
+    }, "get route waypoint details", 2000, 3);
+  }
 }
