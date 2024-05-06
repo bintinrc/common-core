@@ -822,6 +822,7 @@ public class Order extends DataEntity<Order> implements Serializable {
     List<String> listOfAddressData = new ArrayList<>();
     listOfAddressData.add(toAddress1);
     listOfAddressData.add(toAddress2);
+    listOfAddressData.add(toCity);
     listOfAddressData.add(toPostcode);
     listOfAddressData.add(toCountry);
     return listOfAddressData.stream().filter(o -> o != null && !o.isEmpty())
@@ -832,6 +833,7 @@ public class Order extends DataEntity<Order> implements Serializable {
     List<String> listOfAddressData = new ArrayList<>();
     listOfAddressData.add(fromAddress1);
     listOfAddressData.add(fromAddress2);
+    listOfAddressData.add(fromCity);
     listOfAddressData.add(fromPostcode);
     listOfAddressData.add(fromCountry);
     return listOfAddressData.stream().filter(o -> o != null && !o.isEmpty())
