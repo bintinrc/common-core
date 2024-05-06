@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'co.nvqa'
-version '1.5.3-RC7'
+version '1.5.3-RC6'
 
 
 sourceCompatibility = JavaVersion.VERSION_11
