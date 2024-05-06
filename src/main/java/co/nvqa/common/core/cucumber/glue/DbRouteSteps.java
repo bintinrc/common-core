@@ -1,7 +1,7 @@
 package co.nvqa.common.core.cucumber.glue;
 
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
-import co.nvqa.common.core.exception.NvTestCoreDbWaypointNotFoundException;
+import co.nvqa.common.core.exception.NvTestCoreJobWaypointKafkaLagException;
 import co.nvqa.common.core.hibernate.RouteDbDao;
 import co.nvqa.common.core.model.persisted_class.route.AreaVariation;
 import co.nvqa.common.core.model.persisted_class.route.Coverage;
@@ -229,12 +229,24 @@ public class DbRouteSteps extends CoreStandardSteps {
     final JobWaypoint jobWaypoint = doWithRetry(() -> {
       final JobWaypoint result = routeDbDao.getWaypointIdByJobId(jobId);
       if (result == null) {
-        throw new NvTestCoreDbWaypointNotFoundException(
-            "waypoint is not found for job id " + jobId);
+        throw new NvTestCoreJobWaypointKafkaLagException(
+            "waypoint is not yet populated for job id " + jobId);
       }
       return result;
-    }, "reading job waypoint from job id: " + jobId);
+    }, "reading job waypoint from job id: " + jobId, 30000, 4);
     put(KEY_WAYPOINT_ID, jobWaypoint.getWaypointId());
+  }
+
+  @When("DB Route - wait until job_waypoints table is populated for job id {string}")
+  public void waitUntilJobWaypointsPopulatedForJobId(String stringJobId) {
+    final long jobId = Long.parseLong(resolveValue(stringJobId));
+    doWithRetry(() -> {
+      final JobWaypoint result = routeDbDao.getWaypointIdByJobId(jobId);
+      if (result == null) {
+        throw new NvTestCoreJobWaypointKafkaLagException(
+            "waypoint is not yet populated for job id " + jobId);
+      }
+    }, "reading job waypoint from job id: " + jobId, 30000, 4);
   }
 
   /**
