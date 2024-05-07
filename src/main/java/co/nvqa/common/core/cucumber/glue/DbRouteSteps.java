@@ -233,7 +233,7 @@ public class DbRouteSteps extends CoreStandardSteps {
             "waypoint is not yet populated for job id " + jobId);
       }
       return result;
-    }, "reading job waypoint from job id: " + jobId, 30000, 4);
+    }, "reading job waypoint from job id: " + jobId, 15_000, 5);
     put(KEY_WAYPOINT_ID, jobWaypoint.getWaypointId());
   }
 
@@ -246,7 +246,7 @@ public class DbRouteSteps extends CoreStandardSteps {
         throw new NvTestCoreJobWaypointKafkaLagException(
             "waypoint is not yet populated for job id " + jobId);
       }
-    }, "reading job waypoint from job id: " + jobId, 30000, 4);
+    }, "reading job waypoint from job id: " + jobId, 15_000, 5);
   }
 
   /**
