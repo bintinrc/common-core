@@ -14,6 +14,7 @@ import co.nvqa.common.core.model.pickup.MilkRunGroup;
 import co.nvqa.common.core.model.reservation.BulkRouteReservationResponse;
 import co.nvqa.common.core.model.route.AddParcelToRouteRequest;
 import co.nvqa.common.core.model.route.AddPickupJobToRouteRequest;
+import co.nvqa.common.core.model.route.AddToRoutePajRequest;
 import co.nvqa.common.core.model.route.BulkAddPickupJobToRouteRequest;
 import co.nvqa.common.core.model.route.BulkAddPickupJobToRouteResponse;
 import co.nvqa.common.core.model.route.EditRouteRequest;
@@ -912,5 +913,23 @@ public class ApiRouteSteps extends CoreStandardSteps {
     doWithRetry(
         () -> getRouteClient().addOrderToRoute(routeId, orderId, transactionType, routeSource),
         "add order to route");
+  }
+
+  /**
+   * Sample:<p> Given API Route - Operator add paj to route with the following data:<p> |request
+   * |{"job_ids": [11182, 112345]}| |routeId |12345| |jobType
+   * |PUDO_PICKUP_APPOINTMENT/PICKUP_APPOINTMENT| <p>
+   */
+  @When("API Route - Operator add paj to route with the following data:")
+  public void operatorAddPajToRoute(Map<String, String> source) {
+    final Map<String, String> resolvedData = resolveKeyValues(source);
+    final long routeId = Long.parseLong(resolvedData.get("routeId"));
+    final String jobType = resolvedData.get("jobType");
+    final AddToRoutePajRequest request = fromJsonSnakeCase(resolvedData.get("request"),
+        AddToRoutePajRequest.class);
+
+    doWithRetry(
+        () -> getRouteClient().addPajToRoute(request, jobType, routeId),
+        "Add PAJ to Route", 1000, 5);
   }
 }
