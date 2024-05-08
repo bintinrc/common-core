@@ -10,6 +10,7 @@ import co.nvqa.common.core.model.pickup.MilkrunPendingTask;
 import co.nvqa.common.core.model.reservation.BulkRouteReservationResponse;
 import co.nvqa.common.core.model.route.AddParcelToRouteRequest;
 import co.nvqa.common.core.model.route.AddPickupJobToRouteRequest;
+import co.nvqa.common.core.model.route.AddToRoutePajRequest;
 import co.nvqa.common.core.model.route.BulkAddPickupJobToRouteRequest;
 import co.nvqa.common.core.model.route.BulkAddPickupJobToRouteResponse;
 import co.nvqa.common.core.model.route.EditRouteRequest;
@@ -812,6 +813,19 @@ public class RouteClient extends SimpleApiClient {
         .queryParam("route_source", routeSource);
     Response response = doPut("Route-v2 Add Order to Route", spec, url);
     if (response.statusCode() != HttpConstants.RESPONSE_204_NO_CONTENT) {
+      throw new NvTestHttpException("unexpected http status: " + response.statusCode());
+    }
+  }
+
+  public void addPajToRoute(
+      AddToRoutePajRequest request, String jobType, Long routeId) {
+    String url = "route-v2/routes/{routeId}/jobs";
+    RequestSpecification requestSpecification = createAuthenticatedRequest()
+        .body(toJsonSnakeCase(request))
+        .queryParam("job_type", jobType)
+        .pathParam("routeId", routeId);
+    Response response = doPut("Route-v2 Add to Route - PAJ & Pudo PAJ", requestSpecification, url);
+    if (response.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
       throw new NvTestHttpException("unexpected http status: " + response.statusCode());
     }
   }
