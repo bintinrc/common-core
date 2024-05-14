@@ -2,6 +2,8 @@
 
 ## [1.5.3-RC6] 2024-04-19
 
+Add new optional key `refresh (true/false)` to the `API Core - verify driver's total cod:` step
+
 New Step `API Route - Operator add parcel to the route using data below:`
 This step will replace these Core step:
 - API Core - Operator add parcel to the route using data below:
