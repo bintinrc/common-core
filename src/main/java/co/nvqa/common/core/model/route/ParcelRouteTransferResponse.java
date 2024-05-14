@@ -1,5 +1,6 @@
 package co.nvqa.common.core.model.route;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,17 +13,40 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ParcelRouteTransferResponse {
 
-  private List<FailedOrders> failedOrders;
-  private List<RouteResponse> routes;
-  private Long routeId;
+  private Data data;
 
   @Getter
   @Setter
-  @AllArgsConstructor
   @NoArgsConstructor
-  public static class FailedOrders {
+  @AllArgsConstructor
+  public static class Data {
 
+    private List<SuccessOrder> success;
+    private List<FailedOrder> failure;
+  }
+
+  @Getter
+  @Setter
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class SuccessOrder {
+
+    @JsonProperty("tracking_id")
+    private String trackingId;
+    @JsonProperty("route_id")
+    private long routeId;
+    @JsonProperty("waypoint_id")
+    private long waypointId;
+  }
+
+  @Getter
+  @Setter
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class FailedOrder {
+
+    @JsonProperty("tracking_id")
+    private String trackingId;
     private String reason;
-    private List<String> trackingIds;
   }
 }

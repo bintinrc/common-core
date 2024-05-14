@@ -577,19 +577,22 @@ public class RouteClient extends SimpleApiClient {
     doDelete("API Route - Delete Coverage", requestSpecification, url);
   }
 
-  public Response parcelRouteTransferAndGetRawResponse(ParcelRouteTransferRequest request) {
-    String url = "core/2.0/routes-orders-transfers";
-    RequestSpecification requestSpecification = createAuthenticatedRequest()
+  public Response parcelRouteTransferAndGetRawResponse(long routeId,
+      List<String> request) {
+    String url = "route-v2/routes/{routeId}/tracking-ids?transfer=true";
+    RequestSpecification requestSpecification = createAuthenticatedRequest().pathParam("routeId",
+            routeId)
         .body(toJsonSnakeCase(request));
-    return doPost("Parcel Route Transfer", requestSpecification, url);
+    return doPut("Parcel Route Transfer", requestSpecification, url);
   }
 
-  public ParcelRouteTransferResponse parcelRouteTransfer(ParcelRouteTransferRequest request) {
-    Response response = parcelRouteTransferAndGetRawResponse(request);
+  public ParcelRouteTransferResponse parcelRouteTransfer(long routeId,
+      List<String> request) {
+    Response response = parcelRouteTransferAndGetRawResponse(routeId, request);
     if (response.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
       throw new NvTestHttpException("unexpected http status: " + response.statusCode());
     }
-    return fromJsonSnakeCase(response.body().asString(), ParcelRouteTransferResponse.class);
+    return fromJsonCamelCase(response.body().asString(), ParcelRouteTransferResponse.class);
   }
 
   public RouteResponse getRouteDetails(long routeId) {
