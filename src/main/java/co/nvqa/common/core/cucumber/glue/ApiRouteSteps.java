@@ -668,12 +668,11 @@ public class ApiRouteSteps extends CoreStandardSteps {
     ParcelRouteTransferRequest request = new ParcelRouteTransferRequest();
     request.setTrackingId(resolvedTrackingIds);
 
-
     doWithRetry(() -> {
       final ParcelRouteTransferResponse createRouteResponse = getRouteClient()
           .parcelRouteTransfer(id, resolvedTrackingIds);
 
-      put(KEY_CORE_LIST_ROUTE_TRANSFER_RESPONSE, createRouteResponse);
+      put(KEY_ROUTE_LIST_ROUTE_TRANSFER_RESPONSE, createRouteResponse);
     }, "parcel route transfer");
   }
 
