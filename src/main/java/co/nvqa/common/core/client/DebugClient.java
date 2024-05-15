@@ -3,7 +3,6 @@ package co.nvqa.common.core.client;
 import co.nvqa.common.client.SimpleApiClient;
 import co.nvqa.common.constants.HttpConstants;
 import co.nvqa.common.utils.NvTestHttpException;
-import co.nvqa.common.utils.StandardTestConstants;
 import co.nvqa.commonauth.utils.TokenUtils;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
@@ -19,12 +18,12 @@ public class DebugClient extends SimpleApiClient {
         DEFAULT_CAMEL_CASE_MAPPER);
   }
 
-  public Map<String, Object> getTotalCod(Long driverId, String routeDate) {
+  public Map<String, Object> getTotalCod(Long driverId, String routeDate, String refresh) {
     String url = "core/debug/driver/{driverId}/total-cod";
     RequestSpecification spec = createAuthenticatedRequest()
         .pathParam("driverId", driverId)
         .queryParam("routeDate", routeDate)
-        .queryParam("refresh", false);
+        .queryParam("refresh", refresh);
 
     Response r = doGet("GET TOTAL COD", spec, url);
     if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
@@ -32,5 +31,4 @@ public class DebugClient extends SimpleApiClient {
     }
     return r.getBody().as(HashMap.class);
   }
-
 }
