@@ -653,30 +653,26 @@ public class ApiRouteSteps extends CoreStandardSteps {
   }
 
   /**
-   * Sample: API Core - Operator parcel transfer to a new route: | request |
-   * {{"route_id":null,"route_date":"2021-01-19
-   * 08:25:13","from_driver_id":null,"to_driver_id":2679,"to_driver_hub_id":3,"orders":[{"tracking_id":"NVSGDIMMI000238068","inbound_type":"VAN_FROM_NINJAVAN","hub_id":3}]|
+   * Sample: API Route - Operator transfer following parcels to a new route
+   * {KEY_LIST_OF_CREATED_ROUTES[1].id}: | {KEY_LIST_OF_CREATED_TRACKING_IDS[1]} | |
+   * {KEY_LIST_OF_CREATED_TRACKING_IDS[2]} |
    *
-   * @param dataTableAsMap Map of data from feature file.
+   * @param trackingIds List of data from feature file.
+   * @param routeId     long value from feature file.
    */
-  @Given("API Core - Operator parcel transfer to a new route:")
-  public void apiOperatorParcelTransfer(Map<String, String> dataTableAsMap) {
-    Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
+  @Given("API Route - Operator transfer following parcels to a new route {string}")
+  public void apiOperatorParcelTransfer(String routeId, List<String> trackingIds) {
+    List<String> resolvedTrackingIds = resolveValues(trackingIds);
+    final long id = Long.parseLong(resolveValue(routeId));
 
-    ZonedDateTime routeDate = CoreTestUtils.getDateForToday();
-    String formattedRouteDate = DTF_NORMAL_DATETIME.format(
-        routeDate.withZoneSameInstant(ZoneId.of("UTC")));
-
-    ParcelRouteTransferRequest request = fromJsonSnakeCase(resolvedDataTable.get("request"),
-        ParcelRouteTransferRequest.class);
-    if (request.getRouteDate() == null) {
-      request.setRouteDate(formattedRouteDate);
-    }
+    ParcelRouteTransferRequest request = new ParcelRouteTransferRequest();
+    request.setTrackingId(resolvedTrackingIds);
 
     doWithRetry(() -> {
       final ParcelRouteTransferResponse createRouteResponse = getRouteClient()
-          .parcelRouteTransfer(request);
-      put(KEY_LIST_OF_CREATED_ROUTES, createRouteResponse.getRoutes());
+          .parcelRouteTransfer(id, resolvedTrackingIds);
+
+      put(KEY_ROUTE_TRANSFER_RESPONSE, createRouteResponse);
     }, "parcel route transfer");
   }
 
