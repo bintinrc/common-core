@@ -143,4 +143,11 @@ public class OrderDao extends DbBase {
       throw new NvTestCoreOrderKafkaLagException("order record is not found for order " + orderId);
     }
   }
+
+  public List<Orders> getOrderListByBatchId(Long batchId) {
+    String query = "FROM Orders WHERE batchId = :batchId";
+    return findAll(session ->
+        session.createQuery(query, Orders.class)
+            .setParameter("batchId", batchId));
+  }
 }
