@@ -29,7 +29,7 @@ public class ApiReservationSteps extends CoreStandardSteps {
    * Sample:
    * <p>
    * Given API Operator create V2 reservation using data below: <br/>| reservationRequest | {
-   * "legacy_shipper_id":{shipper-v4-legacy-id}, "pickup_address_id":"{KEY_CREATED_ADDRESS.id}",
+   * "pickup_address_id":"{KEY_CREATED_ADDRESS.id}",
    * "pickup_start_time":"{gradle-current-date-yyyy-MM-dd}T15:00:00{gradle-timezone-XXX}",
    * "pickup_end_time":"{gradle-current-date-yyyy-MM-dd}T18:00:00{gradle-timezone-XXX}" } |
    *
@@ -113,8 +113,8 @@ public class ApiReservationSteps extends CoreStandardSteps {
    * Sample:<p>
    * <p>
    * When API Core - Operator update priority level for the reservation using data below:<p> |
-   * pickupAddressId | {KEY_LIST_OF_RESERVATIONS[1].addressId} |<p> | legacyShipperId |
-   * {shipper-v4-legacy-id}                  |<p> | priorityLevel   | 1 |<p> | reservationId   |
+   * pickupAddressId | {KEY_LIST_OF_RESERVATIONS[1].addressId} |<p>
+   *   | priorityLevel   | 1 |<p> | reservationId   |
    * {KEY_CREATED_RESERVATION_ID}            |<p>
    * <p>
    *
@@ -125,13 +125,12 @@ public class ApiReservationSteps extends CoreStandardSteps {
   public void apiOperatorUpdatePriorityLevelForTheReservation(Map<String, String> dataTableAsMap) {
     long pickupAddressId = Long.parseLong(resolveValue(dataTableAsMap.get("pickupAddressId")));
     long globalShipperId = Long.parseLong(resolveValue(dataTableAsMap.get("globalShipperId")));
-    long legacyShipperId = Long.parseLong(resolveValue(dataTableAsMap.get("legacyShipperId")));
     long priorityLevel = Long.parseLong(resolveValue(dataTableAsMap.get("priorityLevel")));
     long reservationId = Long.parseLong(resolveValue(dataTableAsMap.get("reservationId")));
     doWithRetry(
         () ->
             getReservationClient()
-                .updatePriorityLevelOfReservation(pickupAddressId, globalShipperId, legacyShipperId, priorityLevel,
+                .updatePriorityLevelOfReservation(pickupAddressId, globalShipperId, priorityLevel,
                     reservationId), "update priority level");
   }
 
@@ -149,11 +148,11 @@ public class ApiReservationSteps extends CoreStandardSteps {
   public void apiOperatorUpdatePickUpDateAndTimeForTheReservation(
       Map<String, String> dataTableAsMap) {
     Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
-    long legacyShipperId = Long.parseLong(resolveValue(resolvedDataTable.get("reservationId")));
+    long reservationId = Long.parseLong(resolveValue(resolvedDataTable.get("reservationId")));
     doWithRetry(
         () ->
             getReservationClient()
-                .updateDateAndTimeOfReservation(legacyShipperId,
+                .updateDateAndTimeOfReservation(reservationId,
                     resolvedDataTable.get("reservationUpdateRequest")), "update reservation date");
   }
 

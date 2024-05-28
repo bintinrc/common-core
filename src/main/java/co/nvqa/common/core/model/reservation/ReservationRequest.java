@@ -8,7 +8,6 @@ import lombok.Setter;
 public class ReservationRequest {
 
   private Long globalShipperId;
-  private Long legacyShipperId;
   private String pickupStartTime;
   private String pickupEndTime;
   private String pickupApproxVolume;
