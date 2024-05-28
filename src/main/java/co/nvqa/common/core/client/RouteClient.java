@@ -10,6 +10,7 @@ import co.nvqa.common.core.model.pickup.MilkrunPendingTask;
 import co.nvqa.common.core.model.reservation.BulkRouteReservationResponse;
 import co.nvqa.common.core.model.route.AddParcelToRouteRequest;
 import co.nvqa.common.core.model.route.AddPickupJobToRouteRequest;
+import co.nvqa.common.core.model.route.AddToRoutePajRequest;
 import co.nvqa.common.core.model.route.BulkAddPickupJobToRouteRequest;
 import co.nvqa.common.core.model.route.BulkAddPickupJobToRouteResponse;
 import co.nvqa.common.core.model.route.EditRouteRequest;
@@ -20,7 +21,7 @@ import co.nvqa.common.core.model.route.ParcelRouteTransferResponse;
 import co.nvqa.common.core.model.route.RouteRequest;
 import co.nvqa.common.core.model.route.RouteResponse;
 import co.nvqa.common.core.model.route.StartRouteRequest;
-import co.nvqa.common.core.model.route.UpdateRoutesAndWaypointsRequest;
+import co.nvqa.common.core.model.route_v2.UpdateRoutesAndWaypointsRequest;
 import co.nvqa.common.core.model.waypoint.Waypoint;
 import co.nvqa.common.utils.NvTestHttpException;
 import co.nvqa.commonauth.utils.TokenUtils;
@@ -546,7 +547,7 @@ public class RouteClient extends SimpleApiClient {
     Response response = getDeliveryWaypointIdAsRawResponse(trackingId);
     response.then().assertThat().statusCode(HttpConstants.RESPONSE_200_SUCCESS);
     response.then().assertThat().contentType(ContentType.JSON);
-    return response.jsonPath().<Integer>get("delivery.waypointId");
+    return response.jsonPath().getLong("delivery.waypointId");
   }
 
   public Response getDeliveryWaypointIdAsRawResponse(String trackingId) {
@@ -577,19 +578,22 @@ public class RouteClient extends SimpleApiClient {
     doDelete("API Route - Delete Coverage", requestSpecification, url);
   }
 
-  public Response parcelRouteTransferAndGetRawResponse(ParcelRouteTransferRequest request) {
-    String url = "core/2.0/routes-orders-transfers";
-    RequestSpecification requestSpecification = createAuthenticatedRequest()
+  public Response parcelRouteTransferAndGetRawResponse(long routeId,
+      List<String> request) {
+    String url = "route-v2/routes/{routeId}/tracking-ids?transfer=true";
+    RequestSpecification requestSpecification = createAuthenticatedRequest().pathParam("routeId",
+            routeId)
         .body(toJsonSnakeCase(request));
-    return doPost("Parcel Route Transfer", requestSpecification, url);
+    return doPut("Parcel Route Transfer", requestSpecification, url);
   }
 
-  public ParcelRouteTransferResponse parcelRouteTransfer(ParcelRouteTransferRequest request) {
-    Response response = parcelRouteTransferAndGetRawResponse(request);
+  public ParcelRouteTransferResponse parcelRouteTransfer(long routeId,
+      List<String> request) {
+    Response response = parcelRouteTransferAndGetRawResponse(routeId, request);
     if (response.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
       throw new NvTestHttpException("unexpected http status: " + response.statusCode());
     }
-    return fromJsonSnakeCase(response.body().asString(), ParcelRouteTransferResponse.class);
+    return fromJsonCamelCase(response.body().asString(), ParcelRouteTransferResponse.class);
   }
 
   public RouteResponse getRouteDetails(long routeId) {
@@ -798,6 +802,33 @@ public class RouteClient extends SimpleApiClient {
         .body(toJsonSnakeCase(request));
     Response response = doPut("Route-v2 Update Routes and Waypoints", requestSpecification, url);
     if (response.statusCode() != HttpConstants.RESPONSE_204_NO_CONTENT) {
+      throw new NvTestHttpException("unexpected http status: " + response.statusCode());
+    }
+  }
+
+  public void addOrderToRoute(Long routeId, Long orderId,
+      String transactionType, String routeSource) {
+    String url = "route-v2/routes/{routeId}/orders/{orderId}";
+    RequestSpecification spec = createAuthenticatedRequest()
+        .pathParam("routeId", routeId)
+        .pathParam("orderId", orderId)
+        .queryParam("transaction_type", transactionType)
+        .queryParam("route_source", routeSource);
+    Response response = doPut("Route-v2 Add Order to Route", spec, url);
+    if (response.statusCode() != HttpConstants.RESPONSE_204_NO_CONTENT) {
+      throw new NvTestHttpException("unexpected http status: " + response.statusCode());
+    }
+  }
+
+  public void addPajToRoute(
+      AddToRoutePajRequest request, String jobType, Long routeId) {
+    String url = "route-v2/routes/{routeId}/jobs";
+    RequestSpecification requestSpecification = createAuthenticatedRequest()
+        .body(toJsonSnakeCase(request))
+        .queryParam("job_type", jobType)
+        .pathParam("routeId", routeId);
+    Response response = doPut("Route-v2 Add to Route - PAJ & Pudo PAJ", requestSpecification, url);
+    if (response.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
       throw new NvTestHttpException("unexpected http status: " + response.statusCode());
     }
   }

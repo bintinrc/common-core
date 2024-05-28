@@ -1,4 +1,4 @@
-package co.nvqa.common.core.model.route;
+package co.nvqa.common.core.model.route_v2;
 
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -10,8 +10,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ParcelRouteTransferRequest {
+public class UpdateRoutesAndWaypointsRequest {
 
-  private List<String> trackingId;
-
+  private Long routeId;
+  private Long driverId;
+  private List<Long> waypointIds;
 }

@@ -5,6 +5,7 @@ import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import io.cucumber.guice.ScenarioScoped;
 import io.cucumber.java.en.Then;
 import java.util.Map;
+import java.util.Optional;
 import javax.inject.Inject;
 import lombok.Getter;
 import org.assertj.core.api.Assertions;
@@ -19,13 +20,17 @@ public class ApiDebugSteps extends CoreStandardSteps {
 
   @Then("API Core - verify driver's total cod:")
   public void verifyTotalCod(Map<String, String> data) {
-    data = resolveKeyValues(data);
-    long driverId = Long.parseLong(data.get("driverId"));
-    String routeDate = data.get("routeDate");
-    double expected = Double.parseDouble(data.get("cod"));
+    Map<String, String> resolvedDataTable = resolveKeyValues(data);
+    final long driverId = Long.parseLong(resolvedDataTable.get("driverId"));
+    final String routeDate = resolvedDataTable.get("routeDate");
+    final double expected = Double.parseDouble(resolvedDataTable.get("cod"));
+
+    Optional<String> refresh = data.containsKey("refresh") ?
+        Optional.of((resolvedDataTable.get("refresh"))) : Optional.of("false");
+
     doWithRetry(
         () -> {
-          var result = getDebugClient().getTotalCod(driverId, routeDate);
+          var result = getDebugClient().getTotalCod(driverId, routeDate, refresh.orElse("false"));
           Assertions.assertThat(Double.valueOf(result.get("data").toString()))
               .as("Total COD")
               .isEqualTo(expected);

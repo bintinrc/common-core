@@ -293,27 +293,52 @@ public class Order extends DataEntity<Order> implements Serializable {
   }
 
   public String buildFromAddressString() {
-    return fromAddress1 + " " + fromAddress2 + " " + fromPostcode + " " + fromCountry;
+    if (fromCity == null) {
+      fromCity = "";
+    }
+    return normalizeSpace(
+        joinWith(" ", fromAddress1, fromAddress2, fromCity, fromPostcode, fromCountry));
   }
 
   public String buildShortFromAddressString() {
-    return fromAddress1 + " " + fromAddress2 + " " + fromPostcode;
+    if (fromCity == null) {
+      fromCity = "";
+    }
+    return normalizeSpace(
+        joinWith(" ", fromAddress1, fromAddress2, fromPostcode, fromCity));
   }
 
   public String buildToAddressString() {
-    return toAddress1 + " " + toAddress2 + " " + toPostcode + " " + toCountry;
+    if (toCity == null) {
+      toCity = "";
+    }
+    return normalizeSpace(
+        joinWith(" ", toAddress1, toAddress2, toCity, toPostcode, toCountry));
+
   }
 
   public String buildShortToAddressString() {
-    return toAddress1 + " " + toAddress2 + " " + toPostcode;
+    if (toCity == null) {
+      toCity = "";
+    }
+    return normalizeSpace(
+        joinWith(" ", toAddress1, toAddress2, toPostcode, toCity));
+
   }
 
   public String buildShortToAddressWithCountryString() {
-    return normalizeSpace(joinWith(" ", toAddress1, toAddress2, toCountry, toPostcode));
+    if (toCity == null) {
+      toCity = "";
+    }
+    return normalizeSpace(joinWith(" ", toAddress1, toAddress2, toCity, toCountry, toPostcode));
   }
 
   public String buildShortFromAddressWithCountryString() {
-    return normalizeSpace(joinWith(" ", fromAddress1, fromAddress2, fromCountry, fromPostcode));
+    if (fromCity == null) {
+      fromCity = "";
+    }
+    return normalizeSpace(
+        joinWith(" ", fromAddress1, fromAddress2, fromCity, fromCountry, fromPostcode));
   }
 
   public String buildToAddress1and2() {
@@ -797,6 +822,7 @@ public class Order extends DataEntity<Order> implements Serializable {
     List<String> listOfAddressData = new ArrayList<>();
     listOfAddressData.add(toAddress1);
     listOfAddressData.add(toAddress2);
+    listOfAddressData.add(toCity);
     listOfAddressData.add(toPostcode);
     listOfAddressData.add(toCountry);
     return listOfAddressData.stream().filter(o -> o != null && !o.isEmpty())
@@ -807,6 +833,7 @@ public class Order extends DataEntity<Order> implements Serializable {
     List<String> listOfAddressData = new ArrayList<>();
     listOfAddressData.add(fromAddress1);
     listOfAddressData.add(fromAddress2);
+    listOfAddressData.add(fromCity);
     listOfAddressData.add(fromPostcode);
     listOfAddressData.add(fromCountry);
     return listOfAddressData.stream().filter(o -> o != null && !o.isEmpty())

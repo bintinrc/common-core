@@ -6,13 +6,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class UpdateRoutesAndWaypointsRequest {
+public class AddToRoutePajRequest {
 
-  private Long routeId;
-  private Long driverId;
-  private List<Long> waypointIds;
+  private List<Long> jobIds;
+
 }

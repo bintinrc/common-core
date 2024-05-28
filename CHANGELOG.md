@@ -1,5 +1,19 @@
 # Change log
 
+## [1.5.4] 2024-05-28
+New Step `DB Core - Operator verify total orders under the batch_id: {string} is {int}`
+
+## [1.5.3] 2024-05-14
+
+Add new optional key `refresh (true/false)` to the `API Core - verify driver's total cod:` step
+
+New Step `API Route - Operator add parcel to the route using data below:`
+This step will replace these Core step:
+- API Core - Operator add parcel to the route using data below:
+- API Core - Operator new add parcel to DP holding route:
+
+New Step `DB Route - wait until job_waypoints table is populated for job id {string}`
+
 <hr>
 
 ### [1.5.2] 2024-04-18
@@ -9,12 +23,8 @@
 - Upgrade to common-base 1.5.3
 - Upgrade to common-auth 1.5.2
 
-New step:
-
-- API Route - Operator Edit Route Waypoint on Zonal Routing Edit Route:
-
+New step `API Route - Operator Edit Route Waypoint on Zonal Routing Edit Route:
 This step will replace Core's step:
-
 - API Core - Operator Edit Route Waypoint on Zonal Routing Edit Route:
 
 <hr>
