@@ -212,13 +212,11 @@ public class ApiRouteSteps extends CoreStandardSteps {
         "remove pa job from route");
   }
 
-  @Given("API Core - Operator update routed waypoint to pending")
-  public void operatorUpdateWaypointToPending(Map<String, String> dataTableAsMap) {
-    final String json = toJsonCamelCase(resolveKeyValues(dataTableAsMap));
-    final Waypoint waypoint = fromJsonCamelCase(json, Waypoint.class);
-    final List<Waypoint> request = Collections.singletonList(waypoint);
+  @Given("API Route - Operator update routed waypoint {} to pending")
+  public void operatorUpdateWaypointToPending(String waypointId) {
+    long waypoint = Long.parseLong(resolveValue(waypointId));
     doWithRetry(
-        () -> getRouteClient().updateWaypointToPending(request),
+        () -> getRouteClient().updateWaypointToPending(waypoint),
         "set routed waypoint to pending");
   }
 

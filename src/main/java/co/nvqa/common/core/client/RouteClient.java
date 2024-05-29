@@ -193,24 +193,18 @@ public class RouteClient extends SimpleApiClient {
     r.then().contentType(ContentType.JSON);
   }
 
-  public Response updateWaypointToPendingAndGetRawResponse(
-      List<Waypoint> request) {
-    final String url = "core/waypoints";
-    final String json = toJson(request);
-
-    final RequestSpecification spec = createAuthenticatedRequest()
-        .body(json);
-
-    return doPut("Core - Update Routed Waypoint to Pending", spec, url);
+  public Response updateWaypointToPendingAndGetRawResponse(long waypointId) {
+    final String url = "route-v2/routes/waypoints/{waypointId}?validate=true";
+    final RequestSpecification spec = createAuthenticatedRequest().pathParam("waypointId",
+        waypointId);
+    return doDelete("Core - Update Routed Waypoint to Pending", spec, url);
   }
 
-  public List<Waypoint> updateWaypointToPending(List<Waypoint> request) {
-    final Response response = updateWaypointToPendingAndGetRawResponse(request);
-    response.then().contentType(ContentType.JSON);
-    if (response.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+  public void updateWaypointToPending(long waypointId) {
+    final Response response = updateWaypointToPendingAndGetRawResponse(waypointId);
+    if (response.statusCode() != HttpConstants.RESPONSE_204_NO_CONTENT) {
       throw new NvTestHttpException("unexpected http status: " + response.statusCode());
     }
-    return fromJsonSnakeCaseToList(response.getBody().asString(), Waypoint.class);
   }
 
   public Response addReservationToRouteAndGetRawResponse(long routeId, long reservationId,
