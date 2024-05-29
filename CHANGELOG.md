@@ -2,6 +2,7 @@
 
 ## [1.5.4] 2024-05-28
 New Step `DB Core - Operator verify total orders under the batch_id: {string} is {int}`
+Remove legacy shipper id on reservation
 
 ## [1.5.3] 2024-05-14
 
