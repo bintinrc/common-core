@@ -36,4 +36,14 @@ public class ApiDebugSteps extends CoreStandardSteps {
               .isEqualTo(expected);
         }, "verify total cod");
   }
+
+  @Then("API Core - evict driver's cod limit cache:")
+  public void evictDriverCodLimitCache(Map<String, String> data) {
+    Map<String, String> resolvedDataTable = resolveKeyValues(data);
+    final long driverId = Long.parseLong(resolvedDataTable.get("driverId"));
+
+    doWithRetry(
+        () -> getDebugClient().evictDriverCodLimitCache(driverId),
+        "evict driver cod limit cache");
+  }
 }

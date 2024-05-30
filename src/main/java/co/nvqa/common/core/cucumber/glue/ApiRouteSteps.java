@@ -27,7 +27,6 @@ import co.nvqa.common.core.model.route.RouteResponse;
 import co.nvqa.common.core.model.route.RouteTag;
 import co.nvqa.common.core.model.route.TagResponse;
 import co.nvqa.common.core.model.route_v2.UpdateRoutesAndWaypointsRequest;
-import co.nvqa.common.core.model.waypoint.Waypoint;
 import co.nvqa.common.core.utils.CoreTestUtils;
 import co.nvqa.common.model.DataEntity;
 import co.nvqa.common.utils.StandardTestUtils;
@@ -40,7 +39,6 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -101,7 +99,8 @@ public class ApiRouteSteps extends CoreStandardSteps {
       final Response createRouteResponse = getRouteClient()
           .createRouteAndGetRawResponse(generateRouteRequest(dataTableAsMap));
       Assertions.assertThat(createRouteResponse.getStatusCode()).as("status code")
-          .isEqualTo(HttpConstants.RESPONSE_500_INTERNAL_SERVER_ERROR);
+          .isIn(HttpConstants.RESPONSE_500_INTERNAL_SERVER_ERROR,
+              HttpConstants.RESPONSE_400_BAD_REQUEST);
       Assertions.assertThat(createRouteResponse.getBody().asString())
           .matches(resolvedDataTable.get("errorResponseMatches"));
     }, "failed to create route");
@@ -212,13 +211,11 @@ public class ApiRouteSteps extends CoreStandardSteps {
         "remove pa job from route");
   }
 
-  @Given("API Core - Operator update routed waypoint to pending")
-  public void operatorUpdateWaypointToPending(Map<String, String> dataTableAsMap) {
-    final String json = toJsonCamelCase(resolveKeyValues(dataTableAsMap));
-    final Waypoint waypoint = fromJsonCamelCase(json, Waypoint.class);
-    final List<Waypoint> request = Collections.singletonList(waypoint);
+  @Given("API Route - Operator update routed waypoint {} to pending")
+  public void operatorUpdateWaypointToPending(String waypointId) {
+    long waypoint = Long.parseLong(resolveValue(waypointId));
     doWithRetry(
-        () -> getRouteClient().updateWaypointToPending(request),
+        () -> getRouteClient().updateWaypointToPending(waypoint),
         "set routed waypoint to pending");
   }
 

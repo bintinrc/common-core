@@ -31,4 +31,15 @@ public class DebugClient extends SimpleApiClient {
     }
     return r.getBody().as(HashMap.class);
   }
+
+  public void evictDriverCodLimitCache(Long driverId) {
+    String url = "core/debug/driver/{driverId}/cod-limit";
+    RequestSpecification spec = createAuthenticatedRequest()
+        .pathParam("driverId", driverId);
+
+    Response r = doDelete("EVICT DRIVER COD LIMIT CACHE", spec, url);
+    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
+    }
+  }
 }

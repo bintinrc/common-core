@@ -16,13 +16,11 @@ import co.nvqa.common.core.model.route.BulkAddPickupJobToRouteResponse;
 import co.nvqa.common.core.model.route.EditRouteRequest;
 import co.nvqa.common.core.model.route.GetRouteDetailsResponse;
 import co.nvqa.common.core.model.route.MergeWaypointsResponse;
-import co.nvqa.common.core.model.route.ParcelRouteTransferRequest;
 import co.nvqa.common.core.model.route.ParcelRouteTransferResponse;
 import co.nvqa.common.core.model.route.RouteRequest;
 import co.nvqa.common.core.model.route.RouteResponse;
 import co.nvqa.common.core.model.route.StartRouteRequest;
 import co.nvqa.common.core.model.route_v2.UpdateRoutesAndWaypointsRequest;
-import co.nvqa.common.core.model.waypoint.Waypoint;
 import co.nvqa.common.utils.NvTestHttpException;
 import co.nvqa.commonauth.utils.TokenUtils;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -193,24 +191,18 @@ public class RouteClient extends SimpleApiClient {
     r.then().contentType(ContentType.JSON);
   }
 
-  public Response updateWaypointToPendingAndGetRawResponse(
-      List<Waypoint> request) {
-    final String url = "core/waypoints";
-    final String json = toJson(request);
-
-    final RequestSpecification spec = createAuthenticatedRequest()
-        .body(json);
-
-    return doPut("Core - Update Routed Waypoint to Pending", spec, url);
+  public Response updateWaypointToPendingAndGetRawResponse(long waypointId) {
+    final String url = "route-v2/routes/waypoints/{waypointId}?validate=true";
+    final RequestSpecification spec = createAuthenticatedRequest().pathParam("waypointId",
+        waypointId);
+    return doDelete("Route - Update Routed Waypoint to Pending", spec, url);
   }
 
-  public List<Waypoint> updateWaypointToPending(List<Waypoint> request) {
-    final Response response = updateWaypointToPendingAndGetRawResponse(request);
-    response.then().contentType(ContentType.JSON);
-    if (response.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+  public void updateWaypointToPending(long waypointId) {
+    final Response response = updateWaypointToPendingAndGetRawResponse(waypointId);
+    if (response.statusCode() != HttpConstants.RESPONSE_204_NO_CONTENT) {
       throw new NvTestHttpException("unexpected http status: " + response.statusCode());
     }
-    return fromJsonSnakeCaseToList(response.getBody().asString(), Waypoint.class);
   }
 
   public Response addReservationToRouteAndGetRawResponse(long routeId, long reservationId,
