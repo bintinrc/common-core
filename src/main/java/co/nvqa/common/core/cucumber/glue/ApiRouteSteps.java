@@ -14,6 +14,7 @@ import co.nvqa.common.core.model.pickup.MilkRunGroup;
 import co.nvqa.common.core.model.reservation.BulkRouteReservationResponse;
 import co.nvqa.common.core.model.route.AddParcelToRouteRequest;
 import co.nvqa.common.core.model.route.AddPickupJobToRouteRequest;
+import co.nvqa.common.core.model.route.AddToRoutePajRequest;
 import co.nvqa.common.core.model.route.BulkAddPickupJobToRouteRequest;
 import co.nvqa.common.core.model.route.BulkAddPickupJobToRouteResponse;
 import co.nvqa.common.core.model.route.EditRouteRequest;
@@ -25,7 +26,7 @@ import co.nvqa.common.core.model.route.RouteRequest;
 import co.nvqa.common.core.model.route.RouteResponse;
 import co.nvqa.common.core.model.route.RouteTag;
 import co.nvqa.common.core.model.route.TagResponse;
-import co.nvqa.common.core.model.route.UpdateRoutesAndWaypointsRequest;
+import co.nvqa.common.core.model.route_v2.UpdateRoutesAndWaypointsRequest;
 import co.nvqa.common.core.model.waypoint.Waypoint;
 import co.nvqa.common.core.utils.CoreTestUtils;
 import co.nvqa.common.model.DataEntity;
@@ -889,7 +890,7 @@ public class ApiRouteSteps extends CoreStandardSteps {
    * "waypoint_ids": [{KEY_LIST_OF_CREATED_ORDERS[1].transactions[2].waypointId}]} |</p>
    */
   @When("API Route - Operator Edit Route Waypoint on Zonal Routing Edit Route:")
-  public void routev2EditRouteZonalRouting(List<String> requestData) {
+  public void routev2OperatorEditRouteWaypointOnZonalRoutingPage(List<String> requestData) {
     List<String> resolvedData = resolveValues(requestData);
     List<UpdateRoutesAndWaypointsRequest> request = resolvedData.stream()
         .map(data -> fromJsonSnakeCase(data, UpdateRoutesAndWaypointsRequest.class))
@@ -898,5 +899,37 @@ public class ApiRouteSteps extends CoreStandardSteps {
     doWithRetry(
         () -> getRouteClient().updateRoutesAndWaypointsFromZonalRouting(request),
         "Route V2 - Zonal Routing Update Route");
+  }
+
+  @Given("API Route - Operator add parcel to the route using data below:")
+  public void routev2ApiOperatorAddParcelToTheRouteUsingDataBelow(
+      Map<String, String> dataTableAsMap) {
+    final Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
+    final long routeId = Long.parseLong(resolvedDataTable.get("routeId"));
+    final long orderId = Long.parseLong(resolvedDataTable.get("orderId"));
+    final String transactionType = resolvedDataTable.get("transactionType");
+    final String routeSource = resolvedDataTable.get("routeSource");
+
+    doWithRetry(
+        () -> getRouteClient().addOrderToRoute(routeId, orderId, transactionType, routeSource),
+        "add order to route");
+  }
+
+  /**
+   * Sample:<p> Given API Route - Operator add paj to route with the following data:<p> |request
+   * |{"job_ids": [11182, 112345]}| |routeId |12345| |jobType
+   * |PUDO_PICKUP_APPOINTMENT/PICKUP_APPOINTMENT| <p>
+   */
+  @When("API Route - Operator add paj to route with the following data:")
+  public void operatorAddPajToRoute(Map<String, String> source) {
+    final Map<String, String> resolvedData = resolveKeyValues(source);
+    final long routeId = Long.parseLong(resolvedData.get("routeId"));
+    final String jobType = resolvedData.get("jobType");
+    final AddToRoutePajRequest request = fromJsonSnakeCase(resolvedData.get("request"),
+        AddToRoutePajRequest.class);
+
+    doWithRetry(
+        () -> getRouteClient().addPajToRoute(request, jobType, routeId),
+        "Add PAJ to Route", 1000, 5);
   }
 }
