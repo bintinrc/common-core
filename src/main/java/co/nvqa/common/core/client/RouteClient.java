@@ -195,7 +195,7 @@ public class RouteClient extends SimpleApiClient {
     final String url = "route-v2/routes/waypoints/{waypointId}?validate=true";
     final RequestSpecification spec = createAuthenticatedRequest().pathParam("waypointId",
         waypointId);
-    return doDelete("Core - Update Routed Waypoint to Pending", spec, url);
+    return doDelete("Route - Update Routed Waypoint to Pending", spec, url);
   }
 
   public void updateWaypointToPending(long waypointId) {
