@@ -239,24 +239,6 @@ public class RouteClient extends SimpleApiClient {
     return doPut("Core - Bulk Add Reservation to Route", spec, url);
   }
 
-  public Response zonalRoutingEditRouteAndGetRawResponse(List<RouteRequest> request) {
-    String url = "core/routes";
-    String json = toJson(request);
-    RequestSpecification spec = createAuthenticatedRequest()
-        .body(json);
-    return doPut("Core - Zonal Routing Edit Route", spec, url);
-  }
-
-  public List<RouteResponse> zonalRoutingEditRoute(List<RouteRequest> request) {
-    Response r = zonalRoutingEditRouteAndGetRawResponse(request);
-    r.then().contentType(ContentType.JSON);
-    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
-      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
-    }
-    return fromJsonToList(r.body().asString(),
-        RouteResponse.class);
-  }
-
   public List<RouteResponse> getUnarchivedRouteDetailsByDriverId(long driverId) {
     String url = "route-v2/routes";
     RequestSpecification spec = createAuthenticatedRequest()
