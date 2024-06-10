@@ -892,6 +892,20 @@ public class ApiRouteSteps extends CoreStandardSteps {
         "add order to route");
   }
 
+  @Given("API Route - Operator fails to add parcel to the route using data below:")
+  public void routev2ApiOperatorFailsAddParcelToTheRouteUsingDataBelow(
+      Map<String, String> dataTableAsMap) {
+    final Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
+    final long routeId = Long.parseLong(resolvedDataTable.get("routeId"));
+    final long orderId = Long.parseLong(resolvedDataTable.get("orderId"));
+    final String transactionType = resolvedDataTable.get("transactionType");
+    final String routeSource = resolvedDataTable.get("routeSource");
+    final int errorStatusCode = Integer.parseInt(resolvedDataTable.get("errorStatusCode"));
+
+    doWithRetry(() -> getRouteClient().failToAddOrderToRoute(routeId, orderId, transactionType,
+        routeSource, errorStatusCode), "expected to fail add order to route");
+  }
+
   /**
    * Sample:<p> Given API Route - Operator add paj to route with the following data:<p> |request
    * |{"job_ids": [11182, 112345]}| |routeId |12345| |jobType
