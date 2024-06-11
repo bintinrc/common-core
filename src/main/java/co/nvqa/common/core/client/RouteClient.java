@@ -794,6 +794,25 @@ public class RouteClient extends SimpleApiClient {
     }
   }
 
+  public void failToAddOrderToRoute(Long routeId, Long orderId,
+      String transactionType, String routeSource, int errorStatusCode) {
+    String url = "route-v2/routes/{routeId}/orders/{orderId}";
+
+    RequestSpecification spec = createAuthenticatedRequest()
+        .pathParam("routeId", routeId)
+        .pathParam("orderId", orderId)
+        .queryParam("transaction_type", transactionType)
+        .queryParam("route_source", routeSource);
+
+    Response response = doPut("Route-v2 Add Order to Route", spec, url);
+
+    if (response.statusCode() != errorStatusCode) {
+      throw new NvTestHttpException(
+          String.format("Expected http status: %s, but got: %s instead",
+              errorStatusCode, response.statusCode()));
+    }
+  }
+
   public void addPajToRoute(
       AddToRoutePajRequest request, String jobType, Long routeId) {
     String url = "route-v2/routes/{routeId}/jobs";
