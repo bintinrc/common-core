@@ -781,7 +781,7 @@ public class Order extends DataEntity<Order> implements Serializable {
     private String itemDescription;
     private Boolean isDangerousGood;
     private Integer quantity;
-    private Float unitValue;
+    private Double unitValue;
   }
 
   @Getter
