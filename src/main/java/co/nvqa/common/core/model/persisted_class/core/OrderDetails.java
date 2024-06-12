@@ -43,6 +43,12 @@ public class OrderDetails extends DataEntity<OrderDetails> {
   @Column(name = "parent_shipper_id")
   private Long parentShipperId;
 
+  @Column(name = "temperature_range")
+  private String temperatureRange;
+
+  @Column(name = "metadata")
+  private String metaData;
+
   public OrderDetails(Map<String, ?> data) {
     fromMap(data);
   }
