@@ -12,21 +12,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ParcelRouteTransferRequest {
 
-  private Long routeId;
-  private String routeDate;
-  private Long fromDriverId;
-  private Long toDriverId;
-  private Long toDriverHubId;
-  private List<Parcel> orders;
+  private List<String> trackingId;
 
-  @Getter
-  @Setter
-  @NoArgsConstructor
-  @AllArgsConstructor
-  public static class Parcel {
-
-    private String inboundType;
-    private String trackingId;
-    private Long hubId;
-  }
 }

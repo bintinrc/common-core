@@ -27,7 +27,6 @@ import co.nvqa.common.core.model.route.RouteResponse;
 import co.nvqa.common.core.model.route.RouteTag;
 import co.nvqa.common.core.model.route.TagResponse;
 import co.nvqa.common.core.model.route_v2.UpdateRoutesAndWaypointsRequest;
-import co.nvqa.common.core.model.waypoint.Waypoint;
 import co.nvqa.common.core.utils.CoreTestUtils;
 import co.nvqa.common.model.DataEntity;
 import co.nvqa.common.utils.StandardTestUtils;
@@ -40,7 +39,6 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -101,7 +99,8 @@ public class ApiRouteSteps extends CoreStandardSteps {
       final Response createRouteResponse = getRouteClient()
           .createRouteAndGetRawResponse(generateRouteRequest(dataTableAsMap));
       Assertions.assertThat(createRouteResponse.getStatusCode()).as("status code")
-          .isEqualTo(HttpConstants.RESPONSE_500_INTERNAL_SERVER_ERROR);
+          .isIn(HttpConstants.RESPONSE_500_INTERNAL_SERVER_ERROR,
+              HttpConstants.RESPONSE_400_BAD_REQUEST);
       Assertions.assertThat(createRouteResponse.getBody().asString())
           .matches(resolvedDataTable.get("errorResponseMatches"));
     }, "failed to create route");
@@ -212,13 +211,11 @@ public class ApiRouteSteps extends CoreStandardSteps {
         "remove pa job from route");
   }
 
-  @Given("API Core - Operator update routed waypoint to pending")
-  public void operatorUpdateWaypointToPending(Map<String, String> dataTableAsMap) {
-    final String json = toJsonCamelCase(resolveKeyValues(dataTableAsMap));
-    final Waypoint waypoint = fromJsonCamelCase(json, Waypoint.class);
-    final List<Waypoint> request = Collections.singletonList(waypoint);
+  @Given("API Route - Operator update routed waypoint {} to pending")
+  public void operatorUpdateWaypointToPending(String waypointId) {
+    long waypoint = Long.parseLong(resolveValue(waypointId));
     doWithRetry(
-        () -> getRouteClient().updateWaypointToPending(request),
+        () -> getRouteClient().updateWaypointToPending(waypoint),
         "set routed waypoint to pending");
   }
 
@@ -290,22 +287,6 @@ public class ApiRouteSteps extends CoreStandardSteps {
     doWithRetry(
         () -> getRouteClient().pullFromRoute(orderId, type),
         "Operator pull order from route");
-  }
-
-  @When("API Core - Operator Edit Route Waypoint on Zonal Routing Edit Route:")
-  public void editRouteZonalRouting(Map<String, String> dataTableAsMap) {
-    Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
-    String createRouteRequestJson = StandardTestUtils
-        .replaceTokens(resolvedDataTable.get("editRouteRequest"),
-            StandardTestUtils.createDefaultTokens());
-    List<RouteRequest> request = fromJsonToList(createRouteRequestJson, RouteRequest.class);
-    doWithRetry(
-        () -> {
-          final List<RouteResponse> route = getRouteClient()
-              .zonalRoutingEditRoute(request);
-          Assertions.assertThat(route.get(0)).as("updated route is not null").isNotNull();
-        },
-        "Zonal Routing Edit Route");
   }
 
   /**
@@ -653,30 +634,26 @@ public class ApiRouteSteps extends CoreStandardSteps {
   }
 
   /**
-   * Sample: API Core - Operator parcel transfer to a new route: | request |
-   * {{"route_id":null,"route_date":"2021-01-19
-   * 08:25:13","from_driver_id":null,"to_driver_id":2679,"to_driver_hub_id":3,"orders":[{"tracking_id":"NVSGDIMMI000238068","inbound_type":"VAN_FROM_NINJAVAN","hub_id":3}]|
+   * Sample: API Route - Operator transfer following parcels to a new route
+   * {KEY_LIST_OF_CREATED_ROUTES[1].id}: | {KEY_LIST_OF_CREATED_TRACKING_IDS[1]} | |
+   * {KEY_LIST_OF_CREATED_TRACKING_IDS[2]} |
    *
-   * @param dataTableAsMap Map of data from feature file.
+   * @param trackingIds List of data from feature file.
+   * @param routeId     long value from feature file.
    */
-  @Given("API Core - Operator parcel transfer to a new route:")
-  public void apiOperatorParcelTransfer(Map<String, String> dataTableAsMap) {
-    Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
+  @Given("API Route - Operator transfer following parcels to a new route {string}")
+  public void apiOperatorParcelTransfer(String routeId, List<String> trackingIds) {
+    List<String> resolvedTrackingIds = resolveValues(trackingIds);
+    final long id = Long.parseLong(resolveValue(routeId));
 
-    ZonedDateTime routeDate = CoreTestUtils.getDateForToday();
-    String formattedRouteDate = DTF_NORMAL_DATETIME.format(
-        routeDate.withZoneSameInstant(ZoneId.of("UTC")));
-
-    ParcelRouteTransferRequest request = fromJsonSnakeCase(resolvedDataTable.get("request"),
-        ParcelRouteTransferRequest.class);
-    if (request.getRouteDate() == null) {
-      request.setRouteDate(formattedRouteDate);
-    }
+    ParcelRouteTransferRequest request = new ParcelRouteTransferRequest();
+    request.setTrackingId(resolvedTrackingIds);
 
     doWithRetry(() -> {
       final ParcelRouteTransferResponse createRouteResponse = getRouteClient()
-          .parcelRouteTransfer(request);
-      put(KEY_LIST_OF_CREATED_ROUTES, createRouteResponse.getRoutes());
+          .parcelRouteTransfer(id, resolvedTrackingIds);
+
+      put(KEY_ROUTE_TRANSFER_RESPONSE, createRouteResponse);
     }, "parcel route transfer");
   }
 
@@ -913,6 +890,20 @@ public class ApiRouteSteps extends CoreStandardSteps {
     doWithRetry(
         () -> getRouteClient().addOrderToRoute(routeId, orderId, transactionType, routeSource),
         "add order to route");
+  }
+
+  @Given("API Route - Operator fails to add parcel to the route using data below:")
+  public void routev2ApiOperatorFailsAddParcelToTheRouteUsingDataBelow(
+      Map<String, String> dataTableAsMap) {
+    final Map<String, String> resolvedDataTable = resolveKeyValues(dataTableAsMap);
+    final long routeId = Long.parseLong(resolvedDataTable.get("routeId"));
+    final long orderId = Long.parseLong(resolvedDataTable.get("orderId"));
+    final String transactionType = resolvedDataTable.get("transactionType");
+    final String routeSource = resolvedDataTable.get("routeSource");
+    final int errorStatusCode = Integer.parseInt(resolvedDataTable.get("errorStatusCode"));
+
+    doWithRetry(() -> getRouteClient().failToAddOrderToRoute(routeId, orderId, transactionType,
+        routeSource, errorStatusCode), "expected to fail add order to route");
   }
 
   /**

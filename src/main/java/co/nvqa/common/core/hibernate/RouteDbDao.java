@@ -134,15 +134,13 @@ public class RouteDbDao extends DbBase {
   }
 
   public JobWaypoint getWaypointIdByJobId(Long jobId) {
-    List<JobWaypoint> results;
     String query = "FROM JobWaypoint "
         + "WHERE jobId = :jobId "
         + "AND systemId = :systemId";
-    results = findAll(session ->
+    return findOne(session ->
         session.createQuery(query, JobWaypoint.class)
             .setParameter("jobId", jobId)
             .setParameter("systemId", StandardTestConstants.NV_SYSTEM_ID));
-    return results.get(0);
   }
 
   public List<String> getRoutesForDriver(Long driverId, String datetimeFrom, String datetimeTo) {

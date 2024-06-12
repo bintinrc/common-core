@@ -1,5 +1,13 @@
 # Change log
 
+## [1.5.4] 2024-05-28
+
+New Step `API Core - evict driver's cod limit cache:`
+New Step `DB Core - Operator verify total orders under the batch_id: {string} is {int}`
+Remove legacy shipper id on reservation
+
+<hr>
+
 ## [1.5.3] 2024-05-14
 
 Add new optional key `refresh (true/false)` to the `API Core - verify driver's total cod:` step

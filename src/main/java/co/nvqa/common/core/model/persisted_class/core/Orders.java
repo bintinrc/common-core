@@ -101,6 +101,8 @@ public class Orders extends DataEntity<Orders> {
   private Long latestWarehouseSweepId;
   @Column(name = "shipper_ref_metadata")
   private String shipperRefMetadata;
+  @Column(name = "batch_id")
+  private Long batchId;
   @Column(name = "cod_id")
   private String codId;
   @Column(name = "created_at")

@@ -309,4 +309,21 @@ public class DBOrdersTableSteps extends CoreStandardSteps {
     Assertions.assertThat(actualServiceType).as("orders.service_type equal")
         .isEqualTo(expectedServiceType);
   }
+
+  /**
+   * Sample:
+   * <p>DB Core - Operator verify total orders under the batch_id: 'KEY_BATCH_ID' is <successOrder>
+   * @param batchId — batch id of created orders
+   * @param totalOrders — expected number of orders
+   */
+
+  @Given("DB Core - Operator verify total orders under the batch_id: {string} is {int}")
+  public void dbCoreOperatorVerifyTotalOrdersUnderTheBatchIdIs(String batchId, int totalOrders) {
+    Long lgBatchId = resolveValue(batchId);
+    doWithRetry(() -> {
+      List<Orders> orders = orderDao.getOrderListByBatchId(lgBatchId);
+      Assertions.assertThat(orders.size()).as("Assert that orders match for the given batch_id")
+          .isEqualTo(totalOrders);
+    }, "Get orders by batch id and assert", 10_000, 3);
+  }
 }

@@ -16,13 +16,11 @@ import co.nvqa.common.core.model.route.BulkAddPickupJobToRouteResponse;
 import co.nvqa.common.core.model.route.EditRouteRequest;
 import co.nvqa.common.core.model.route.GetRouteDetailsResponse;
 import co.nvqa.common.core.model.route.MergeWaypointsResponse;
-import co.nvqa.common.core.model.route.ParcelRouteTransferRequest;
 import co.nvqa.common.core.model.route.ParcelRouteTransferResponse;
 import co.nvqa.common.core.model.route.RouteRequest;
 import co.nvqa.common.core.model.route.RouteResponse;
 import co.nvqa.common.core.model.route.StartRouteRequest;
 import co.nvqa.common.core.model.route_v2.UpdateRoutesAndWaypointsRequest;
-import co.nvqa.common.core.model.waypoint.Waypoint;
 import co.nvqa.common.utils.NvTestHttpException;
 import co.nvqa.commonauth.utils.TokenUtils;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -193,24 +191,18 @@ public class RouteClient extends SimpleApiClient {
     r.then().contentType(ContentType.JSON);
   }
 
-  public Response updateWaypointToPendingAndGetRawResponse(
-      List<Waypoint> request) {
-    final String url = "core/waypoints";
-    final String json = toJson(request);
-
-    final RequestSpecification spec = createAuthenticatedRequest()
-        .body(json);
-
-    return doPut("Core - Update Routed Waypoint to Pending", spec, url);
+  public Response updateWaypointToPendingAndGetRawResponse(long waypointId) {
+    final String url = "route-v2/routes/waypoints/{waypointId}?validate=true";
+    final RequestSpecification spec = createAuthenticatedRequest().pathParam("waypointId",
+        waypointId);
+    return doDelete("Route - Update Routed Waypoint to Pending", spec, url);
   }
 
-  public List<Waypoint> updateWaypointToPending(List<Waypoint> request) {
-    final Response response = updateWaypointToPendingAndGetRawResponse(request);
-    response.then().contentType(ContentType.JSON);
-    if (response.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
+  public void updateWaypointToPending(long waypointId) {
+    final Response response = updateWaypointToPendingAndGetRawResponse(waypointId);
+    if (response.statusCode() != HttpConstants.RESPONSE_204_NO_CONTENT) {
       throw new NvTestHttpException("unexpected http status: " + response.statusCode());
     }
-    return fromJsonSnakeCaseToList(response.getBody().asString(), Waypoint.class);
   }
 
   public Response addReservationToRouteAndGetRawResponse(long routeId, long reservationId,
@@ -245,24 +237,6 @@ public class RouteClient extends SimpleApiClient {
     RequestSpecification spec = createAuthenticatedRequest()
         .body(request);
     return doPut("Core - Bulk Add Reservation to Route", spec, url);
-  }
-
-  public Response zonalRoutingEditRouteAndGetRawResponse(List<RouteRequest> request) {
-    String url = "core/routes";
-    String json = toJson(request);
-    RequestSpecification spec = createAuthenticatedRequest()
-        .body(json);
-    return doPut("Core - Zonal Routing Edit Route", spec, url);
-  }
-
-  public List<RouteResponse> zonalRoutingEditRoute(List<RouteRequest> request) {
-    Response r = zonalRoutingEditRouteAndGetRawResponse(request);
-    r.then().contentType(ContentType.JSON);
-    if (r.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
-      throw new NvTestHttpException("unexpected http status: " + r.statusCode());
-    }
-    return fromJsonToList(r.body().asString(),
-        RouteResponse.class);
   }
 
   public List<RouteResponse> getUnarchivedRouteDetailsByDriverId(long driverId) {
@@ -578,19 +552,22 @@ public class RouteClient extends SimpleApiClient {
     doDelete("API Route - Delete Coverage", requestSpecification, url);
   }
 
-  public Response parcelRouteTransferAndGetRawResponse(ParcelRouteTransferRequest request) {
-    String url = "core/2.0/routes-orders-transfers";
-    RequestSpecification requestSpecification = createAuthenticatedRequest()
+  public Response parcelRouteTransferAndGetRawResponse(long routeId,
+      List<String> request) {
+    String url = "route-v2/routes/{routeId}/tracking-ids?transfer=true";
+    RequestSpecification requestSpecification = createAuthenticatedRequest().pathParam("routeId",
+            routeId)
         .body(toJsonSnakeCase(request));
-    return doPost("Parcel Route Transfer", requestSpecification, url);
+    return doPut("Parcel Route Transfer", requestSpecification, url);
   }
 
-  public ParcelRouteTransferResponse parcelRouteTransfer(ParcelRouteTransferRequest request) {
-    Response response = parcelRouteTransferAndGetRawResponse(request);
+  public ParcelRouteTransferResponse parcelRouteTransfer(long routeId,
+      List<String> request) {
+    Response response = parcelRouteTransferAndGetRawResponse(routeId, request);
     if (response.statusCode() != HttpConstants.RESPONSE_200_SUCCESS) {
       throw new NvTestHttpException("unexpected http status: " + response.statusCode());
     }
-    return fromJsonSnakeCase(response.body().asString(), ParcelRouteTransferResponse.class);
+    return fromJsonCamelCase(response.body().asString(), ParcelRouteTransferResponse.class);
   }
 
   public RouteResponse getRouteDetails(long routeId) {
@@ -814,6 +791,25 @@ public class RouteClient extends SimpleApiClient {
     Response response = doPut("Route-v2 Add Order to Route", spec, url);
     if (response.statusCode() != HttpConstants.RESPONSE_204_NO_CONTENT) {
       throw new NvTestHttpException("unexpected http status: " + response.statusCode());
+    }
+  }
+
+  public void failToAddOrderToRoute(Long routeId, Long orderId,
+      String transactionType, String routeSource, int errorStatusCode) {
+    String url = "route-v2/routes/{routeId}/orders/{orderId}";
+
+    RequestSpecification spec = createAuthenticatedRequest()
+        .pathParam("routeId", routeId)
+        .pathParam("orderId", orderId)
+        .queryParam("transaction_type", transactionType)
+        .queryParam("route_source", routeSource);
+
+    Response response = doPut("Route-v2 Add Order to Route", spec, url);
+
+    if (response.statusCode() != errorStatusCode) {
+      throw new NvTestHttpException(
+          String.format("Expected http status: %s, but got: %s instead",
+              errorStatusCode, response.statusCode()));
     }
   }
 
