@@ -769,13 +769,26 @@ public class RouteClient extends SimpleApiClient {
     return r;
   }
 
-  public void updateRoutesAndWaypointsFromZonalRouting(
+  public Response updateRoutesAndWaypointsFromZonalRoutingAndGetRawResponse(
       List<UpdateRoutesAndWaypointsRequest> request) {
     String url = "route-v2/routes/zonal";
     RequestSpecification requestSpecification = createAuthenticatedRequest()
         .body(toJsonSnakeCase(request));
-    Response response = doPut("Route-v2 Update Routes and Waypoints", requestSpecification, url);
+    return doPut("Route-v2 Update Routes and Waypoints", requestSpecification, url);
+  }
+
+  public void updateRoutesAndWaypointsFromZonalRouting(
+      List<UpdateRoutesAndWaypointsRequest> request) {
+    Response response = updateRoutesAndWaypointsFromZonalRoutingAndGetRawResponse(request);
     if (response.statusCode() != HttpConstants.RESPONSE_204_NO_CONTENT) {
+      throw new NvTestHttpException("unexpected http status: " + response.statusCode());
+    }
+  }
+
+  public void failUpdateRoutesAndWaypointsFromZonalRouting(
+      List<UpdateRoutesAndWaypointsRequest> request) {
+    Response response = updateRoutesAndWaypointsFromZonalRoutingAndGetRawResponse(request);
+    if (response.statusCode() == HttpConstants.RESPONSE_204_NO_CONTENT) {
       throw new NvTestHttpException("unexpected http status: " + response.statusCode());
     }
   }
