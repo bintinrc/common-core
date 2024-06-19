@@ -2,10 +2,11 @@
 
 ## [1.5.4] 2024-05-28
 
-New Step `API Core - evict driver's cod limit cache:`
-New Step `DB Core - Operator verify total orders under the batch_id: {string} is {int}`
-Remove legacy shipper id on reservation
-New fields on `edit_delivery_order/ParcelJob` bean
+- New Step `API Core - evict driver's cod limit cache:`
+- New Step `DB Core - Operator verify total orders under the batch_id: {string} is {int}`
+- Remove legacy shipper id on reservation
+- New fields on `edit_delivery_order/ParcelJob` bean
+- New Step `API Route - Operator Fails to Edit Route Waypoint on Zonal Routing Edit Route:`
 
 <hr>
 
