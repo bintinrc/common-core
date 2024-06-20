@@ -4,7 +4,6 @@ import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.exception.NvTestCoreTransactionStatusMismatchException;
 import co.nvqa.common.core.hibernate.BlobsDao;
 import co.nvqa.common.core.hibernate.CodCollectionDao;
-import co.nvqa.common.core.hibernate.CodInboundsDao;
 import co.nvqa.common.core.hibernate.InboundScansDao;
 import co.nvqa.common.core.hibernate.OrderDao;
 import co.nvqa.common.core.hibernate.OrderDeliveryDetailsDao;
@@ -26,7 +25,6 @@ import co.nvqa.common.core.hibernate.WaypointsDao;
 import co.nvqa.common.core.model.order.Order;
 import co.nvqa.common.core.model.order.Order.Transaction;
 import co.nvqa.common.core.model.persisted_class.core.CodCollections;
-import co.nvqa.common.core.model.persisted_class.core.CodInbounds;
 import co.nvqa.common.core.model.persisted_class.core.InboundScans;
 import co.nvqa.common.core.model.persisted_class.core.OrderDeliveryVerifications;
 import co.nvqa.common.core.model.persisted_class.core.OrderDetails;
@@ -81,8 +79,6 @@ public class DbCoreSteps extends CoreStandardSteps {
   private WarehouseSweepsDao warehouseSweepsDao;
   @Inject
   private OutboundScansDao outboundScansDao;
-  @Inject
-  private CodInboundsDao codInboundsDao;
   @Inject
   private OrderTagsDao orderTagsDao;
   @Inject
@@ -495,36 +491,6 @@ public class DbCoreSteps extends CoreStandardSteps {
           .as("outbound_scans record was not found: " + dataTableRaw).isNotNull();
       expected.compareWithActual(actual, resolvedData);
     }, "Verify record in outbound_scans table", 2000, 10);
-  }
-
-  @Then("DB Core - verify cod_inbounds record:")
-  public void verifyCodInboundsData(Map<String, String> dataTableRaw) {
-    Map<String, String> resolvedData = resolveKeyValues(dataTableRaw);
-    CodInbounds expected = new CodInbounds(resolvedData);
-    doWithRetry(() -> {
-      CodInbounds actual = null;
-      if (expected.getRouteId() != null) {
-        actual = codInboundsDao.getCodInboundsByRouteId(expected.getRouteId());
-      }
-      Assertions.assertThat(actual)
-          .as("cod_inbounds record was not found: " + dataTableRaw).isNotNull();
-      expected.compareWithActual(actual, resolvedData);
-    }, "Verify records in cod_inbounds table");
-  }
-
-  @Then("DB Core - verify cod_inbounds record is deleted:")
-  public void dbOperatorVerifyTheNewCodSoftDeleted(Map<String, String> dataTableRaw) {
-    Map<String, String> resolvedData = resolveKeyValues(dataTableRaw);
-    CodInbounds expected = new CodInbounds(resolvedData);
-    doWithRetry(() -> {
-      CodInbounds actual = null;
-      if (expected.getRouteId() != null) {
-        actual = codInboundsDao.getDeletedCodInboundsByRouteId(expected.getRouteId());
-      }
-      Assertions.assertThat(actual.getDeletedAt())
-          .as("cod_inbounds record was not deleted: " + dataTableRaw)
-          .isNotNull();
-    }, "Operator verify the COD for created route is soft deleted");
   }
 
   @When("DB Core - verify orders from {string} records are hard-deleted in waypoints table:")
