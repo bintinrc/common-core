@@ -18,4 +18,7 @@ public class ParcelJob {
   private int deliveryTimewindow;
   private Stamp stamp;
   private double insurance;
+  private String deliveryInstruction;
+  private String orderInstruction;
+  private String pickupInstruction;
 }

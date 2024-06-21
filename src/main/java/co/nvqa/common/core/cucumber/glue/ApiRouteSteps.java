@@ -878,6 +878,18 @@ public class ApiRouteSteps extends CoreStandardSteps {
         "Route V2 - Zonal Routing Update Route");
   }
 
+  @When("API Route - Operator Fails to Edit Route Waypoint on Zonal Routing Edit Route:")
+  public void routev2OperatorFailsToEditRouteWaypointOnZonalRoutingPage(List<String> requestData) {
+    List<String> resolvedData = resolveValues(requestData);
+    List<UpdateRoutesAndWaypointsRequest> request = resolvedData.stream()
+        .map(data -> fromJsonSnakeCase(data, UpdateRoutesAndWaypointsRequest.class))
+        .collect(Collectors.toList());
+
+    doWithRetry(
+        () -> getRouteClient().failUpdateRoutesAndWaypointsFromZonalRouting(request),
+        "(expected fail) Route V2 - Zonal Routing Update Route");
+  }
+
   @Given("API Route - Operator add parcel to the route using data below:")
   public void routev2ApiOperatorAddParcelToTheRouteUsingDataBelow(
       Map<String, String> dataTableAsMap) {
