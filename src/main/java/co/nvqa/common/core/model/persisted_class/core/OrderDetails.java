@@ -49,7 +49,7 @@ public class OrderDetails extends DataEntity<OrderDetails> {
 
   // example: {"insurance_currency":"SGD","cod_currency":"SGD"}
   @Column(name = "metadata")
-  private String metaData;
+  private String metadata;
 
   public OrderDetails(Map<String, ?> data) {
     fromMap(data);
