@@ -7,6 +7,7 @@
 - Remove legacy shipper id on reservation
 - New fields on `edit_delivery_order/ParcelJob` bean
 - New Step `API Route - Operator Fails to Edit Route Waypoint on Zonal Routing Edit Route:`
+- Deprecate `core.waypoints` table and redirect existing DB steps to `route.waypoints` table
 
 <hr>
 
