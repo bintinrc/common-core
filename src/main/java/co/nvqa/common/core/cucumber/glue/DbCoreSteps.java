@@ -41,7 +41,7 @@ import co.nvqa.common.core.model.persisted_class.core.ShipperPickupSearch;
 import co.nvqa.common.core.model.persisted_class.core.TransactionFailureReasons;
 import co.nvqa.common.core.model.persisted_class.core.Transactions;
 import co.nvqa.common.core.model.persisted_class.core.WarehouseSweeps;
-import co.nvqa.common.core.model.persisted_class.core.Waypoints;
+import co.nvqa.common.core.model.persisted_class.route.Waypoints;
 import co.nvqa.common.model.DataEntity;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
