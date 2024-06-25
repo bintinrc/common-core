@@ -152,15 +152,6 @@ public class DbCoreSteps extends CoreStandardSteps {
     }, "Validating verified Zone Type value is as expected", 2000, 3);
   }
 
-  @Then("DB Core - operator get waypoints details for {string}")
-  public void dbCoreGetWaypointDetails(String waypointId) {
-    Long resolvedWayPointIdKey = Long.parseLong(resolveValue(waypointId));
-    doWithRetry(() -> {
-      Waypoints result = waypointsDao.getWaypointsDetails(resolvedWayPointIdKey);
-      put(KEY_CORE_WAYPOINT_DETAILS, result);
-    }, "get core waypoint details", 2000, 3);
-  }
-
   @Then("DB Core - verifies that latitude is equal to {string} and longitude is equal to {string} and for waypointId {string}")
   public void dbCoreVerifiesLatLong(String expectedLatitude, String expectedLongitude,
       String waypointId) {
@@ -491,11 +482,6 @@ public class DbCoreSteps extends CoreStandardSteps {
           .as("outbound_scans record was not found: " + dataTableRaw).isNotNull();
       expected.compareWithActual(actual, resolvedData);
     }, "Verify record in outbound_scans table", 2000, 10);
-  }
-
-  @When("DB Core - verify orders from {string} records are hard-deleted in waypoints table:")
-  public void verifyOrdersWaypointsAreHardDeleted(String listKey, List<String> orderIds) {
-    resolveValues(orderIds).forEach(id -> verifyOrderWaypointsAreHardDeleted(id, listKey));
   }
 
   @When("DB Core - verify {value} order from {string} records are hard-deleted in waypoints table")

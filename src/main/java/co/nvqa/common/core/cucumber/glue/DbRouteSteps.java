@@ -3,6 +3,7 @@ package co.nvqa.common.core.cucumber.glue;
 import co.nvqa.common.core.cucumber.CoreStandardSteps;
 import co.nvqa.common.core.exception.NvTestCoreJobWaypointKafkaLagException;
 import co.nvqa.common.core.hibernate.RouteDbDao;
+import co.nvqa.common.core.model.persisted_class.core.Orders;
 import co.nvqa.common.core.model.persisted_class.route.AreaVariation;
 import co.nvqa.common.core.model.persisted_class.route.Coverage;
 import co.nvqa.common.core.model.persisted_class.route.JobWaypoint;
@@ -345,5 +346,18 @@ public class DbRouteSteps extends CoreStandardSteps {
       Waypoints result = routeDbDao.getWaypointsDetails(resolvedWayPointIdKey);
       put(KEY_ROUTE_WAYPOINT_DETAILS, result);
     }, "get route waypoint details", 2000, 3);
+  }
+
+  @And("DB Route - verify waypoints records are hard-deleted")
+  public void verifyWaypointsAreHardDeleted(List<String> data) {
+    List<String> resolvedData = resolveValues(data);
+    doWithRetry(() ->
+            resolvedData.forEach(e -> {
+              Waypoints actual = routeDbDao.getWaypointsDetails(Long.parseLong(e));
+              Assertions.assertThat(actual)
+                  .as("waypoints records were hard-deleted: %s", actual)
+                  .isNull();
+            })
+        , "verify waypoints records", 10_000, 3);
   }
 }
